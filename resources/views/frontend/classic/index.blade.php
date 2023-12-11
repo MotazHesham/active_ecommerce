@@ -1,6 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('content')
+    @php $lang = get_system_language()->code;  @endphp
     <!-- Sliders -->
     <div class="home-banner-area mb-3" style="">
         <div class="container">
@@ -14,7 +15,7 @@
                     @if (get_setting('home_slider_images') != null)
                         <div class="aiz-carousel dots-inside-bottom" data-autoplay="true" data-infinite="true">
                             @php
-                                $decoded_slider_images = json_decode(get_setting('home_slider_images'), true);
+                                $decoded_slider_images = json_decode(get_setting('home_slider_images', null, $lang), true);
                                 $sliders = get_slider_images($decoded_slider_images);
                             @endphp
                             @foreach ($sliders as $key => $slider)
@@ -179,7 +180,7 @@
                             $category_name = $category->getTranslation('name');
                         @endphp
                             <div class="col-xl-4 col-md-6 border-left border-bottom py-3 py-md-2rem">
-                                <div class="d-sm-flex">
+                                <div class="d-sm-flex text-center text-sm-left">
                                     <div class="mb-3">
                                         <img src="{{ isset($category->bannerImage->file_name) ? my_asset($category->bannerImage->file_name) : static_asset('assets/img/placeholder.jpg') }}"
                                             class="lazyload w-150px h-auto mx-auto has-transition"
@@ -237,11 +238,12 @@
     @endif
 
     <!-- Banner section 1 -->
-    @if (get_setting('home_banner1_images') != null)
+    @php $homeBanner1Images = get_setting('home_banner1_images', null, $lang);   @endphp
+    @if ($homeBanner1Images != null)
         <div class="mb-2 mb-md-3 mt-2 mt-md-3">
             <div class="container">
                 @php
-                    $banner_1_imags = json_decode(get_setting('home_banner1_images'));
+                    $banner_1_imags = json_decode($homeBanner1Images);
                     $data_md = count($banner_1_imags) >= 2 ? 2 : 1;
                 @endphp
                 <div class="w-100">
@@ -273,11 +275,12 @@
     </div>
 
     <!-- Banner Section 2 -->
-    @if (get_setting('home_banner2_images') != null)
+    @php $homeBanner2Images = get_setting('home_banner2_images', null, $lang);   @endphp
+    @if ($homeBanner2Images != null)
         <div class="mb-2 mb-md-3 mt-2 mt-md-3">
             <div class="container">
                 @php
-                    $banner_2_imags = json_decode(get_setting('home_banner2_images'));
+                    $banner_2_imags = json_decode($homeBanner2Images);
                     $data_md = count($banner_2_imags) >= 2 ? 2 : 1;
                 @endphp
                 <div class="aiz-carousel gutters-16 overflow-hidden arrow-inactive-none arrow-dark arrow-x-15"
@@ -312,11 +315,12 @@
     </div>
 
     <!-- Banner Section 3 -->
-    @if (get_setting('home_banner3_images') != null)
+    @php $homeBanner3Images = get_setting('home_banner3_images', null, $lang);   @endphp
+    @if ($homeBanner3Images != null)
         <div class="mb-2 mb-md-3 mt-2 mt-md-3">
             <div class="container">
                 @php
-                    $banner_3_imags = json_decode(get_setting('home_banner3_images'));
+                    $banner_3_imags = json_decode($homeBanner3Images);
                     $data_md = count($banner_3_imags) >= 2 ? 2 : 1;
                 @endphp
                 <div class="aiz-carousel gutters-16 overflow-hidden arrow-inactive-none arrow-dark arrow-x-15"
@@ -450,16 +454,20 @@
                         </div>
                     </div>
                     <!-- Banner -->
-                    @if (get_setting('classified_banner_image') != null || get_setting('classified_banner_image_small') != null)
+                    @php
+                        $classifiedBannerImage = get_setting('classified_banner_image', null, $lang);
+                        $classifiedBannerImageSmall = get_setting('classified_banner_image_small', null, $lang);
+                    @endphp
+                    @if ($classifiedBannerImage != null || $classifiedBannerImageSmall != null)
                         <div class="mb-3 overflow-hidden hov-scale-img d-none d-md-block">
                             <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
-                                data-src="{{ uploaded_asset(get_setting('classified_banner_image')) }}"
+                                data-src="{{ uploaded_asset($classifiedBannerImage) }}"
                                 alt="{{ env('APP_NAME') }} promo" class="lazyload img-fit h-100 has-transition"
                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
                         </div>
                         <div class="mb-3 overflow-hidden hov-scale-img d-md-none">
                             <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
-                                data-src="{{ get_setting('classified_banner_image_small') != null ? uploaded_asset(get_setting('classified_banner_image_small')) : uploaded_asset(get_setting('classified_banner_image')) }}"
+                                data-src="{{ $classifiedBannerImageSmall != null ? uploaded_asset($classifiedBannerImageSmall) : uploaded_asset($classifiedBannerImage) }}"
                                 alt="{{ env('APP_NAME') }} promo" class="lazyload img-fit h-100 has-transition"
                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
                         </div>

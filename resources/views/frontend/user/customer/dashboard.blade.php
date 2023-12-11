@@ -2,6 +2,21 @@
 
 @section('panel_content')
 
+    @php
+        $welcomeCoupon = ifUserHasWelcomeCouponAndNotUsed();
+    @endphp
+    @if($welcomeCoupon)
+        <div class="alert alert-primary align-items-center border d-flex flex-wrap justify-content-between" style="border-color: #3490F3 !important;">
+            @php
+                $discount = $welcomeCoupon->discount_type == 'amount' ? single_price($welcomeCoupon->discount) : $welcomeCoupon->discount.'%';
+            @endphp
+            <div class="fw-400 fs-14" style="color: #3490F3 !important;">   
+                {{ translate('Welcome Coupon') }} <strong>{{ $discount }}</strong> {{ translate('Discount on your Purchase Within') }} <strong>{{ $welcomeCoupon->validation_days }}</strong> {{ translate('days of Registration') }}
+            </div>
+            <button class="btn btn-sm mt-3 mt-lg-0 rounded-4" onclick="copyCouponCode('{{ $welcomeCoupon->coupon_code }}')" style="background-color: #3490F3; color: white;" >{{ translate('Copy coupon Code') }}</button>
+        </div>
+    @endif
+
     <div class="row gutters-16">
         <!-- Wallet summary -->
         @if (get_setting('wallet_system') == 1)

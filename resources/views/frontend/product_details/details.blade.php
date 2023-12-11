@@ -126,6 +126,14 @@
                 </button>
             </div>
         @endif
+        <!-- Size guide -->
+        @php
+            $sizeChartId = ($detailedProduct->main_category && $detailedProduct->main_category->sizeChart) ? $detailedProduct->main_category->sizeChart->id : 0;
+            $sizeChartName = ($detailedProduct->main_category && $detailedProduct->main_category->sizeChart) ? $detailedProduct->main_category->sizeChart->name : null;
+        @endphp
+        <div class=" ml-4">
+            <a href="javascript:void(1);" onclick="showSizeChartDetail({{ $sizeChartId }}, '{{ $sizeChartName }}')" class="animate-underline-primary">{{ translate('Show size guide') }}</a>
+        </div>
     </div>
 
     <hr>

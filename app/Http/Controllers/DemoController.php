@@ -54,11 +54,11 @@ class DemoController extends Controller
 
     public function cron_2()
     {
-        if (env('DEMO_MODE') != 'On') {
-            return back();
-        }
-        $this->remove_folder();
-        $this->extract_uploads();
+        // if (env('DEMO_MODE') != 'On') {
+        //     return back();
+        // }
+        // $this->remove_folder();
+        // $this->extract_uploads();
     }
 
 

@@ -19,9 +19,6 @@
                 @endphp
 
                 @foreach ($carts as $key => $cartItem)
-                    @php
-                        $product = get_single_product($cartItem['product_id']);
-                    @endphp
                     @if ($cartItem->coupon_applied == 1)
                         @php
                             $coupon_code = $cartItem->coupon_code;
@@ -31,7 +28,7 @@
                 @endforeach
 
                 @php
-                    $coupon_discount = carts_coupon_discount($coupon_code);
+                    $coupon_discount = $carts->sum('discount');
                 @endphp
             @endif
 

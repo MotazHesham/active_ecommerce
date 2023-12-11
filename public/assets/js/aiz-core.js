@@ -1266,6 +1266,7 @@ $.fn.toggleAttr = function (attr, attr1, attr2) {
                 var slidesDots = $this.data("dots");
                 var slidesRows = $this.data("rows");
                 var slidesAutoplay = $this.data("autoplay");
+                var slidesAutoplaySpeed = $this.data("autoplay-speed");
                 var slidesFade = $this.data("fade");
                 var asNavFor = $this.data("nav-for");
                 var infinite = $this.data("infinite");
@@ -1301,6 +1302,7 @@ $.fn.toggleAttr = function (attr, attr1, attr2) {
                 slidesDots = !slidesDots ? false : slidesDots;
                 slidesRows = !slidesRows ? 1 : slidesRows;
                 slidesAutoplay = !slidesAutoplay ? false : slidesAutoplay;
+                slidesAutoplaySpeed = !slidesAutoplaySpeed ? '5000' : slidesAutoplaySpeed;
                 slidesFade = !slidesFade ? false : slidesFade;
                 asNavFor = !asNavFor ? null : asNavFor;
                 infinite = !infinite ? false : infinite;
@@ -1318,6 +1320,7 @@ $.fn.toggleAttr = function (attr, attr1, attr2) {
                 $this.slick({
                     slidesToShow: slidesPerView,
                     autoplay: slidesAutoplay,
+                    autoplaySpeed: slidesAutoplaySpeed,
                     dots: slidesDots,
                     arrows: slidesArrows,
                     infinite: infinite,

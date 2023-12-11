@@ -247,6 +247,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Size chart show Modal -->
+    @include('modals.size_chart_show_modal')
 @endsection
 
 @section('script')
@@ -367,6 +370,25 @@
             @else
                 $('#login_modal').modal('show');
             @endif
+        }
+
+        function showSizeChartDetail(id, name){
+            $('#size-chart-show-modal .modal-title').html('');
+            $('#size-chart-show-modal .modal-body').html('');
+            if (id == 0) {
+                AIZ.plugins.notify('warning', '{{ translate("Sorry, There is no size guide found for this product.") }}');
+                return false;
+            }
+            $.ajax({
+                type: "GET",
+                url: "{{ route('size-charts-show', '') }}/"+id,
+                data: {},
+                success: function(data) {
+                    $('#size-chart-show-modal .modal-title').html(name);
+                    $('#size-chart-show-modal .modal-body').html(data);
+                    $('#size-chart-show-modal').modal('show');
+                }
+            });
         }
     </script>
 @endsection

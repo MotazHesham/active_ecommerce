@@ -29,6 +29,8 @@
                                     <option value="product_base" selected>{{translate('For Products')}}</option>
                                 @elseif ($coupon->type == "cart_base")
                                     <option value="cart_base">{{translate('For Total Orders')}}</option>
+                                @elseif ($coupon->type == "welcome_base")
+                                    <option value="welcome_base">{{translate('Welcome Coupon')}}</option>
                                 @endif
                             </select>
                         </div>

@@ -46,6 +46,7 @@ use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\SizeChartController;
 
 /*
   |--------------------------------------------------------------------------
@@ -165,6 +166,8 @@ Route::post('/language', [LanguageController::class, 'changeLanguage'])->name('l
 // Currency Switch
 Route::post('/currency', [CurrencyController::class, 'changeCurrency'])->name('currency.change');
 
+// Size Chart Show
+Route::get('/size-charts-show/{id}', [SizeChartController::class, 'show'])->name('size-charts-show');
 
 Route::get('/sitemap.xml', function () {
     return base_path('sitemap.xml');

@@ -45,6 +45,7 @@ class ForgotPasswordController extends Controller
      */
     public function sendResetLinkEmail(Request $request)
     {
+        
         $phone = "+{$request['country_code']}{$request['phone']}";
         if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
             $user = User::where('email', $request->email)->first();
@@ -59,7 +60,7 @@ class ForgotPasswordController extends Controller
 
                 Mail::to($user->email)->queue(new SecondEmailVerifyMailManager($array));
 
-                return view('auth.passwords.reset');
+                return view('auth.'.get_setting('authentication_layout_select').'.reset_password');
             }
             else {
                 flash(translate('No account exists with this email'))->error();
@@ -72,7 +73,7 @@ class ForgotPasswordController extends Controller
                 $user->verification_code = rand(100000,999999);
                 $user->save();
                 SmsUtility::password_reset($user);
-                return view('otp_systems.frontend.auth.passwords.reset_with_phone');
+                return view('otp_systems.frontend.auth.'.get_setting('authentication_layout_select').'.reset_with_phone');
             }
             else {
                 flash(translate('No account exists with this phone number'))->error();

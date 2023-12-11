@@ -154,6 +154,21 @@
 			<!-- tab content -->
 			<div class="flex-grow-1 p-sm-3 p-lg-2rem mb-2rem mb-md-0">
 				<div class="tab-content">
+					
+					<!-- Language Bar -->
+					<ul class="nav nav-tabs nav-fill border-light language-bar">
+						@foreach (get_all_active_language() as $key => $language)
+							<li class="nav-item">
+								<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+									href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
+									<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
+										height="11" class="mr-1">
+									<span>{{ $language->name }}</span>
+								</a>
+							</li>
+						@endforeach
+					</ul>
+
 					<!-- Home Slider -->
 					<div class="tab-pane fade" id="home_slider" role="tabpanel" aria-labelledby="home-slider-tab">
 						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
@@ -177,13 +192,9 @@
 										</div>
 									</div>
 
-									<input type="hidden" name="types[]" value="home_slider_images">
-									<input type="hidden" name="types[]" value="home_slider_links">
-									
-									<!-- Images & links -->
 									<!-- Images & links -->
 									<div class="home-slider-target">
-										@php $home_slider_images = get_setting('home_slider_images')  @endphp
+										@php $home_slider_images = get_setting('home_slider_images', null, $lang)  @endphp
 										@if ($home_slider_images != null)
 											@foreach (json_decode($home_slider_images, true) as $key => $value)
 												<div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
@@ -196,7 +207,7 @@
 																		<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 																	</div>
 																	<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-																	<input type="hidden" name="types[]" value="home_slider_images">
+																	<input type="hidden" name="types[][{{ $lang }}]" value="home_slider_images">
 																	<input type="hidden" name="home_slider_images[]" class="selected-files" value="{{ json_decode($home_slider_images, true)[$key] }}">
 																</div>
 																<div class="file-preview box sm">
@@ -241,7 +252,7 @@
 																	<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 																</div>
 																<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-																<input type="hidden" name="types[]" value="home_slider_images">
+																<input type="hidden" name="types[][{{ $lang }}]" value="home_slider_images">
 																<input type="hidden" name="home_slider_images[]" class="selected-files" value="">
 															</div>
 															<div class="file-preview box sm">
@@ -390,8 +401,8 @@
 														<div class="input-group-text bg-soft-secondary">{{ translate('Browse') }}</div>
 													</div>
 													<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-													<input type="hidden" name="types[]" value="todays_deal_banner">
-													<input type="hidden" name="todays_deal_banner" value="{{ get_setting('todays_deal_banner') }}" class="selected-files">
+													<input type="hidden" name="types[][{{ $lang }}]" value="todays_deal_banner">
+													<input type="hidden" name="todays_deal_banner" value="{{ get_setting('todays_deal_banner', null, $lang) }}" class="selected-files">
 												</div>
 												<div class="file-preview box"></div>
 											</div>
@@ -404,8 +415,8 @@
 														<div class="input-group-text bg-soft-secondary">{{ translate('Browse') }}</div>
 													</div>
 													<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-													<input type="hidden" name="types[]" value="todays_deal_banner_small">
-													<input type="hidden" name="todays_deal_banner_small" value="{{ get_setting('todays_deal_banner_small') }}" class="selected-files">
+													<input type="hidden" name="types[][{{ $lang }}]" value="todays_deal_banner_small">
+													<input type="hidden" name="todays_deal_banner_small" value="{{ get_setting('todays_deal_banner_small', null, $lang) }}" class="selected-files">
 												</div>
 												<div class="file-preview box"></div>
 											</div>
@@ -463,11 +474,9 @@
 								<div class="w-100">
 									<label class="col-from-label fs-13 fw-500 mb-3">{{ translate('Banner & Links (Max 3)') }}</label>
 									
-									<input type="hidden" name="types[]" value="home_banner1_images">
-									<input type="hidden" name="types[]" value="home_banner1_links">
 									<!-- Images & links -->
 									<div class="home-banner1-target">
-										@php $home_banner1_images = get_setting('home_banner1_images'); @endphp
+										@php $home_banner1_images = get_setting('home_banner1_images', null, $lang); @endphp
 										@if ($home_banner1_images != null)
 											@foreach (json_decode($home_banner1_images, true) as $key => $value)
 												<div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
@@ -480,7 +489,7 @@
 																		<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 																	</div>
 																	<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-																	<input type="hidden" name="types[]" value="home_banner1_images">
+																	<input type="hidden" name="types[][{{ $lang }}]" value="home_banner1_images">
 																	<input type="hidden" name="home_banner1_images[]" class="selected-files" value="{{ json_decode($home_banner1_images, true)[$key] }}">
 																</div>
 																<div class="file-preview box sm">
@@ -525,7 +534,7 @@
 																	<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 																</div>
 																<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-																<input type="hidden" name="types[]" value="home_banner1_images">
+																<input type="hidden" name="types[][{{ $lang }}]" value="home_banner1_images">
 																<input type="hidden" name="home_banner1_images[]" class="selected-files" value="">
 															</div>
 															<div class="file-preview box sm">
@@ -572,11 +581,9 @@
 								<div class="w-100">
 									<label class="col-from-label fs-13 fw-500 mb-3">{{ translate('Banner & Links (Max 3)') }}</label>
 									
-									<input type="hidden" name="types[]" value="home_banner2_images">
-									<input type="hidden" name="types[]" value="home_banner2_links">
 									<!-- Images & links -->
 									<div class="home-banner2-target">
-										@php $home_banner2_images = get_setting('home_banner2_images'); @endphp
+										@php $home_banner2_images = get_setting('home_banner2_images', null, $lang); @endphp
 										@if ($home_banner2_images != null)
 											@foreach (json_decode($home_banner2_images, true) as $key => $value)
 												<div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
@@ -589,7 +596,7 @@
 																		<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 																	</div>
 																	<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-																	<input type="hidden" name="types[]" value="home_banner2_images">
+																	<input type="hidden" name="types[][{{ $lang }}]" value="home_banner2_images">
 																	<input type="hidden" name="home_banner2_images[]" class="selected-files" value="{{ json_decode($home_banner2_images, true)[$key] }}">
 																</div>
 																<div class="file-preview box sm">
@@ -634,7 +641,7 @@
 																	<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 																</div>
 																<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-																<input type="hidden" name="types[]" value="home_banner2_images">
+																<input type="hidden" name="types[][{{ $lang }}]" value="home_banner2_images">
 																<input type="hidden" name="home_banner2_images[]" class="selected-files" value="">
 															</div>
 															<div class="file-preview box sm">
@@ -681,11 +688,9 @@
 								<div class="w-100">
 									<label class="col-from-label fs-13 fw-500 mb-3">{{ translate('Banner & Links (Max 3)') }}</label>
 									
-									<input type="hidden" name="types[]" value="home_banner3_images">
-									<input type="hidden" name="types[]" value="home_banner3_links">
 									<!-- Images & links -->
 									<div class="home-banner3-target">
-										@php $home_banner3_images = get_setting('home_banner3_images'); @endphp
+										@php $home_banner3_images = get_setting('home_banner3_images', null, $lang); @endphp
 										@if ($home_banner3_images != null)
 											@foreach (json_decode($home_banner3_images, true) as $key => $value)
 												<div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
@@ -698,7 +703,7 @@
 																		<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 																	</div>
 																	<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-																	<input type="hidden" name="types[]" value="home_banner3_images">
+																	<input type="hidden" name="types[][{{ $lang }}]" value="home_banner3_images">
 																	<input type="hidden" name="home_banner3_images[]" class="selected-files" value="{{ json_decode($home_banner3_images, true)[$key] }}">
 																</div>
 																<div class="file-preview box sm">
@@ -743,7 +748,7 @@
 																	<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 																</div>
 																<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-																<input type="hidden" name="types[]" value="home_banner3_images">
+																<input type="hidden" name="types[][{{ $lang }}]" value="home_banner3_images">
 																<input type="hidden" name="home_banner3_images[]" class="selected-files" value="">
 															</div>
 															<div class="file-preview box sm">
@@ -797,8 +802,8 @@
 												<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 											</div>
 											<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-											<input type="hidden" name="types[]" value="auction_banner_image">
-											<input type="hidden" name="auction_banner_image" class="selected-files" value="{{ get_setting('auction_banner_image') }}">
+											<input type="hidden" name="types[][{{ $lang }}]" value="auction_banner_image">
+											<input type="hidden" name="auction_banner_image" class="selected-files" value="{{ get_setting('auction_banner_image', null, $lang) }}">
 										</div>
 										<div class="file-preview box sm">
 										</div>
@@ -833,8 +838,8 @@
 															<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 														</div>
 														<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-														<input type="hidden" name="types[]" value="coupon_background_image">
-														<input type="hidden" name="coupon_background_image" class="selected-files" value="{{ get_setting('coupon_background_image') }}">
+														<input type="hidden" name="types[][{{ $lang }}]" value="coupon_background_image">
+														<input type="hidden" name="coupon_background_image" class="selected-files" value="{{ get_setting('coupon_background_image', null, $lang) }}">
 													</div>
 													<div class="file-preview box sm">
 													</div>
@@ -862,16 +867,16 @@
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label class="col-from-label fs-13 fw-500">{{ translate('Title') }}</label>
-												<input type="hidden" name="types[]" value="cupon_title">
-												<input type="text" class="form-control" placeholder="{{ translate('Title') }}" name="cupon_title" value="{{ get_setting('cupon_title') }}">
+												<input type="hidden" name="types[][{{ $lang }}]" value="cupon_title">
+												<input type="text" class="form-control" placeholder="{{ translate('Title') }}" name="cupon_title" value="{{ get_setting('cupon_title', null, $lang) }}">
 											</div>
 										</div>
 										<!-- Subtitle -->
 										<div class="col-12">
 											<div class="form-group">
 												<label class="col-from-label fs-13 fw-500">{{ translate('Subtitle') }}</label>
-												<input type="hidden" name="types[]" value="cupon_subtitle">
-												<input type="text" class="form-control" placeholder="{{ translate('Subtitle') }}" name="cupon_subtitle" value="{{ get_setting('cupon_subtitle') }}">
+												<input type="hidden" name="types[][{{ $lang }}]" value="cupon_subtitle">
+												<input type="text" class="form-control" placeholder="{{ translate('Subtitle') }}" name="cupon_subtitle" value="{{ get_setting('cupon_subtitle', null, $lang) }}">
 											</div>
 										</div>
 									</div>
@@ -982,8 +987,8 @@
 													<div class="input-group-text bg-soft-secondary">{{ translate('Browse') }}</div>
 												</div>
 												<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-												<input type="hidden" name="types[]" value="classified_banner_image">
-												<input type="hidden" name="classified_banner_image" value="{{ get_setting('classified_banner_image') }}" class="selected-files">
+												<input type="hidden" name="types[][{{ $lang }}]" value="classified_banner_image">
+												<input type="hidden" name="classified_banner_image" value="{{ get_setting('classified_banner_image', null, $lang) }}" class="selected-files">
 											</div>
 											<div class="file-preview box"></div>
 										</div>
@@ -997,8 +1002,8 @@
 													<div class="input-group-text bg-soft-secondary">{{ translate('Browse') }}</div>
 												</div>
 												<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-												<input type="hidden" name="types[]" value="classified_banner_image_small">
-												<input type="hidden" name="classified_banner_image_small" value="{{ get_setting('classified_banner_image_small') }}" class="selected-files">
+												<input type="hidden" name="types[][{{ $lang }}]" value="classified_banner_image_small">
+												<input type="hidden" name="classified_banner_image_small" value="{{ get_setting('classified_banner_image_small', null, $lang) }}" class="selected-files">
 											</div>
 											<div class="file-preview box"></div>
 										</div>

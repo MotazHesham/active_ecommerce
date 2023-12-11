@@ -114,6 +114,9 @@ class CouponController extends Controller
         elseif($request->coupon_type == "cart_base"){
             return view('partials.coupons.cart_base_coupon');
         }
+        elseif($request->coupon_type == "welcome_base"){
+            return view('partials.coupons.welcome_base_coupon');
+        }
     }
 
     public function get_coupon_form_edit(Request $request)
@@ -128,6 +131,20 @@ class CouponController extends Controller
             $coupon = Coupon::findOrFail($request->id);
             return view('partials.coupons.cart_base_coupon_edit',compact('coupon'));
         }
+        elseif($request->coupon_type == "welcome_base"){
+            $coupon = Coupon::findOrFail($request->id);
+            return view('partials.coupons.welcome_base_coupon_edit',compact('coupon'));
+        }
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $coupon = Coupon::findOrFail($request->id);
+        $coupon->status = $request->status;
+        if ($coupon->save()) {
+            return 1;
+        }
+        return 0;
     }
 
 }

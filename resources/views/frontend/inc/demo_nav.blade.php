@@ -96,6 +96,15 @@
                     </div>
                     <p class="demo-title">{{ translate('Furniture Store') }}</p>
                 </div>
+                <!-- Medical Store -->
+                <div class="col-md-6 my-3">
+                    <div class="demo-img-content">
+                        <a href="https://demo.activeitzone.com/ecommerce-medical/" target="_blank" class="h-100 w-100">
+                            <img src="{{ static_asset('assets/img/demo/demo_thumb_medical.png') }}">
+                        </a>
+                    </div>
+                    <p class="demo-title">{{ translate('Medical Store') }}</p>
+                </div>
                 <!-- Demo content -->
                 <div class="col-md-6 my-3">
                     <div class="demo-img-content">

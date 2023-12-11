@@ -35,7 +35,7 @@
 							</span>
 						</label>
 						<div class="d-flex flex-wrap justify-content-between align-items-center">
-							<span class="fs-14 fw-500 text-dark">{{ translate('Homepage 1 Classic') }}</span>
+							<span class="fs-14 fw-500 text-dark">{{ translate('Homepage 1 - Classic') }}</span>
 							<span>
 								<a href="javascript:void(0);" class="btn btn-xs btn-danger rounded-0" 
 									onclick="imageShowOverlay('{{ static_asset('assets/img/pages/home-classic.png') }}')">{{ translate('View') }}</a>
@@ -53,10 +53,28 @@
 							</span>
 						</label>
 						<div class="d-flex flex-wrap justify-content-between align-items-center">
-							<span class="fs-14 fw-500 text-dark">{{ translate('Homepage 2 Metro') }}</span>
+							<span class="fs-14 fw-500 text-dark">{{ translate('Homepage 2 - Metro') }}</span>
 							<span>
 								<a href="javascript:void(0);" class="btn btn-xs btn-danger rounded-0"
 									onclick="imageShowOverlay('{{ static_asset('assets/img/pages/home-metro.png') }}')">{{ translate('View') }}</a>
+							</span>
+						</div>
+					</div>
+					<!-- Home Minima -->
+					<div class="col-xxl-3 col-lg-4 col-sm-6 my-3">
+						<label class="aiz-megabox d-block mb-3">
+							<input value="minima" type="radio" name="homepage_select" @if(get_setting('homepage_select') == 'minima') checked @endif>
+							<span class="d-block aiz-megabox-elem rounded-0 img-overlay">
+								<div class="h-350px w-100 overflow-hidden">
+									<img src="{{ static_asset('assets/img/pages/home-minima.png') }}" class="w-100" alt="home-page">
+								</div>
+							</span>
+						</label>
+						<div class="d-flex flex-wrap justify-content-between align-items-center">
+							<span class="fs-14 fw-500 text-dark">{{ translate('Homepage 3 - Minima') }}</span>
+							<span>
+								<a href="javascript:void(0);" class="btn btn-xs btn-danger rounded-0"
+									onclick="imageShowOverlay('{{ static_asset('assets/img/pages/home-minima.png') }}')">{{ translate('View') }}</a>
 							</span>
 						</div>
 					</div>
@@ -67,7 +85,7 @@
 							<div class="text-secondary mr-3"><i class="las la-4x la-sliders-h"></i></div>
 							<div>
 								<h4 class="fs-16 text-secondary">{{ translate('Configure your page layout') }}</h4>
-								<small class="fs-12 text-secondary">{{ translate('Each page contain different layout, choose one to bundle it in your theme.') }}</small>
+								<small class="fs-12 text-secondary">{{ translate('Each page contain different layout, choose one to bundle it in your Layout.') }}</small>
 							</div>
 						</div>
 					</div>

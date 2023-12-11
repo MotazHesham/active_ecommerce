@@ -107,6 +107,7 @@
                                                     <option value="{{ $brand->id }}" @selected(old('brand_id') == $brand->id)>{{ $brand->getTranslation('name') }}</option>
                                                     @endforeach
                                                 </select>
+                                                <small class="text-muted">{{translate("You can choose a brand if you'd like to display your product by brand.")}}</small>
                                             </div>
                                         </div>
                                         <!-- Unit -->
@@ -128,6 +129,7 @@
                                             <label class="col-xxl-3 col-from-label fs-13">{{translate('Minimum Purchase Qty')}} <span class="text-danger">*</span></label>
                                             <div class="col-xxl-9">
                                                 <input type="number" lang="en" class="form-control" name="min_qty" value="1" min="1">
+                                                <small class="text-muted">{{translate("The minimum quantity needs to be purchased by your customer.")}}</small>
                                             </div>
                                         </div>
                                         <!-- Tags -->
@@ -208,26 +210,31 @@
                                 <div class="form-group row">
                                     <label class="col-md-3 col-from-label">{{translate('Featured')}}</label>
                                     <div class="col-md-9">
-                                        <label class="aiz-switch aiz-switch-success mb-0">
+                                        <label class="aiz-switch aiz-switch-success mb-0 d-block">
                                             <input type="checkbox" name="featured" value="1">
                                             <span></span>
                                         </label>
+                                        <small class="text-muted">{{ translate('If you enable this, this product will be granted as a featured product.') }}</small>
                                     </div>
                                 </div>
                                 <!-- Todays Deal -->
                                 <div class="form-group row">
                                     <label class="col-md-3 col-from-label">{{translate('Todays Deal')}}</label>
                                     <div class="col-md-9">
-                                        <label class="aiz-switch aiz-switch-success mb-0">
+                                        <label class="aiz-switch aiz-switch-success mb-0 d-block">
                                             <input type="checkbox" name="todays_deal" value="1">
                                             <span></span>
                                         </label>
+                                        <small class="text-muted">{{ translate('If you enable this, this product will be granted as a todays deal product.') }}</small>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Flash Deal -->
-                            <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Flash Deal')}}</h5>
+                            <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                {{translate('Flash Deal')}}
+                                <small class="text-muted">({{ translate('If you want to select this product as a flash deal, you can use it') }})</small>
+                            </h5>
                             <div class="w-100">
                                 <!-- Add To Flash -->
                                 <div class="form-group row">

@@ -37,6 +37,24 @@
             --blue: #3390f3;
             --hov-blue: #1f6dc2;
             --soft-blue: #f1fafd;
+            
+            /* --primary: #009ef7;
+            --hov-primary: #008cdd;
+            --soft-primary: rgb(0, 158, 247, 0.15);
+            --success: #19c553;
+            --hov-success: #16a846;
+            --soft-success:  rgb(25, 197, 83, 0.15);
+            --info: #8f60ee;
+            --hov-info: #714cbd;
+            --soft-info: rgb(143, 96, 238, 0.15);
+            --warning: #ffc700;
+            --soft-warning: rgb(255, 199, 0, 0.15);
+            --danger: #F0416C;
+            --soft-danger: rgb(240, 65, 108, 0.15);
+            
+            --secondary-base: #f1416c;  
+            --hov-secondary-base: #c73459;
+            --soft-secondary-base: rgb(241, 65, 108, 0.15); */
         }
         body {
             font-size: 12px;

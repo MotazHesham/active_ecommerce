@@ -44,11 +44,12 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $lang = get_system_language() ? get_system_language()->code : null;
         $featured_categories = Cache::rememberForever('featured_categories', function () {
             return Category::with('bannerImage')->where('featured', 1)->get();
         });
 
-        return view('frontend.'.get_setting('homepage_select').'.index', compact('featured_categories'));
+        return view('frontend.'.get_setting('homepage_select').'.index', compact('featured_categories','lang'));
         
     }
     
@@ -82,7 +83,8 @@ class HomeController extends Controller
         if (!addon_is_activated('auction')) {
             return;
         }
-        return view('auction.frontend.auction_products_section');
+        $lang = get_system_language() ? get_system_language()->code : null;
+        return view('auction.frontend.'.get_setting('homepage_select').'.auction_products_section', compact('lang'));
     }
 
     public function load_home_categories_section()
@@ -102,11 +104,12 @@ class HomeController extends Controller
         }
 
         if(Route::currentRouteName() == 'seller.login' && get_setting('vendor_system_activation') == 1){
-            return view('frontend.seller_login');
-        }else if(Route::currentRouteName() == 'deliveryboy.login' && addon_is_activated('delivery_boy')){
-            return view('frontend.deliveryboy_login');
+            return view('auth.'.get_setting('authentication_layout_select').'.seller_login');
         }
-        return view('frontend.user_login');
+        else if(Route::currentRouteName() == 'deliveryboy.login' && addon_is_activated('delivery_boy')){
+            return view('auth.'.get_setting('authentication_layout_select').'.deliveryboy_login');
+        }
+        return view('auth.'.get_setting('authentication_layout_select').'.user_login');
     }
 
     public function registration(Request $request)
@@ -130,7 +133,7 @@ class HomeController extends Controller
             } catch (\Exception $e) {
             }
         }
-        return view('frontend.user_registration');
+        return view('auth.'.get_setting('authentication_layout_select').'.user_registration');
     }
 
     public function cart_login(Request $request)
@@ -698,7 +701,6 @@ class HomeController extends Controller
 
     public function reset_password_with_code(Request $request)
     {
-
         if (($user = User::where('email', $request->email)->where('verification_code', $request->code)->first()) != null) {
             if ($request->password == $request->password_confirmation) {
                 $user->password = Hash::make($request->password);
@@ -715,11 +717,11 @@ class HomeController extends Controller
                 return redirect()->route('home');
             } else {
                 flash(translate("Password and confirm password didn't match"))->warning();
-                return view('auth.passwords.reset');
+                return view('auth.'.get_setting('authentication_layout_select').'.reset_password');
             }
         } else {
             flash(translate("Verification code mismatch"))->error();
-            return view('auth.passwords.reset');
+            return view('auth.'.get_setting('authentication_layout_select').'.reset_password');
         }
     }
 

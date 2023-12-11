@@ -29,7 +29,9 @@
                     <th data-breakpoints="lg">{{translate('Type')}}</th>
                     <th data-breakpoints="lg">{{translate('Start Date')}}</th>
                     <th data-breakpoints="lg">{{translate('End Date')}}</th>
-                    <th width="10%">{{translate('Options')}}</th>
+                    <th data-breakpoints="lg">{{translate('Validation Days')}}</th>
+                    <th data-breakpoints="lg">{{translate('Status')}}</th>
+                    <th width="10%" class="text-right">{{translate('Options')}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -40,8 +42,21 @@
                         <td>
                             {{ translate(Str::headline($coupon->type)) }}
                         </td>
-                        <td>{{ date('d-m-Y', $coupon->start_date) }}</td>
-                        <td>{{ date('d-m-Y', $coupon->end_date) }}</td>
+                        <td>{{ $coupon->type != 'welcome_base' ? date('d-m-Y', $coupon->start_date) : '' }}</td>
+                        <td>{{ $coupon->type != 'welcome_base' ? date('d-m-Y', $coupon->end_date) : '' }}</td>
+                        <td>
+                            @if($coupon->type == 'welcome_base')
+                                {{ json_decode($coupon->details)->validation_days }}
+                            @endif
+                        </td>
+                        <td>
+                            @if($coupon->type == 'welcome_base')
+                                <label class="aiz-switch aiz-switch-success mb-0">
+                                    <input onchange="updateCouponStatus(this)" value="{{ $coupon->id }}" type="checkbox" <?php if ($coupon->status == 1) echo "checked"; ?> >
+                                    <span class="slider round"></span>
+                                </label>
+                            @endif
+                        </td>
 						<td class="text-right">
                             @can('edit_coupon')
                                 <a class="btn btn-soft-primary btn-icon btn-circle btn-sm" href="{{route('coupon.edit', encrypt($coupon->id) )}}" title="{{ translate('Edit') }}">
@@ -49,9 +64,11 @@
                                 </a>
                             @endcan
                             @can('delete_coupon')
-                                <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete" data-href="{{route('coupon.destroy', $coupon->id)}}" title="{{ translate('Delete') }}">
-                                    <i class="las la-trash"></i>
-                                </a>
+                                @if($coupon->type != 'welcome_base')
+                                    <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete" data-href="{{route('coupon.destroy', $coupon->id)}}" title="{{ translate('Delete') }}">
+                                        <i class="las la-trash"></i>
+                                    </a>
+                                @endif
                             @endcan
                         </td>
                     </tr>
@@ -65,4 +82,25 @@
 
 @section('modal')
     @include('modals.delete_modal')
+@endsection
+
+@section('script')
+    <script type="text/javascript">
+        function updateCouponStatus(el){
+            if(el.checked){
+                var status = 1;
+            }
+            else{
+                var status = 0;
+            }
+            $.post('{{ route('coupon.update_status') }}', {_token:'{{ csrf_token() }}', id:el.value, status:status}, function(data){
+                if(data == 1){
+                    AIZ.plugins.notify('success', '{{ translate('Coupon Status updated successfully') }}');
+                }
+                else{
+                    AIZ.plugins.notify('danger', '{{ translate('Something went wrong') }}');
+                }
+            });
+        }
+    </script>
 @endsection

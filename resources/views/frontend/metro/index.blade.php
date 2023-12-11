@@ -21,6 +21,8 @@
         }
     </style>
 
+    @php $lang = get_system_language()->code;  @endphp
+
     <!-- Sliders -->
     <div class="home-banner-area mb-3">
         <div class="p-0">
@@ -29,7 +31,7 @@
                 @if (get_setting('home_slider_images') != null)
                     <div class="aiz-carousel dots-inside-bottom mobile-img-auto-height" data-autoplay="true" data-infinite="true">
                         @php
-                            $decoded_slider_images = json_decode(get_setting('home_slider_images'), true);
+                            $decoded_slider_images = json_decode(get_setting('home_slider_images', null, $lang), true);
                             $sliders = get_slider_images($decoded_slider_images);
                         @endphp
                         @foreach ($sliders as $key => $slider)
@@ -66,7 +68,7 @@
                 <div class="d-flex d-lg-none flex-wrap mb-2 mb-md-3 @if ($flash_deal_bg_full_width && $flash_deal_bg != null) pt-2 pt-md-3 @endif align-items-baseline justify-content-between">
                     <!-- Title -->
                     <h3 class="fs-16 fs-md-20 fw-700 mb-2 mb-sm-0">
-                        <span class="d-inline-block {{ $flash_deal_banner_menu_text }}">{{ translate('Flash Sale') }}</span>
+                        <span class="d-inline-block {{ ($flash_deal_bg_full_width && $flash_deal_bg != null) ? $flash_deal_banner_menu_text : 'text-dark'}}">{{ translate('Flash Sale') }}</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="24" viewBox="0 0 16 24"
                             class="ml-3">
                             <path id="Path_28795" data-name="Path 28795"
@@ -78,10 +80,10 @@
                     <div>
                         <div class="text-dark d-flex align-items-center mb-0">
                             <a href="{{ route('flash-deals') }}"
-                                class="fs-10 fs-md-12 fw-700 has-transition {{ $flash_deal_banner_menu_text }} @if (get_setting('flash_deal_banner_menu_text') == 'light') text-white opacity-60 hov-opacity-100 animate-underline-white @else text-reset opacity-60 hov-opacity-100 hov-text-primary animate-underline-primary @endif mr-3">{{ translate('View All Flash Sale') }}</a>
+                                class="fs-10 fs-md-12 fw-700 has-transition @if ((get_setting('flash_deal_banner_menu_text') == 'light') && $flash_deal_bg_full_width && $flash_deal_bg != null) text-white opacity-60 hov-opacity-100 animate-underline-white @else text-reset opacity-60 hov-opacity-100 hov-text-primary animate-underline-primary @endif mr-3">{{ translate('View All Flash Sale') }}</a>
                             <span class=" border-left border-soft-light border-width-2 pl-3">
                                 <a href="{{ route('flash-deal-details', $flash_deal->slug) }}"
-                                    class="fs-10 fs-md-12 fw-700 has-transition {{ $flash_deal_banner_menu_text }} @if (get_setting('flash_deal_banner_menu_text') == 'light') text-white opacity-60 hov-opacity-100 animate-underline-white @else text-reset opacity-60 hov-opacity-100 hov-text-primary animate-underline-primary @endif">{{ translate('View All Products from This Flash Sale') }}</a>
+                                    class="fs-10 fs-md-12 fw-700 has-transition @if ((get_setting('flash_deal_banner_menu_text') == 'light') && $flash_deal_bg_full_width && $flash_deal_bg != null) == 'light') text-white opacity-60 hov-opacity-100 animate-underline-white @else text-reset opacity-60 hov-opacity-100 hov-text-primary animate-underline-primary @endif">{{ translate('View All Products from This Flash Sale') }}</a>
                             </span>
                         </div>
                     </div>
@@ -269,7 +271,7 @@
         <div class="pb-2 pb-md-3 pt-2 pt-md-3" style="background: #f5f5fa;">
             <div class="container mb-2 mb-md-3">
                 @php
-                    $banner_1_imags = json_decode(get_setting('home_banner1_images'));
+                    $banner_1_imags = json_decode(get_setting('home_banner1_images', null, $lang));
                     $data_md = count($banner_1_imags) >= 2 ? 2 : 1;
                 @endphp
                 <div class="w-100">
@@ -305,7 +307,7 @@
         <div class="mb-2 mb-md-3 mt-2 mt-md-3">
             <div class="container">
                 @php
-                    $banner_2_imags = json_decode(get_setting('home_banner2_images'));
+                    $banner_2_imags = json_decode(get_setting('home_banner2_images', null, $lang));
                     $data_md = count($banner_2_imags) >= 2 ? 2 : 1;
                 @endphp
                 <div class="aiz-carousel gutters-16 overflow-hidden arrow-inactive-none arrow-dark arrow-x-15"
@@ -344,7 +346,7 @@
         <div class="mb-2 mb-md-3 mt-2 mt-md-3">
             <div class="container">
                 @php
-                    $banner_3_imags = json_decode(get_setting('home_banner3_images'));
+                    $banner_3_imags = json_decode(get_setting('home_banner3_images', null, $lang));
                     $data_md = count($banner_3_imags) >= 2 ? 2 : 1;
                 @endphp
                 <div class="aiz-carousel gutters-16 overflow-hidden arrow-inactive-none arrow-dark arrow-x-15"
@@ -381,7 +383,7 @@
             style="background-color: {{ get_setting('cupon_background_color', '#292933') }}">
             <div class="container">
                 <div class="position-relative py-5">
-                    <div class="text-center text-xl-left z-5">
+                    <div class="text-center text-xl-left position-relative z-5">
                         <div class="d-lg-flex">
                             <div class="mb-3 mb-lg-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -448,7 +450,7 @@
                         </div>
                     </div>
                     <div class="position-absolute right-0 bottom-0 h-100">
-                        <img class="h-100" src="{{ uploaded_asset(get_setting('coupon_background_image')) }}"
+                        <img class="h-100" src="{{ uploaded_asset(get_setting('coupon_background_image', null, $lang)) }}"
                             onerror="this.onerror=null;this.src='{{ static_asset('assets/img/coupon.svg') }}';"
                             alt="{{ env('APP_NAME') }} promo">
                     </div>
@@ -483,16 +485,20 @@
                         </div>
                     </div>
                     <!-- Banner -->
-                    @if (get_setting('classified_banner_image') != null || get_setting('classified_banner_image_small') != null)
+                    @php
+                        $classifiedBannerImage = get_setting('classified_banner_image', null, $lang);
+                        $classifiedBannerImageSmall = get_setting('classified_banner_image_small', null, $lang);
+                    @endphp
+                    @if ($classifiedBannerImage != null || $classifiedBannerImageSmall != null)
                         <div class="mb-3 overflow-hidden hov-scale-img d-none d-md-block">
                             <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
-                                data-src="{{ uploaded_asset(get_setting('classified_banner_image')) }}"
+                                data-src="{{ uploaded_asset($classifiedBannerImage) }}"
                                 alt="{{ env('APP_NAME') }} promo" class="lazyload img-fit h-100 has-transition"
                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
                         </div>
                         <div class="mb-3 overflow-hidden hov-scale-img d-md-none">
                             <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
-                                data-src="{{ get_setting('classified_banner_image_small') != null ? uploaded_asset(get_setting('classified_banner_image_small')) : uploaded_asset(get_setting('classified_banner_image')) }}"
+                                data-src="{{ $classifiedBannerImageSmall != null ? uploaded_asset($classifiedBannerImageSmall) : uploaded_asset($classifiedBannerImage) }}"
                                 alt="{{ env('APP_NAME') }} promo" class="lazyload img-fit h-100 has-transition"
                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
                         </div>

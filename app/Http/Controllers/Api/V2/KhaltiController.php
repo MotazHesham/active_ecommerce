@@ -12,14 +12,14 @@ class KhaltiController extends Controller
     {
         if ($request->payment_type == 'cart_payment') {
             $combined_order = CombinedOrder::find($request->combined_order_id);
-            $purchase_order_id = $combined_order->id;
+            $purchase_order_id = $combined_order->id . '-' . uniqid();
             $amount = $combined_order->grand_total;
         } elseif ($request->payment_type == 'wallet_payment') {
             $amount = $request->amount;
-            $purchase_order_id = $request->user_id;
+            $purchase_order_id = $request->payment_type . '-' . $amount  . '-' . uniqid();
         } elseif ($request->payment_type == 'seller_package_payment' || $request->payment_type == 'customer_package_payment') {
             $amount = $request->amount;
-            $purchase_order_id = $request->package_id;
+            $purchase_order_id = $request->package_id . '-' . uniqid();
         }
 
         $return_url = route('api.khalti.success'); //must be changed
@@ -55,7 +55,7 @@ class KhaltiController extends Controller
         // Response
         $response = json_decode(curl_exec($ch), true);
         curl_close($ch);
-        
+
         // return response()->json([
         //     "result" => true,
         //     "url" => $response['payment_url']

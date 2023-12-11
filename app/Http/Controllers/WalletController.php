@@ -70,10 +70,16 @@ class WalletController extends Controller
         return redirect()->route('wallet.index');
     }
 
-    public function offline_recharge_request()
+    public function offline_recharge_request(Request $request)
     {
-        $wallets = Wallet::where('offline_payment', 1)->paginate(10);
-        return view('manual_payment_methods.wallet_request', compact('wallets'));
+        $wallets = Wallet::where('offline_payment', 1);
+        $type = null;
+        if ($request->type != null) {
+            $wallets = $wallets->where('approval', $request->type);
+            $type = $request->type;
+        }
+        $wallets = $wallets->paginate(10);
+        return view('manual_payment_methods.wallet_request', compact('wallets', 'type'));
     }
 
     public function updateApproved(Request $request)

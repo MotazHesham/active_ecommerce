@@ -53,6 +53,7 @@ use App\Http\Controllers\ClubPointController;
 use App\Http\Controllers\CommissionController;
 use AizPackages\ColorCodeConverter\Services\ColorCodeConverter;
 use App\Models\FlashDealProduct;
+use App\Models\UserCoupon;
 
 //sensSMS function for OTP
 if (!function_exists('sendSMS')) {
@@ -470,6 +471,7 @@ if (!function_exists('carts_product_discount')) {
     }
 }
 
+// carts coupon discount
 if (!function_exists('carts_coupon_discount')) {
     function carts_coupon_discount($code, $formatted = false)
     {
@@ -479,11 +481,9 @@ if (!function_exists('carts_coupon_discount')) {
             if (strtotime(date('d-m-Y')) >= $coupon->start_date && strtotime(date('d-m-Y')) <= $coupon->end_date) {
                 if (CouponUsage::where('user_id', Auth::user()->id)->where('coupon_id', $coupon->id)->first() == null) {
                     $coupon_details = json_decode($coupon->details);
-
                     $carts = Cart::where('user_id', Auth::user()->id)
                         ->where('owner_id', $coupon->user_id)
                         ->get();
-
                     if ($coupon->type == 'cart_base') {
                         $subtotal = 0;
                         $tax = 0;
@@ -495,7 +495,6 @@ if (!function_exists('carts_coupon_discount')) {
                             $shipping += $cartItem['shipping_cost'];
                         }
                         $sum = $subtotal + $tax + $shipping;
-
                         if ($sum >= $coupon_details->min_buy) {
                             if ($coupon->discount_type == 'percent') {
                                 $coupon_discount = ($sum * $coupon->discount) / 100;
@@ -522,7 +521,6 @@ if (!function_exists('carts_coupon_discount')) {
                     }
                 }
             }
-
             if ($coupon_discount > 0) {
                 Cart::where('user_id', Auth::user()->id)
                     ->where('owner_id', $coupon->user_id)
@@ -542,7 +540,6 @@ if (!function_exists('carts_coupon_discount')) {
                     );
             }
         }
-
         if ($formatted) {
             return format_price(convert_price($coupon_discount));
         } else {
@@ -550,6 +547,7 @@ if (!function_exists('carts_coupon_discount')) {
         }
     }
 }
+
 
 //Shows Price on page based on low to high
 if (!function_exists('home_price')) {
@@ -2220,7 +2218,50 @@ if (!function_exists('get_Affiliate_onfig_value')) {
     }
 }
 
-// get affliate config
+// Welcome Coupon add for user
+if (!function_exists('offerUserWelcomeCoupon')) {
+    function offerUserWelcomeCoupon()
+    {
+        $coupon = Coupon::where('type','welcome_base')->where('status',1)->first();
+        if($coupon){
+            
+            $couponDetails = json_decode($coupon->details);
+            
+            $user_coupon                = new UserCoupon();
+            $user_coupon->user_id       = auth()->user()->id;
+            $user_coupon->coupon_id     = $coupon->id;
+            $user_coupon->coupon_code   = $coupon->code;
+            $user_coupon->min_buy       = $couponDetails->min_buy;
+            $user_coupon->validation_days = $couponDetails->validation_days;
+            $user_coupon->discount      = $coupon->discount;
+            $user_coupon->discount_type = $coupon->discount_type;
+            $user_coupon->expiry_date   = strtotime(date('d-m-Y H:i:s') . ' +' . $couponDetails->validation_days . 'days');
+            $user_coupon->save();
+        }
+    }
+}
+
+// get User Welcome Coupon
+if (!function_exists('ifUserHasWelcomeCouponAndNotUsed')) {
+    function ifUserHasWelcomeCouponAndNotUsed()
+    {
+        $user = auth()->user();
+        $userCoupon = $user->userCoupon;
+        if($userCoupon){
+            $userWelcomeCoupon = $userCoupon->where('expiry_date','>=',strtotime(date('d-m-Y H:i:s')))->first();
+            if($userWelcomeCoupon){
+                $couponUse = $userWelcomeCoupon->coupon->couponUsages->where('user_id',$user->id)->first();
+                if(!$couponUse){
+                    return $userWelcomeCoupon;
+                }
+            }
+        }
+        
+        return false;
+    }
+}
+
+// get dev mail
 if (!function_exists('get_dev_mail')) {
     function get_dev_mail()
     {

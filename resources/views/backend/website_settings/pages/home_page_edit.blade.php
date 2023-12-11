@@ -4,6 +4,10 @@
 <div class="row">
 	<div class="col-xl-10 mx-auto">
 		<h6 class="fw-600">{{ translate('Home Page Settings') }}</h6>
+		@php 
+			$activeLanguages = get_all_active_language();
+			$defaultLanguage = env('DEFAULT_LANGUAGE');
+		@endphp
 
 		{{-- Home Slider --}}
 		<div class="card">
@@ -11,6 +15,18 @@
 				<h6 class="mb-0">{{ translate('Home Slider') }}</h6>
 			</div>
 			<div class="card-body">
+				<ul class="nav nav-tabs nav-fill border-light mb-2">
+					@foreach ($activeLanguages as $key => $language)
+						<li class="nav-item">
+							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
+								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
+									height="11" class="mr-1">
+								<span>{{ $language->name }}</span>
+							</a>
+						</li>
+					@endforeach
+				</ul>
 				<div class="alert alert-info">
 					{{ translate('We have limited banner height to maintain UI. We had to crop from both left & right side in view for different devices to make it responsive. Before designing banner keep these points in mind.') }}
 				</div>
@@ -19,8 +35,6 @@
 					<div class="form-group">
 						<label>{{ translate('Photos & Links') }}</label>
 						<div class="home-slider-target">
-							<input type="hidden" name="types[]" value="home_slider_images">
-							<input type="hidden" name="types[]" value="home_slider_links">
 							@if (get_setting('home_slider_images') != null)
 								@foreach (json_decode(get_setting('home_slider_images'), true) as $key => $value)
 									<div class="row gutters-5">
@@ -31,8 +45,8 @@
 					                                    <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 					                                </div>
 					                                <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-													<input type="hidden" name="types[]" value="home_slider_images">
-					                                <input type="hidden" name="home_slider_images[]" class="selected-files" value="{{ json_decode(get_setting('home_slider_images'), true)[$key] }}">
+													<input type="hidden" name="types[][{{ $lang }}]" value="home_slider_images">
+					                                <input type="hidden" name="home_slider_images[]" class="selected-files" value="{{ json_decode(get_setting('home_slider_images', null, $lang), true)[$key] }}">
 					                            </div>
 					                            <div class="file-preview box sm">
 					                            </div>
@@ -44,54 +58,58 @@
 												<input type="text" class="form-control" placeholder="http://" name="home_slider_links[]" value="{{ json_decode(get_setting('home_slider_links'), true)[$key] }}">
 											</div>
 										</div>
-										<div class="col-md-auto">
-											<div class="form-group">
-												<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-													<i class="las la-times"></i>
-												</button>
+										@if($lang == $defaultLanguage)
+											<div class="col-md-auto">
+												<div class="form-group">
+													<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+														<i class="las la-times"></i>
+													</button>
+												</div>
 											</div>
-										</div>
+										@endif
 									</div>
 								@endforeach
 							@endif
 						</div>
-						<button
-							type="button"
-							class="btn btn-soft-secondary btn-sm"
-							data-toggle="add-more"
-							data-content='
-							<div class="row gutters-5">
-								<div class="col-md-5">
-									<div class="form-group">
-										<div class="input-group" data-toggle="aizuploader" data-type="image">
-											<div class="input-group-prepend">
-												<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+						@if($lang == $defaultLanguage)
+							<button
+								type="button"
+								class="btn btn-soft-secondary btn-sm"
+								data-toggle="add-more"
+								data-content='
+								<div class="row gutters-5">
+									<div class="col-md-5">
+										<div class="form-group">
+											<div class="input-group" data-toggle="aizuploader" data-type="image">
+												<div class="input-group-prepend">
+													<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+												</div>
+												<div class="form-control file-amount">{{ translate('Choose File') }}</div>
+												<input type="hidden" name="types[]" value="home_slider_images">
+												<input type="hidden" name="home_slider_images[]" class="selected-files">
 											</div>
-											<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-											<input type="hidden" name="types[]" value="home_slider_images">
-											<input type="hidden" name="home_slider_images[]" class="selected-files">
-										</div>
-										<div class="file-preview box sm">
+											<div class="file-preview box sm">
+											</div>
 										</div>
 									</div>
-								</div>
-								<div class="col-md">
-									<div class="form-group">
-										<input type="hidden" name="types[]" value="home_slider_links">
-										<input type="text" class="form-control" placeholder="http://" name="home_slider_links[]">
+									<div class="col-md">
+										<div class="form-group">
+											<input type="hidden" name="types[]" value="home_slider_links">
+											<input type="text" class="form-control" placeholder="http://" name="home_slider_links[]">
+										</div>
 									</div>
-								</div>
-								<div class="col-md-auto">
-									<div class="form-group">
-										<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-											<i class="las la-times"></i>
-										</button>
+									<div class="col-md-auto">
+										<div class="form-group">
+											<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+												<i class="las la-times"></i>
+											</button>
+										</div>
 									</div>
-								</div>
-							</div>'
-							data-target=".home-slider-target">
-							{{ translate('Add New') }}
-						</button>
+								</div>'
+								data-target=".home-slider-target">
+								{{ translate('Add New') }}
+							</button>
+						@endif
 					</div>
 					<div class="text-right">
 						<button type="submit" class="btn btn-primary">{{ translate('Update') }}</button>
@@ -106,6 +124,18 @@
 				<h6 class="mb-0">{{ translate("Today's deal") }}</h6>
 			</div>
 			<div class="card-body">
+				<ul class="nav nav-tabs nav-fill border-light mb-2">
+					@foreach ($activeLanguages as $key => $language)
+						<li class="nav-item">
+							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
+								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
+									height="11" class="mr-1">
+								<span>{{ $language->name }}</span>
+							</a>
+						</li>
+					@endforeach
+				</ul>
 				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
@@ -115,8 +145,8 @@
 								<div class="input-group-text bg-soft-secondary">{{ translate('Browse') }}</div>
 							</div>
 							<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-							<input type="hidden" name="types[]" value="todays_deal_banner">
-							<input type="hidden" name="todays_deal_banner" value="{{ get_setting('todays_deal_banner') }}" class="selected-files">
+							<input type="hidden" name="types[][{{ $lang }}]" value="todays_deal_banner">
+							<input type="hidden" name="todays_deal_banner" value="{{ get_setting('todays_deal_banner', null, $lang) }}" class="selected-files">
 						</div>
 						<div class="file-preview box"></div>
 					</div>
@@ -127,8 +157,8 @@
 								<div class="input-group-text bg-soft-secondary">{{ translate('Browse') }}</div>
 							</div>
 							<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-							<input type="hidden" name="types[]" value="todays_deal_banner_small">
-							<input type="hidden" name="todays_deal_banner_small" value="{{ get_setting('todays_deal_banner_small') }}" class="selected-files">
+							<input type="hidden" name="types[][{{ $lang }}]" value="todays_deal_banner_small">
+							<input type="hidden" name="todays_deal_banner_small" value="{{ get_setting('todays_deal_banner_small', null, $lang) }}" class="selected-files">
 						</div>
 						<div class="file-preview box"></div>
 					</div>
@@ -150,13 +180,23 @@
 				<h6 class="mb-0">{{ translate('Home Banner 1 (Max 3)') }}</h6>
 			</div>
 			<div class="card-body">
+				<ul class="nav nav-tabs nav-fill border-light mb-2">
+					@foreach ($activeLanguages as $key => $language)
+						<li class="nav-item">
+							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
+								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
+									height="11" class="mr-1">
+								<span>{{ $language->name }}</span>
+							</a>
+						</li>
+					@endforeach
+				</ul>
 				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
 						<label>{{ translate('Banner & Links') }}</label>
 						<div class="home-banner1-target">
-							<input type="hidden" name="types[]" value="home_banner1_images">
-							<input type="hidden" name="types[]" value="home_banner1_links">
 							@if (get_setting('home_banner1_images') != null)
 								@foreach (json_decode(get_setting('home_banner1_images'), true) as $key => $value)
 									<div class="row gutters-5">
@@ -167,8 +207,8 @@
 					                                    <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 					                                </div>
 					                                <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-													<input type="hidden" name="types[]" value="home_banner1_images">
-					                                <input type="hidden" name="home_banner1_images[]" class="selected-files" value="{{ json_decode(get_setting('home_banner1_images'), true)[$key] }}">
+													<input type="hidden" name="types[][{{ $lang }}]" value="home_banner1_images">
+					                                <input type="hidden" name="home_banner1_images[]" class="selected-files" value="{{ json_decode(get_setting('home_banner1_images', null, $lang), true)[$key] }}">
 					                            </div>
 					                            <div class="file-preview box sm">
 					                            </div>
@@ -180,54 +220,58 @@
 												<input type="text" class="form-control" placeholder="http://" name="home_banner1_links[]" value="{{ json_decode(get_setting('home_banner1_links'), true)[$key] }}">
 											</div>
 										</div>
-										<div class="col-md-auto">
-											<div class="form-group">
-												<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-													<i class="las la-times"></i>
-												</button>
+										@if($lang == $defaultLanguage)
+											<div class="col-md-auto">
+												<div class="form-group">
+													<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+														<i class="las la-times"></i>
+													</button>
+												</div>
 											</div>
-										</div>
+										@endif
 									</div>
 								@endforeach
 							@endif
 						</div>
-						<button
-							type="button"
-							class="btn btn-soft-secondary btn-sm"
-							data-toggle="add-more"
-							data-content='
-							<div class="row gutters-5">
-								<div class="col-md-5">
-									<div class="form-group">
-										<div class="input-group" data-toggle="aizuploader" data-type="image">
-											<div class="input-group-prepend">
-												<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+						@if($lang == $defaultLanguage)
+							<button
+								type="button"
+								class="btn btn-soft-secondary btn-sm"
+								data-toggle="add-more"
+								data-content='
+								<div class="row gutters-5">
+									<div class="col-md-5">
+										<div class="form-group">
+											<div class="input-group" data-toggle="aizuploader" data-type="image">
+												<div class="input-group-prepend">
+													<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+												</div>
+												<div class="form-control file-amount">{{ translate('Choose File') }}</div>
+												<input type="hidden" name="types[]" value="home_banner1_images">
+												<input type="hidden" name="home_banner1_images[]" class="selected-files">
 											</div>
-											<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-											<input type="hidden" name="types[]" value="home_banner1_images">
-											<input type="hidden" name="home_banner1_images[]" class="selected-files">
-										</div>
-										<div class="file-preview box sm">
+											<div class="file-preview box sm">
+											</div>
 										</div>
 									</div>
-								</div>
-								<div class="col-md">
-									<div class="form-group">
-										<input type="hidden" name="types[]" value="home_banner1_links">
-										<input type="text" class="form-control" placeholder="http://" name="home_banner1_links[]">
+									<div class="col-md">
+										<div class="form-group">
+											<input type="hidden" name="types[]" value="home_banner1_links">
+											<input type="text" class="form-control" placeholder="http://" name="home_banner1_links[]">
+										</div>
 									</div>
-								</div>
-								<div class="col-md-auto">
-									<div class="form-group">
-										<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-											<i class="las la-times"></i>
-										</button>
+									<div class="col-md-auto">
+										<div class="form-group">
+											<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+												<i class="las la-times"></i>
+											</button>
+										</div>
 									</div>
-								</div>
-							</div>'
-							data-target=".home-banner1-target">
-							{{ translate('Add New') }}
-						</button>
+								</div>'
+								data-target=".home-banner1-target">
+								{{ translate('Add New') }}
+							</button>
+						@endif
 					</div>
 					<div class="text-right">
 						<button type="submit" class="btn btn-primary">{{ translate('Update') }}</button>
@@ -242,6 +286,18 @@
 				<h6 class="mb-0">{{ translate('Home Banner 2 (Max 3)') }}</h6>
 			</div>
 			<div class="card-body">
+				<ul class="nav nav-tabs nav-fill border-light mb-2">
+					@foreach ($activeLanguages as $key => $language)
+						<li class="nav-item">
+							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
+								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
+									height="11" class="mr-1">
+								<span>{{ $language->name }}</span>
+							</a>
+						</li>
+					@endforeach
+				</ul>
 				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
@@ -259,8 +315,8 @@
 					                                    <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 					                                </div>
 					                                <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-													<input type="hidden" name="types[]" value="home_banner2_images">
-					                                <input type="hidden" name="home_banner2_images[]" class="selected-files" value="{{ json_decode(get_setting('home_banner2_images'), true)[$key] }}">
+													<input type="hidden" name="types[][{{ $lang }}]" value="home_banner2_images">
+					                                <input type="hidden" name="home_banner2_images[]" class="selected-files" value="{{ json_decode(get_setting('home_banner2_images', null, $lang), true)[$key] }}">
 					                            </div>
 					                            <div class="file-preview box sm">
 					                            </div>
@@ -272,54 +328,58 @@
 												<input type="text" class="form-control" placeholder="http://" name="home_banner2_links[]" value="{{ json_decode(get_setting('home_banner2_links'), true)[$key] }}">
 											</div>
 										</div>
-										<div class="col-md-auto">
-											<div class="form-group">
-												<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-													<i class="las la-times"></i>
-												</button>
+										@if($lang == $defaultLanguage)
+											<div class="col-md-auto">
+												<div class="form-group">
+													<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+														<i class="las la-times"></i>
+													</button>
+												</div>
 											</div>
-										</div>
+										@endif
 									</div>
 								@endforeach
 							@endif
 						</div>
-						<button
-							type="button"
-							class="btn btn-soft-secondary btn-sm"
-							data-toggle="add-more"
-							data-content='
-							<div class="row gutters-5">
-								<div class="col-md-5">
-									<div class="form-group">
-										<div class="input-group" data-toggle="aizuploader" data-type="image">
-											<div class="input-group-prepend">
-												<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+						@if($lang == $defaultLanguage)
+							<button
+								type="button"
+								class="btn btn-soft-secondary btn-sm"
+								data-toggle="add-more"
+								data-content='
+								<div class="row gutters-5">
+									<div class="col-md-5">
+										<div class="form-group">
+											<div class="input-group" data-toggle="aizuploader" data-type="image">
+												<div class="input-group-prepend">
+													<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+												</div>
+												<div class="form-control file-amount">{{ translate('Choose File') }}</div>
+												<input type="hidden" name="types[]" value="home_banner2_images">
+												<input type="hidden" name="home_banner2_images[]" class="selected-files">
 											</div>
-											<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-											<input type="hidden" name="types[]" value="home_banner2_images">
-											<input type="hidden" name="home_banner2_images[]" class="selected-files">
-										</div>
-										<div class="file-preview box sm">
+											<div class="file-preview box sm">
+											</div>
 										</div>
 									</div>
-								</div>
-								<div class="col-md">
-									<div class="form-group">
-										<input type="hidden" name="types[]" value="home_banner2_links">
-										<input type="text" class="form-control" placeholder="http://" name="home_banner2_links[]">
+									<div class="col-md">
+										<div class="form-group">
+											<input type="hidden" name="types[]" value="home_banner2_links">
+											<input type="text" class="form-control" placeholder="http://" name="home_banner2_links[]">
+										</div>
 									</div>
-								</div>
-								<div class="col-md-auto">
-									<div class="form-group">
-										<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-											<i class="las la-times"></i>
-										</button>
+									<div class="col-md-auto">
+										<div class="form-group">
+											<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+												<i class="las la-times"></i>
+											</button>
+										</div>
 									</div>
-								</div>
-							</div>'
-							data-target=".home-banner2-target">
-							{{ translate('Add New') }}
-						</button>
+								</div>'
+								data-target=".home-banner2-target">
+								{{ translate('Add New') }}
+							</button>
+						@endif
 					</div>
 					<div class="text-right">
 						<button type="submit" class="btn btn-primary">{{ translate('Update') }}</button>
@@ -334,6 +394,18 @@
 				<h6 class="mb-0">{{ translate('Home Banner 3 (Max 3)') }}</h6>
 			</div>
 			<div class="card-body">
+				<ul class="nav nav-tabs nav-fill border-light mb-2">
+					@foreach ($activeLanguages as $key => $language)
+						<li class="nav-item">
+							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
+								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
+									height="11" class="mr-1">
+								<span>{{ $language->name }}</span>
+							</a>
+						</li>
+					@endforeach
+				</ul>
 				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
@@ -351,8 +423,8 @@
 					                                    <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 					                                </div>
 					                                <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-													<input type="hidden" name="types[]" value="home_banner3_images">
-					                                <input type="hidden" name="home_banner3_images[]" class="selected-files" value="{{ json_decode(get_setting('home_banner3_images'), true)[$key] }}">
+													<input type="hidden" name="types[][{{ $lang }}]" value="home_banner3_images">
+					                                <input type="hidden" name="home_banner3_images[]" class="selected-files" value="{{ json_decode(get_setting('home_banner3_images', null, $lang), true)[$key] }}">
 					                            </div>
 					                            <div class="file-preview box sm">
 					                            </div>
@@ -364,54 +436,58 @@
 												<input type="text" class="form-control" placeholder="http://" name="home_banner3_links[]" value="{{ json_decode(get_setting('home_banner3_links'), true)[$key] }}">
 											</div>
 										</div>
-										<div class="col-md-auto">
-											<div class="form-group">
-												<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-													<i class="las la-times"></i>
-												</button>
+										@if($lang == $defaultLanguage)
+											<div class="col-md-auto">
+												<div class="form-group">
+													<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+														<i class="las la-times"></i>
+													</button>
+												</div>
 											</div>
-										</div>
+										@endif
 									</div>
 								@endforeach
 							@endif
 						</div>
-						<button
-							type="button"
-							class="btn btn-soft-secondary btn-sm"
-							data-toggle="add-more"
-							data-content='
-							<div class="row gutters-5">
-								<div class="col-md-5">
-									<div class="form-group">
-										<div class="input-group" data-toggle="aizuploader" data-type="image">
-											<div class="input-group-prepend">
-												<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+						@if($lang == $defaultLanguage)
+							<button
+								type="button"
+								class="btn btn-soft-secondary btn-sm"
+								data-toggle="add-more"
+								data-content='
+								<div class="row gutters-5">
+									<div class="col-md-5">
+										<div class="form-group">
+											<div class="input-group" data-toggle="aizuploader" data-type="image">
+												<div class="input-group-prepend">
+													<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+												</div>
+												<div class="form-control file-amount">{{ translate('Choose File') }}</div>
+												<input type="hidden" name="types[]" value="home_banner3_images">
+												<input type="hidden" name="home_banner3_images[]" class="selected-files">
 											</div>
-											<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-											<input type="hidden" name="types[]" value="home_banner3_images">
-											<input type="hidden" name="home_banner3_images[]" class="selected-files">
-										</div>
-										<div class="file-preview box sm">
+											<div class="file-preview box sm">
+											</div>
 										</div>
 									</div>
-								</div>
-								<div class="col-md">
-									<div class="form-group">
-										<input type="hidden" name="types[]" value="home_banner3_links">
-										<input type="text" class="form-control" placeholder="http://" name="home_banner3_links[]">
+									<div class="col-md">
+										<div class="form-group">
+											<input type="hidden" name="types[]" value="home_banner3_links">
+											<input type="text" class="form-control" placeholder="http://" name="home_banner3_links[]">
+										</div>
 									</div>
-								</div>
-								<div class="col-md-auto">
-									<div class="form-group">
-										<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-											<i class="las la-times"></i>
-										</button>
+									<div class="col-md-auto">
+										<div class="form-group">
+											<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+												<i class="las la-times"></i>
+											</button>
+										</div>
 									</div>
-								</div>
-							</div>'
-							data-target=".home-banner3-target">
-							{{ translate('Add New') }}
-						</button>
+								</div>'
+								data-target=".home-banner3-target">
+								{{ translate('Add New') }}
+							</button>
+						@endif
 					</div>
 					<div class="text-right">
 						<button type="submit" class="btn btn-primary">{{ translate('Update') }}</button>
@@ -427,6 +503,18 @@
 				<h6 class="mb-0">{{ translate('Auction Banner') }}</h6>
 			</div>
 			<div class="card-body">
+				<ul class="nav nav-tabs nav-fill border-light mb-2">
+					@foreach ($activeLanguages as $key => $language)
+						<li class="nav-item">
+							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
+								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
+									height="11" class="mr-1">
+								<span>{{ $language->name }}</span>
+							</a>
+						</li>
+					@endforeach
+				</ul>
 				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					
@@ -436,8 +524,8 @@
 								<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
 							</div>
 							<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-							<input type="hidden" name="types[]" value="auction_banner_image">
-							<input type="hidden" name="auction_banner_image" class="selected-files" value="{{ get_setting('auction_banner_image') }}">
+							<input type="hidden" name="types[][{{ $lang }}]" value="auction_banner_image">
+							<input type="hidden" name="auction_banner_image" class="selected-files" value="{{ get_setting('auction_banner_image', null, $lang) }}">
 						</div>
 						<div class="file-preview box sm">
 						</div>
@@ -555,6 +643,18 @@
 				<h6 class="mb-0">{{ translate('Classified Ads Banner') }}</h6>
 			</div>
 			<div class="card-body">
+				<ul class="nav nav-tabs nav-fill border-light mb-2">
+					@foreach ($activeLanguages as $key => $language)
+						<li class="nav-item">
+							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
+								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
+									height="11" class="mr-1">
+								<span>{{ $language->name }}</span>
+							</a>
+						</li>
+					@endforeach
+				</ul>
 				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
@@ -564,8 +664,8 @@
 								<div class="input-group-text bg-soft-secondary">{{ translate('Browse') }}</div>
 							</div>
 							<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-							<input type="hidden" name="types[]" value="classified_banner_image">
-							<input type="hidden" name="classified_banner_image" value="{{ get_setting('classified_banner_image') }}" class="selected-files">
+							<input type="hidden" name="types[][{{ $lang }}]" value="classified_banner_image">
+							<input type="hidden" name="classified_banner_image" value="{{ get_setting('classified_banner_image', null, $lang) }}" class="selected-files">
 						</div>
 						<div class="file-preview box"></div>
 					</div>
@@ -576,8 +676,8 @@
 								<div class="input-group-text bg-soft-secondary">{{ translate('Browse') }}</div>
 							</div>
 							<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-							<input type="hidden" name="types[]" value="classified_banner_image_small">
-							<input type="hidden" name="classified_banner_image_small" value="{{ get_setting('classified_banner_image_small') }}" class="selected-files">
+							<input type="hidden" name="types[][{{ $lang }}]" value="classified_banner_image_small">
+							<input type="hidden" name="classified_banner_image_small" value="{{ get_setting('classified_banner_image_small', null, $lang) }}" class="selected-files">
 						</div>
 						<div class="file-preview box"></div>
 					</div>
@@ -596,31 +696,6 @@
 			<div class="card-body">
 				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
 					@csrf
-					{{-- <div class="form-group row">
-						<label class="col-md-2 col-from-label">{{translate('Top Categories (Max 10)')}}</label>
-						<div class="col-md-10">
-							<input type="hidden" name="types[]" value="top10_categories">
-							<select name="top10_categories[]" class="form-control aiz-selectpicker" multiple data-max-options="10" data-live-search="true" data-selected="{{ get_setting('top10_categories') }}">
-								@foreach (\App\Models\Category::where('parent_id', 0)->with('childrenCategories')->get() as $category)
-									<option value="{{ $category->id }}">{{ $category->getTranslation('name') }}</option>
-									@foreach ($category->childrenCategories as $childCategory)
-										@include('categories.child_category', ['child_category' => $childCategory])
-									@endforeach
-								@endforeach
-							</select>
-						</div>
-					</div>
-					<div class="form-group row">
-						<label class="col-md-2 col-from-label">{{translate('Top Brands (Max 10)')}}</label>
-						<div class="col-md-10">
-							<input type="hidden" name="types[]" value="top10_brands">
-							<select name="top10_brands[]" class="form-control aiz-selectpicker" multiple data-max-options="10" data-live-search="true" data-selected="{{ get_setting('top10_brands') }}">
-								@foreach (\App\Models\Brand::all() as $key => $brand)
-									<option value="{{ $brand->id }}">{{ $brand->getTranslation('name') }}</option>
-								@endforeach
-							</select>
-						</div>
-					</div> --}}
 					<div class="form-group row">
 						<label class="col-md-2 col-from-label">{{translate('Top Brands (Max 12)')}}</label>
 						<div class="col-md-10">

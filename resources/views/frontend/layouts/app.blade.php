@@ -771,7 +771,7 @@
                     $('.email-form-group').removeClass('d-none');
                     $('input[name=phone]').val(null);
                     isPhoneShown = false;
-                    $(el).html('*{{ translate('Use Phone Instead') }}');
+                    $(el).html('*{{ translate('Use Phone Number Instead') }}');
                 } else {
                     $('.phone-form-group').removeClass('d-none');
                     $('.email-form-group').addClass('d-none');
@@ -780,7 +780,8 @@
                     $(el).html('<i>*{{ translate('Use Email Instead') }}</i>');
                 }
             }
-        </script> @endif
+        </script> 
+    @endif
 
     <script>
         var acc = document.getElementsByClassName("aiz-accordion-heading");

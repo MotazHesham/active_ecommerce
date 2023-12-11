@@ -59,4 +59,9 @@ class Category extends Model
     {
         return $this->belongsToMany(Attribute::class);
     }
+
+    public function sizeChart()
+    {
+        return $this->belongsTo(SizeChart::class, 'id', 'category_id');
+    }
 }

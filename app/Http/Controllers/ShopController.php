@@ -48,7 +48,7 @@ class ShopController extends Controller
                 return back();
             }
         } else {
-            return view('frontend.seller_form');
+            return view('auth.'.get_setting('authentication_layout_select').'.seller_registration');
         }
     }
 

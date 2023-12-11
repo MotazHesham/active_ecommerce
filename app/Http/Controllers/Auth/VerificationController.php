@@ -54,7 +54,7 @@ class VerificationController extends Controller
         if ($request->user()->email != null) {
             return $request->user()->hasVerifiedEmail()
                             ? redirect($this->redirectPath())
-                            : view('auth.verify');
+                            : view('auth.'.get_setting('authentication_layout_select').'.verify_email');
         }
         else {
             $otpController = new OTPVerificationController;
@@ -87,6 +87,7 @@ class VerificationController extends Controller
             $user->email_verified_at = Carbon::now();
             $user->save();
             auth()->login($user, true);
+            offerUserWelcomeCoupon();
             flash(translate('Your email has been verified successfully'))->success();
         }
         else {

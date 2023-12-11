@@ -23,6 +23,7 @@ use App\Http\Controllers\CustomerProductController;
 use App\Http\Controllers\DigitalProductController;
 use App\Http\Controllers\FlashDealController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\MeasurementPointsController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
@@ -38,6 +39,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\SellerWithdrawRequestController;
+use App\Http\Controllers\SizeChartController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StateController;
 use App\Http\Controllers\SubscriberController;
@@ -266,6 +268,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
             Route::get('/header', 'header')->name('website.header');
             Route::get('/appearance', 'appearance')->name('website.appearance');
             Route::get('/select-homepage', 'select_homepage')->name('website.select-homepage');
+            Route::get('/authentication-layout-settings', 'authentication_layout_settings')->name('website.authentication-layout-settings');
             Route::get('/pages', 'pages')->name('website.pages');
         });
 
@@ -365,6 +368,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     //Coupons
     Route::resource('coupon', CouponController::class);
     Route::controller(CouponController::class)->group(function () {
+        Route::post('/coupon/update-status', 'updateStatus')->name('coupon.update_status');
         Route::get('/coupon/destroy/{id}', 'destroy')->name('coupon.destroy');
     
         //Coupon Form
@@ -424,6 +428,15 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/colors/update/{id}', 'update_color')->name('colors.update');
         Route::get('/colors/destroy/{id}', 'destroy_color')->name('colors.destroy');
     });
+
+    // Size Chart
+    Route::resource('size-charts', SizeChartController::class );
+    Route::get('/size-charts/destroy/{id}',  [SizeChartController::class, 'destroy'])->name('size-charts.destroy');
+    Route::post('size-charts/get-combination',   [SizeChartController::class, 'get_combination'])->name('size-charts.get-combination');
+
+    // Measurement Points
+    Route::resource('measurement-points', MeasurementPointsController::class );
+    Route::get('/measurement-points/destroy/{id}',  [MeasurementPointsController::class, 'destroy'])->name('measurement-points.destroy');
 
     // Addon
     Route::resource('addons', AddonController::class);

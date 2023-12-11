@@ -1439,7 +1439,7 @@
 	    //first check all boxes below
 	    //all not disabled
 	    //console.log($(this))
-	    var this_state = clickedNode.prop("checked");
+	    // var this_state = clickedNode.prop("checked");
 	    //var this_indeterminate = $(this).prop("indeterminate");
 	    //console.log(this_state)
 	    //console.log(this_indeterminate)
