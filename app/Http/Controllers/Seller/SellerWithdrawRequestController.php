@@ -39,8 +39,14 @@ class SellerWithdrawRequestController extends Controller
         $seller_withdraw_request->viewed = '0';
         if ($seller_withdraw_request->save()) {
 
-            $users = User::findMany([auth()->user()->id, User::where('user_type', 'admin')->first()->id]);
-            Notification::send($users, new PayoutNotification(Auth::user(), $request->amount, 'pending'));
+            // Seller payout request notification to admin
+            $users = User::findMany(User::where('user_type', 'admin')->first()->id);
+            $data = array();
+            $data['user'] = auth()->user();
+            $data['amount'] = $request->amount;
+            $data['status'] = 'pending';
+            $data['notification_type_id'] = get_notification_type('seller_payout_request', 'type')->id;
+            Notification::send($users, new PayoutNotification($data));
 
             flash(translate('Request has been sent successfully'))->success();
             return redirect()->route('seller.money_withdraw_requests.index');

@@ -8,10 +8,13 @@ class SliderCollection extends ResourceCollection
 {
     public function toArray($request)
     {
+
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
+                //dd($data);
                 return [
-                    'photo' => uploaded_asset($data)
+                    'photo' => uploaded_asset($data['image']),
+                    'url' => ($data['link']),
                 ];
             })
         ];

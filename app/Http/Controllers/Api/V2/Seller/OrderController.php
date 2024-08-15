@@ -10,11 +10,8 @@ use App\Models\OrderDetail;
 use App\Services\OrderService ;
 use Illuminate\Http\Request;
 
-
-
 class OrderController extends Controller
 {
-
     public function getOrderList(Request $request)
     {
         $order_query = Order::query();
@@ -31,10 +28,8 @@ class OrderController extends Controller
         }
 
         $orders = $order_query->where('seller_id', auth()->user()->id)->latest()->paginate(10);
-
         return new OrderCollection($orders);
     }
-
 
     public function getOrderDetails($id)
     {
@@ -48,7 +43,6 @@ class OrderController extends Controller
         $order_query = OrderDetail::where('order_id', $order_id->id);
 
         return  OrderItemResource::collection($order_query->get());
-        // return new PurchaseHistoryItemsCollection($order_query->get());
     }
 
     public function update_delivery_status(Request $request) {

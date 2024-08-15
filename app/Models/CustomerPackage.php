@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 use App;
 
 class CustomerPackage extends Model
 {
+  use PreventDemoModeChanges;
+
     public function getTranslation($field = '', $lang = false){
       $lang = $lang == false ? App::getLocale() : $lang;
       $brand_translation = $this->hasMany(CustomerPackageTranslation::class)->where('lang', $lang)->first();
@@ -22,9 +25,4 @@ class CustomerPackage extends Model
         return $this->hasMany(CustomerPackagePayment::class);
     
     }
-
-    
-
-
-
 }

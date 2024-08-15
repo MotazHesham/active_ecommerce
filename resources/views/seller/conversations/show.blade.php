@@ -45,7 +45,7 @@
                 @endforeach
             </ul> --}}
             <div id="messages">
-                @include('frontend.'.get_setting('homepage_select').'.partials.messages', ['conversation', $conversation])
+                @include('frontend.partials.messages', ['conversation', $conversation])
             </div>
             <form class="pt-4" action="{{ route('seller.conversations.message_store') }}" method="POST">
                 @csrf

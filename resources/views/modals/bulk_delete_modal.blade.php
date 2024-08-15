@@ -6,7 +6,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
             </div>
             <div class="modal-body text-center">
-                <p class="mt-1">{{ translate('Are you sure to delete those files?') }}</p>
+                <p class="mt-1">{{ translate('Are you sure to delete those?') }}</p>
                 <button type="button" class="btn btn-link mt-2" data-dismiss="modal">{{ translate('Cancel') }}</button>
                 <a href="javascript:void(0)" onclick="bulk_delete()" class="btn btn-primary mt-2">{{ translate('Delete') }}</a>
             </div>

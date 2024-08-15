@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Models\CombinedOrder;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use PaytmWallet;
@@ -16,14 +17,7 @@ class PaytmController extends Controller
         $combined_order_id = $request->combined_order_id;
         $amount = $request->amount;
         $user_id = $request->user_id;
-        $package_id = 0;
-
-        if (isset($request->package_id)) {
-            $package_id = $request->package_id;
-        }
-
-
-        $user = User::find($request->user_id);
+        $user = User::find($user_id);
 
         if ($payment_type == 'cart_payment') {
             $combined_order = CombinedOrder::find($combined_order_id);
@@ -49,7 +43,30 @@ class PaytmController extends Controller
             ]);
 
             return $payment->receive();
-        } elseif ($payment_type == 'wallet_payment') {
+        }
+        elseif ($payment_type == 'order_re_payment') {
+            $order = Order::find($request->order_id);
+            $amount = floatval($order->grand_total);
+            $payment = PaytmWallet::with('receive');
+            $payment->prepare([
+                'order' => rand(10000, 99999),
+                'user' => $user->id,
+                'mobile_number' => $user->phone,
+                'email' => $user->email,
+                'amount' => $amount,
+                'callback_url' => route(
+                    'api.paytm.callback',
+                    [
+                        "payment_type" => $payment_type,
+                        "order_id" => $order->id,
+                        "amount" => $amount,
+                        "user_id" => $user_id
+                    ]
+                )
+            ]);
+            return $payment->receive();
+        }
+        elseif ($payment_type == 'wallet_payment') {
             $amount = $amount;
             $payment = PaytmWallet::with('receive');
             $payment->prepare([
@@ -69,7 +86,8 @@ class PaytmController extends Controller
                 )
             ]);
             return $payment->receive();
-        } elseif ($payment_type == 'seller_package_payment') {
+        }
+        elseif ($payment_type == 'seller_package_payment' || $payment_type == 'customer_package_payment') {
             $amount = $amount;
             $payment = PaytmWallet::with('receive');
             $payment->prepare([
@@ -85,7 +103,7 @@ class PaytmController extends Controller
                         "combined_order_id" => $combined_order_id,
                         "amount" => $amount,
                         "user_id" => $user_id,
-                        "package_id" => $package_id,
+                        "package_id" => $request->package_id,
                     ]
                 )
             ]);
@@ -105,12 +123,17 @@ class PaytmController extends Controller
             if ($request->payment_type == 'cart_payment') {
                 checkout_done($request->combined_order_id, json_encode($response));
             }
-
-            if ($request->payment_type == 'wallet_payment') {
+            elseif ($request->payment_type == 'order_re_payment') {
+                order_re_payment_done($request->order_id, 'Paytm', json_encode($response));
+            }
+            elseif ($request->payment_type == 'wallet_payment') {
                 wallet_payment_done($request->user_id, $request->amount, 'Paytm', json_encode($response));
             }
-            if ($request->payment_type == 'seller_package_payment') {
-                seller_purchase_payment_done($request->user_id, $request->package_id, $request->amount, 'Paytm', json_encode($response));
+            elseif ($request->payment_type == 'seller_package_payment') {
+                seller_purchase_payment_done($request->user_id, $request->package_id, 'Paytm', json_encode($response));
+            }
+            elseif ($request->payment_type == 'customer_package_payment') {
+                customer_purchase_payment_done($request->user_id, $request->package_id, 'Paypal', json_encode($response));
             }
 
             return response()->json(['result' => true, 'message' => translate("Payment is successful")]);

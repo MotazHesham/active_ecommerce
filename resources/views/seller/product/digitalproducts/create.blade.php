@@ -2,10 +2,16 @@
 
 @section('panel_content')
 
+<div class="page-content mx-0">
     <div class="aiz-titlebar mt-2 mb-4">
         <div class="row align-items-center">
             <div class="col-md-6">
                 <h1 class="h3">{{ translate('Add Your Product') }}</h1>
+            </div>
+            <div class="col text-right">
+                <a class="btn btn-xs btn-soft-primary" href="javascript:void(0);" onclick="clearTempdata()">
+                    {{ translate('Clear Tempdata') }}
+                </a>
             </div>
         </div>
     </div>
@@ -20,6 +26,9 @@
             </ul>
         </div>
     @endif
+
+    <!-- Data type -->
+    <input type="hidden" id="data_type" value="digital">
 
     <form class="" action="{{route('seller.digitalproducts.store')}}" method="POST" enctype="multipart/form-data" id="choice_form">
         @csrf
@@ -198,6 +207,65 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Frequently Bought Products --}}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0 h6">{{ translate('Frequently Bought') }}</h5>
+                    </div>
+                    <div class="w-100">
+                        <div class="d-flex my-3"> 
+                            <div class="align-items-center d-flex mar-btm ml-4 mr-5 radio">
+                                <input id="fq_bought_select_products" type="radio" name="frequently_bought_selection_type" value="product" onchange="fq_bought_product_selection_type()" checked >
+                                <label for="fq_bought_select_products" class="fs-14 fw-500 mb-0 ml-2">{{translate('Select Product')}}</label>
+                            </div>
+                            <div class="radio mar-btm mr-3 d-flex align-items-center">
+                                <input id="fq_bought_select_category" type="radio" name="frequently_bought_selection_type" value="category" onchange="fq_bought_product_selection_type()">
+                                <label for="fq_bought_select_category" class="fs-14 fw-500 mb-0 ml-2">{{translate('Select Category')}}</label>
+                            </div>
+                        </div>
+
+                        <div class="px-3 px-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="fq_bought_select_product_div">
+    
+                                        <div id="selected-fq-bought-products">
+    
+                                        </div>
+    
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center"
+                                            onclick="showFqBoughtProductModal()">
+                                            <i class="las la-plus"></i>
+                                            <span class="ml-2">{{ translate('Add More') }}</span>
+                                        </button>
+                                    </div>
+    
+                                    {{-- Select Category for Frequently Bought Product --}}
+                                    <div class="fq_bought_select_category_div d-none">
+                                        <div class="form-group row">
+                                            <label class="col-md-2 col-from-label">{{translate('Category')}}</label>
+                                            <div class="col-md-10">
+                                                <select class="form-control aiz-selectpicker" data-placeholder="{{ translate('Select a Category')}}" name="fq_bought_product_category_id" data-live-search="true">
+                                                    @foreach ($categories as $category)
+                                                        <option value="{{ $category->id }}">{{ $category->getTranslation('name') }}</option>
+                                                        @foreach ($category->childrenCategories as $childCategory)
+                                                            @include('categories.child_category', ['child_category' => $childCategory])
+                                                        @endforeach
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="col-lg-4">
                 <div class="card">
@@ -230,7 +298,13 @@
             <button type="submit" name="button" value="publish" class="btn btn-primary">{{translate('Save Product')}}</button>
         </div>
     </form>
+</div>
 
+@endsection
+
+@section('modal')
+	<!-- Frequently Bought Product Select Modal -->
+    @include('modals.product_select_modal')
 @endsection
 
 @section('script')
@@ -240,5 +314,54 @@
     $(document).ready(function() {
         $("#treeview").hummingbird();
     });
+
+    function fq_bought_product_selection_type(){
+            var productSelectionType = $("input[name='frequently_bought_selection_type']:checked").val();
+            if(productSelectionType == 'product'){
+                $('.fq_bought_select_product_div').removeClass('d-none');
+                $('.fq_bought_select_category_div').addClass('d-none');
+            }
+            else if(productSelectionType == 'category'){
+                $('.fq_bought_select_category_div').removeClass('d-none');
+                $('.fq_bought_select_product_div').addClass('d-none');
+            }
+        }
+
+        function showFqBoughtProductModal() {
+            $('#fq-bought-product-select-modal').modal('show', {backdrop: 'static'});
+        }
+
+        function filterFqBoughtProduct() {
+            var searchKey = $('input[name=search_keyword]').val();
+            var fqBroughCategory = $('select[name=fq_brough_category]').val();
+            $.post('{{ route('seller.product.search') }}', { _token: AIZ.data.csrf, product_id: null, search_key:searchKey, category:fqBroughCategory, product_type:"digital" }, function(data){
+                $('#product-list').html(data);
+                AIZ.plugins.fooTable();
+            });
+        }
+
+        function addFqBoughtProduct() {
+            var selectedProducts = [];
+            $("input:checkbox[name=fq_bought_product_id]:checked").each(function() {
+                selectedProducts.push($(this).val());
+            });
+
+            var fqBoughtProductIds = [];
+            $("input[name='fq_bought_product_ids[]']").each(function() {
+                fqBoughtProductIds.push($(this).val());
+            });
+
+            var productIds = selectedProducts.concat(fqBoughtProductIds.filter((item) => selectedProducts.indexOf(item) < 0))
+
+            $.post('{{ route('seller.get-selected-products') }}', { _token: AIZ.data.csrf, product_ids:productIds}, function(data){
+                $('#fq-bought-product-select-modal').modal('hide');
+                $('#selected-fq-bought-products').html(data);
+                AIZ.plugins.fooTable();
+            });
+        }
+        
 </script>
+
+@include('partials.product.product_temp_data')
+
 @endsection

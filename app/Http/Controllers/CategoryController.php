@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\CategoryTranslation;
+use App\Models\User;
 use App\Utility\CategoryUtility;
 use Illuminate\Support\Str;
 use Cache;
@@ -125,8 +126,12 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $categories = Category::where('parent_id', 0)
             ->where('digital', $category->digital)
-            ->with('childrenCategories')
-            ->whereNotIn('id', CategoryUtility::children_ids($category->id, true))->where('id', '!=' , $category->id)
+            // ->with('childrenCategories')
+            // ->whereNotIn('id', CategoryUtility::children_ids($category->id, true))->where('id', '!=' , $category->id)
+            ->with(['childrenCategories' => function ($query) use ($category) {
+                $query->whereNotIn('id', CategoryUtility::children_ids($category->id, true))
+                      ->where('id', '!=' , $category->id);
+            }])
             ->orderBy('name','asc')
             ->get();
 
@@ -169,12 +174,12 @@ class CategoryController extends Controller
             $category->level = 0;
         }
 
-        if($category->level > $previous_level){
-            CategoryUtility::move_level_down($category->id);
-        }
-        elseif ($category->level < $previous_level) {
-            CategoryUtility::move_level_up($category->id);
-        }
+        // if($category->level > $previous_level){
+        //     CategoryUtility::move_level_down($category->id);
+        // }
+        // elseif ($category->level < $previous_level) {
+        //     CategoryUtility::move_level_up($category->id);
+        // }
 
         if ($request->slug != null) {
             $category->slug = strtolower($request->slug);
@@ -189,6 +194,9 @@ class CategoryController extends Controller
         }
 
         $category->save();
+
+        //Updating childer categories level
+        CategoryUtility::update_child_level($category->id);
 
         $category->attributes()->sync($request->filtering_attributes);
 
@@ -246,5 +254,16 @@ class CategoryController extends Controller
             ->get();
 
         return view('backend.product.categories.categories_option', compact('categories'));
+    }
+
+    public function categoriesWiseProductDiscount(Request $request){
+        $sort_search =null;
+        $categories = Category::orderBy('order_level', 'desc');
+        if ($request->has('search')){
+            $sort_search = $request->search;
+            $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
+        }
+        $categories = $categories->paginate(15);
+        return view('backend.product.category_wise_discount.set_discount', compact('categories', 'sort_search'));
     }
 }

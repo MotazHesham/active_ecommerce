@@ -31,51 +31,52 @@
         </div>
         <div class="d-flex justify-content-around align-items-center align-items-stretch">
 
-            <div class="aiz-topbar-item ml-2">
+             <!-- Notifications -->
+             <div class="aiz-topbar-item mr-3">
                 <div class="align-items-stretch d-flex dropdown">
                     <a class="dropdown-toggle no-arrow" data-toggle="dropdown" href="javascript:void(0);" role="button" aria-haspopup="false" aria-expanded="false">
                         <span class="btn btn-icon p-0 d-flex justify-content-center align-items-center">
                             <span class="d-flex align-items-center position-relative">
                                 <i class="las la-bell fs-24"></i>
-                                @if(Auth::user()->unreadNotifications->count() > 0)
+                                @if(auth()->user()->unreadNotifications->count() > 0)
                                     <span class="badge badge-sm badge-dot badge-circle badge-primary position-absolute absolute-top-right"></span>
                                 @endif
                             </span>
                         </span>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated dropdown-menu-lg py-0">
-                        <div class="notifications">
 
-                            <ul class="nav nav-tabs" role="tablist">
-                                <li class="nav-item active">
-                                    <a class="nav-link" data-toggle="tab" data-type="order" href="#orders-notifications"
-                                        role="tab" id="orders-tab">{{ translate('Orders') }}</a>
+                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated dropdown-menu-xl py-0">
+                        <div class="notifications">
+                            <ul class="nav nav-tabs nav-justified" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark active" data-toggle="tab" data-type="order" href="javascript:void(0);"
+                                        data-target="#orders-notifications" role="tab" id="orders-tab">{{ translate('Orders') }}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" data-type="seller"
-                                        href="#sellers-notifications" role="tab" id="sellers-tab">{{ translate('Sellers') }}</a>
+                                    <a class="nav-link text-dark" data-toggle="tab" data-type="seller" href="javascript:void(0);"
+                                        data-target="#sellers-notifications" role="tab" id="sellers-tab">{{ translate('Products') }}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" data-type="seller"
-                                        href="#payouts-notifications" role="tab" id="sellers-tab">{{ translate('Payouts') }}</a>
+                                    <a class="nav-link text-dark" data-toggle="tab" data-type="seller" href="javascript:void(0);"
+                                        data-target="#payouts-notifications" role="tab" id="sellers-tab">{{ translate('Payouts') }}</a>
                                 </li>
-                                
                             </ul>
-                            <div class="tab-content">
+                            <div class="tab-content c-scrollbar-light overflow-auto" style="height: 75vh; max-height: 400px; overflow-y: auto;">
                                 <div class="tab-pane active" id="orders-notifications" role="tabpanel">
-                                    <x-notification :notifications="auth()->user()->unreadNotifications()->where('type', 'App\Notifications\OrderNotification')->take(20)->get()" />
+                                    <x-unread_notification :notifications="auth()->user()->unreadNotifications()->where('type', 'App\Notifications\OrderNotification')->take(20)->get()" />
                                 </div>
                                 <div class="tab-pane" id="sellers-notifications" role="tabpanel">
-                                    <x-notification :notifications="auth()->user()->unreadNotifications()->where('type', 'like', '%shop%')->take(20)->get()" />
+                                    <x-unread_notification :notifications="auth()->user()->unreadNotifications()->where('type', 'like', '%shop%')->take(20)->get()" />
                                 </div>
                                 <div class="tab-pane" id="payouts-notifications" role="tabpanel">
-                                    <x-notification :notifications="auth()->user()->unreadNotifications()->where('type', 'App\Notifications\PayoutNotification')->take(20)->get()" />
+                                    <x-unread_notification :notifications="auth()->user()->unreadNotifications()->where('type', 'App\Notifications\PayoutNotification')->take(20)->get()" />
                                 </div>
                             </div>
                         </div>
+
                         <div class="text-center border-top">
                             <a href="{{ route('seller.all-notification') }}" class="text-reset d-block py-2">
-                                {{translate('View All Notifications')}}
+                                {{ translate('View All Notifications') }}
                             </a>
                         </div>
                     </div>

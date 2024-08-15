@@ -99,6 +99,10 @@
     <script type="text/javascript">
 	    @foreach (session('flash_notification', collect())->toArray() as $message)
 	        AIZ.plugins.notify('{{ $message['level'] }}', '{{ $message['message'] }}');
+            @if ($message['message'] == translate('Product has been inserted successfully'))
+                localStorage.setItem('tempdataproduct', '{}');
+                localStorage.setItem('tempload', 'no');
+            @endif
 	    @endforeach
 
         $('.dropdown-menu a[data-toggle="tab"]').click(function(e) {

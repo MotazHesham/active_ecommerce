@@ -21,7 +21,7 @@
                             {{ date('d-m-Y', strtotime($review->created_at)) }}
                         </div>
                         <!-- Review ratting -->
-                        <span class="rating rating-mr-1">
+                        <span class="rating rating-mr-2">
                             @for ($i = 0; $i < $review->rating; $i++)
                                 <i class="las la-star active"></i>
                             @endfor
@@ -64,7 +64,7 @@
             {{ translate('There have been no reviews for this product yet.') }}
         </div>
     @endif
-    
+
     <!-- Pagination -->
     <div class="aiz-pagination product-reviews-pagination py-2 px-4 d-flex justify-content-end">
         {{ $reviews->links() }}

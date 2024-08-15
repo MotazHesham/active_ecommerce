@@ -85,7 +85,7 @@
                                         </div>
                                         <!-- Remove From Cart -->
                                         <div class="col-md-auto col-6 order-5 order-md-0 text-right">
-                                            <a href="javascript:void(0)" onclick="removeFromCartView(event, {{ $cartItem['id'] }})" class="btn btn-icon btn-sm btn-soft-primary bg-soft-warning hov-bg-primary btn-circle">
+                                            <a href="javascript:void(0)" onclick="removeFromCartView(event, {{ $cartItem['id'] }})" class="btn btn-icon btn-sm btn-soft-primary bg-soft-secondary-base hov-bg-primary btn-circle">
                                                 <i class="las la-trash fs-16"></i>
                                             </a>
                                         </div>
@@ -110,7 +110,8 @@
                         </div>
                         <!-- Continue to Shipping -->
                         <div class="col-md-6 text-center text-md-right">
-                            @if(Auth::check())
+
+                            @if(get_setting('guest_checkout_activation') == 1 || Auth::check())
                                 <a href="{{ route('checkout.shipping_info') }}" class="btn btn-primary fs-14 fw-700 rounded-0 px-4">
                                     {{ translate('Continue to Shipping')}}
                                 </a>
@@ -136,7 +137,3 @@
         </div>
     @endif
 </div>
-
-<script type="text/javascript">
-    AIZ.extra.plusMinus();
-</script>

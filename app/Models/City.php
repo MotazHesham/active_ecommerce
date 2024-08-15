@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 use App;
 
 class City extends Model
 {
+    use PreventDemoModeChanges;
+
     public function getTranslation($field = '', $lang = false){
         $lang = $lang == false ? App::getLocale() : $lang;
         $city_translation = $this->hasMany(CityTranslation::class)->where('lang', $lang)->first();

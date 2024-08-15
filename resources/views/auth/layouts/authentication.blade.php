@@ -86,6 +86,9 @@
     </style>
 
     @yield('css')
+    <script>
+        var AIZ = AIZ || {};
+    </script>
 </head>
 <body>
 

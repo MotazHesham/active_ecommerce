@@ -238,3 +238,11 @@
     </form>
 
 @endsection
+
+@section('script')
+<script type="text/javascript">
+    $(document).ready(function() {
+        AIZ.plugins.tagify();
+    });
+</script>
+@endsection

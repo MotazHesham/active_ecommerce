@@ -164,7 +164,6 @@ class CustomerProductController extends Controller
             $customer_product->unit             = $request->unit;
             $customer_product->description      = $request->description;
         }
-        $customer_product->status               = '1';
         $customer_product->user_id              = Auth::user()->id;
         $customer_product->category_id          = $request->category_id;
         $customer_product->brand_id             = $request->brand_id;

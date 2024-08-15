@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\User;
+use App\Traits\PreventDemoModeChanges;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
@@ -18,6 +19,8 @@ use Storage;
 //class ProductsImport implements ToModel, WithHeadingRow, WithValidation
 class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, ToModel
 {
+    use PreventDemoModeChanges;
+
     private $rows = 0;
 
     public function collection(Collection $rows)
@@ -71,6 +74,14 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, To
                     'sku' => $row['sku'],
                     'variant' => '',
                 ]);
+                if($row['multi_categories'] != null){
+                    foreach (explode(',', $row['multi_categories']) as $category_id) {
+                        ProductCategory::insert([
+                            "product_id" => $productId->id,
+                            "category_id" => $category_id
+                        ]);
+                    }
+                }
             }
 
             flash(translate('Products imported successfully'))->success();

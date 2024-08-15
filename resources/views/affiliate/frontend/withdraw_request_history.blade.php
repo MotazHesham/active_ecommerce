@@ -9,7 +9,7 @@
                     <div class="aiz-titlebar mb-4">
                         <div class="row align-items-center">
                             <div class="col-md-6">
-                                <h1 class="fs-20 fw-700 text-dark">{{ translate('Affiliate') }}</h1>
+                                <h3 class="fs-20 fw-700 text-dark">{{ translate('Affiliate') }}</h3>
                             </div>
                         </div>
                     </div>
@@ -96,13 +96,20 @@
 
                 <form class="" action="{{ route('affiliate.withdraw_request.store') }}" method="post">
                     @csrf
+                    @php
+                        $minimum_affiliate_withdraw_info = \App\Models\AffiliateConfig::where('type', 'minimum_affiliate_withdraw_amount')->first();
+                        $minimum_affiliate_withdraw_amount = '';
+                        if($minimum_affiliate_withdraw_info) {
+                            $minimum_affiliate_withdraw_amount = $minimum_affiliate_withdraw_info->value;
+                        }
+                    @endphp
                     <div class="modal-body gry-bg px-3 pt-3">
                         <div class="row">
                             <div class="col-md-3">
                                 <label>{{ translate('Amount')}} <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-md-9">
-                                <input type="number" class="form-control mb-3 rounded-0" name="amount" min="1" max="{{ Auth::user()->affiliate_user->balance }}" placeholder="{{ translate('Amount')}}" required>
+                                <input type="number" class="form-control mb-3 rounded-0" name="amount" min="{{ $minimum_affiliate_withdraw_amount }}" max="{{ Auth::user()->affiliate_user->balance }}" placeholder="{{ translate('Amount')}}" required>
                             </div>
                         </div>
                         <div class="form-group text-right">

@@ -20,7 +20,9 @@
             </span>
             <div class="ml-3 mt-0 p-0">
                 <div class="fs-14">{{ strip_tags($product_query->question) }}</div>
-                <span class="text-secondary">{{ $product_query->user->name }} </span>
+                <span class="text-secondary">
+                    {{ $product_query->user->name }} 
+                    <span class="fs-10 ml-3">{{ date('d-m-Y H:ia', strtotime($product_query->created_at)) }}</span></span>
             </div>
         </div>
         <div class="answer d-flex my-2">
@@ -38,7 +40,9 @@
                 <div class="fs-14">
                     {{ strip_tags($product_query->reply ? $product_query->reply : translate('Seller did not respond yet')) }}
                 </div>
-                <span class=" text-secondary"> {{ $product_query->product->user->name }}
+                <span class=" text-secondary">
+                    {{ $product_query->product->user->name }} 
+                    <span class="fs-10 ml-3">{{ date('d-m-Y H:ia', strtotime($product_query->created_at)) }}</span>
                 </span>
             </div>
         </div>

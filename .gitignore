@@ -1,9 +1,9 @@
+.env
 /bootstrap/compiled.php
 .env.*.php
 .env.php
-/app/Exceptions
 /node_modules
-/public/hot
+/public/assets
 /public/storage
 /public/uploads
 /storage/*.key
@@ -19,12 +19,10 @@ npm-debug.log
 yarn-error.log
 .DS_Store
 .idea/
-
 updates/
 composer.lock
 *.lock
 resources/lang/en.json
-.env
 updates.zip
 ecommerce.zip
 install.zip

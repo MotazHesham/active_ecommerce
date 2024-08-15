@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use Illuminate\Http\Request;
 use App\Models\Seller;
 use App\Models\User;
@@ -9,6 +10,7 @@ use App\Models\Shop;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Wishlist;
 use Illuminate\Support\Facades\Hash;
 use App\Notifications\EmailVerificationNotification;
 use App\Notifications\ShopVerificationNotification;
@@ -40,7 +42,9 @@ class SellerController extends Controller
         $approved = null;
         $shops = Shop::whereIn('user_id', function ($query) {
             $query->select('id')
-                ->from(with(new User)->getTable());
+                ->from(with(new User)->getTable())
+                ->where('user_type', 'seller')
+                ->where('email_verified_at', '!=', null);
         })->latest();
 
         if ($request->has('search')) {
@@ -172,7 +176,24 @@ class SellerController extends Controller
     public function destroy($id)
     {
         $shop = Shop::findOrFail($id);
-        Product::where('user_id', $shop->user_id)->delete();
+
+        // Seller Product and product related data delete
+        $products = $shop->user->products;
+        foreach($products as $product){
+            $product_id = $product->id;
+            $product->product_translations()->delete();
+            $product->categories()->detach();
+            $product->stocks()->delete();
+            $product->taxes()->delete();
+            $product->frequently_bought_products()->delete();
+            $product->last_viewed_products()->delete();
+            $product->flash_deal_products()->delete();
+
+            if ($product->delete()) {
+                Cart::where('product_id', $product_id)->delete();
+                Wishlist::where('product_id', $product_id)->delete();
+            }
+        }
         $orders = Order::where('user_id', $shop->user_id)->get();
 
         foreach ($orders as $key => $order) {
@@ -215,8 +236,12 @@ class SellerController extends Controller
         $shop->save();
         Cache::forget('verified_sellers_id');
 
-        $users = User::findMany([$shop->user->id, User::where('user_type', 'admin')->first()->id]);
-        Notification::send($users, new ShopVerificationNotification($shop, 'approved'));
+        $users = User::findMany([$shop->user->id]);
+        $data = array();
+        $data['shop'] = $shop;
+        $data['status'] = 'approved';
+        $data['notification_type_id'] = get_notification_type('shop_verify_request_approved', 'type')->id;
+        Notification::send($users, new ShopVerificationNotification($data));
 
         flash(translate('Seller has been approved successfully'))->success();
         return redirect()->route('sellers.index');
@@ -230,8 +255,12 @@ class SellerController extends Controller
         $shop->save();
         Cache::forget('verified_sellers_id');
 
-        $users = User::findMany([$shop->user->id, User::where('user_type', 'admin')->first()->id]);
-        Notification::send($users, new ShopVerificationNotification($shop, 'rejected'));
+        $users = User::findMany([$shop->user->id]);
+        $data = array();
+        $data['shop'] = $shop;
+        $data['status'] = 'rejected';
+        $data['notification_type_id'] = get_notification_type('shop_verify_request_rejected', 'type')->id;
+        Notification::send($users, new ShopVerificationNotification($data));
 
         flash(translate('Seller verification request has been rejected successfully'))->success();
         return redirect()->route('sellers.index');
@@ -258,8 +287,15 @@ class SellerController extends Controller
         Cache::forget('verified_sellers_id');
 
         $status = $request->status == 1 ? 'approved' : 'rejected';
-        $users = User::findMany([$shop->user->id, User::where('user_type', 'admin')->first()->id]);
-        Notification::send($users, new ShopVerificationNotification($shop, $status));
+        $users = User::findMany([$shop->user->id]);
+        $data = array();
+        $data['shop'] = $shop;
+        $data['status'] = $status;
+        $data['notification_type_id'] = $status == 'approved' ? 
+                                        get_notification_type('shop_verify_request_approved', 'type')->id : 
+                                        get_notification_type('shop_verify_request_rejected', 'type')->id;
+
+        Notification::send($users, new ShopVerificationNotification($data));
         return 1;
     }
 

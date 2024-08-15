@@ -15,10 +15,10 @@
     <div class="col-lg-8 mx-auto">
         <div class="card">
             <div class="card-body p-0">
-                <ul class="nav nav-tabs nav-fill border-light">
+                <ul class="nav nav-tabs nav-fill language-bar">
                     @foreach (get_all_active_language() as $key => $language)
                     <li class="nav-item">
-                        <a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3" href="{{ route('categories.edit', ['id'=>$category->id, 'lang'=> $language->code] ) }}">
+                        <a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3" href="{{ route('categories.edit', ['id'=>$category->id, 'lang'=> $language->code] ) }}">
                             <img src="{{ static_asset('assets/img/flags/'.$language->code.'.png') }}" height="11" class="mr-1">
                             <span>{{$language->name}}</span>
                         </a>
@@ -48,13 +48,7 @@
                         <label class="col-md-3 col-form-label">{{translate('Parent Category')}}</label>
                         <div class="col-md-9">
                             <select class="select2 form-control aiz-selectpicker" name="parent_id" data-toggle="select2" data-placeholder="Choose ..."data-live-search="true" data-selected="{{ $category->parent_id }}">
-                                @include('backend.product.categories.categories_option', ['categories' => $categories]){{-- <option value="0">{{ translate('No Parent') }}</option>
-                                @foreach ($categories as $acategory)
-                                    <option value="{{ $acategory->id }}">{{ $acategory->getTranslation('name') }}</option>
-                                    @foreach ($acategory->childrenCategories as $childCategory)
-                                        @include('categories.child_category', ['child_category' => $childCategory])
-                                    @endforeach
-                                @endforeach --}}
+                                @include('backend.product.categories.categories_option_edit', ['categories' => $categories])
                             </select>
                         </div>
                     </div>
@@ -68,7 +62,7 @@
                         </div>
                     </div>
     	            <div class="form-group row">
-                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Banner')}} <small>({{ translate('200x200') }})</small></label>
+                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Banner')}}</label>
                         <div class="col-md-9">
                             <div class="input-group" data-toggle="aizuploader" data-type="image">
                                 <div class="input-group-prepend">
@@ -79,10 +73,11 @@
                             </div>
                             <div class="file-preview box sm">
                             </div>
+                            <small class="text-muted">{{ translate('Minimum dimensions required: 150px width X 150px height.') }}</small>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Icon')}} <small>({{ translate('32x32') }})</small></label>
+                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Icon')}}</label>
                         <div class="col-md-9">
                             <div class="input-group" data-toggle="aizuploader" data-type="image">
                                 <div class="input-group-prepend">
@@ -93,10 +88,11 @@
                             </div>
                             <div class="file-preview box sm">
                             </div>
+                            <small class="text-muted">{{ translate('Minimum dimensions required: 16px width X 16px height.') }}</small>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Cover Image')}} <small>({{ translate('360x360') }})</small></label>
+                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Cover Image')}}</label>
                         <div class="col-md-9">
                             <div class="input-group" data-toggle="aizuploader" data-type="image">
                                 <div class="input-group-prepend">
@@ -107,6 +103,7 @@
                             </div>
                             <div class="file-preview box sm">
                             </div>
+                            <small class="text-muted">{{ translate('Minimum dimensions required: 318px width X 340px height.') }}</small>
                         </div>
                     </div>
                     <div class="form-group row">

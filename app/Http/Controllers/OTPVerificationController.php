@@ -38,7 +38,7 @@ class OTPVerificationController extends Controller
         if ($user->verification_code == $request->verification_code) {
             $user->email_verified_at = date('Y-m-d h:m:s');
             $user->save();
-
+            offerUserWelcomeCoupon();
             flash('Your phone number has been verified successfully')->success();
             return redirect()->route('home');
         }

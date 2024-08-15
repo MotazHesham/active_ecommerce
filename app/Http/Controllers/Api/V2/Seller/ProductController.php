@@ -6,7 +6,6 @@ use App\Http\Requests\ProductRequest;
 use App\Http\Resources\V2\Seller\AttributeCollection;
 use App\Http\Resources\V2\Seller\BrandCollection;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 use App\Http\Resources\V2\Seller\CategoriesCollection;
 use App\Http\Resources\V2\Seller\ColorCollection;
@@ -20,6 +19,7 @@ use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\ProductTax;
 use App\Models\ProductTranslation;
 use App\Models\Review;
@@ -30,6 +30,7 @@ use App\Services\ProductFlashDealService;
 use App\Services\ProductService;
 use App\Services\ProductStockService;
 use App\Services\ProductTaxService;
+use App\Services\FrequentlyBoughtProductService;
 
 class ProductController extends Controller
 {
@@ -37,17 +38,20 @@ class ProductController extends Controller
     protected $productTaxService;
     protected $productFlashDealService;
     protected $productStockService;
+    protected $frequentlyBoughtProductService;
 
     public function __construct(
         ProductService $productService,
         ProductTaxService $productTaxService,
         ProductFlashDealService $productFlashDealService,
-        ProductStockService $productStockService
+        ProductStockService $productStockService,
+        FrequentlyBoughtProductService $frequentlyBoughtProductService
     ) {
         $this->productService = $productService;
         $this->productTaxService = $productTaxService;
         $this->productFlashDealService = $productFlashDealService;
         $this->productStockService = $productStockService;
+        $this->frequentlyBoughtProductService = $frequentlyBoughtProductService;
     }
 
     public function index()
@@ -126,6 +130,11 @@ class ProductController extends Controller
             'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id'
         ]), $product);
 
+        // Frequently Bought Products
+        $this->frequentlyBoughtProductService->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+        ]));
+
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
@@ -150,14 +159,6 @@ class ProductController extends Controller
         $product->lang =  $request->lang == null ? env("DEFAULT_LANGUAGE") : $request->lang;
 
         return new ProductDetailsCollection($product);
-        /* $data = response()->json([
-            'lang'          => $lang,
-            'product'       => $product,
-            'product_name'  => $product->getTranslation('name',$lang),
-            'product_unit'  => $product->getTranslation('unit',$lang),
-            'description'   => $product->getTranslation('description',$lang),
-        ]);
-        return $data;*/
     }
 
     public function update(ProductRequest $request, Product $product)
@@ -176,9 +177,16 @@ class ProductController extends Controller
         //Product categories
         $product->categories()->sync($request->category_ids);
 
+        //Product Stock
         $this->productStockService->store($request->only([
             'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id'
         ]), $product);
+
+        // Frequently Bought Products
+        $product->frequently_bought_products()->delete();
+        $this->frequentlyBoughtProductService->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+        ]));
 
         //VAT & Tax
         if ($request->tax_id) {
@@ -263,6 +271,17 @@ class ProductController extends Controller
         //Store in Product Tax Table
         (new ProductTaxService)->product_duplicate_store($product->taxes, $product_new);
 
+        // Product Categories
+        foreach($product_new->product_categories as $product_category){
+            ProductCategory::insert([
+                'product_id' => $product_new->id,
+                'category_id' => $product_category->category_id,
+            ]);
+        }
+
+        // Frequently Bought Products
+        $this->frequentlyBoughtProductService->product_duplicate_store($product->frequently_bought_products, $product_new);
+
         return $this->success(translate('Product has been duplicated successfully'));
     }
 
@@ -275,8 +294,12 @@ class ProductController extends Controller
         }
 
         $product->product_translations()->delete();
+        $product->categories()->detach();
         $product->stocks()->delete();
         $product->taxes()->delete();
+        $product->frequently_bought_products()->delete();
+        $product->last_viewed_products()->delete();
+        $product->flash_deal_products()->delete();
 
         if (Product::destroy($id)) {
             Cart::where('product_id', $id)->delete();
@@ -307,5 +330,10 @@ class ProductController extends Controller
         return response()->json([
             'ramaining_product' => $remaining_uploads,
         ]);
+    }
+
+    public function productSearch(Request $request){
+        $products = (new ProductService)->product_search($request->all());
+        return new ProductCollection($products);
     }
 }

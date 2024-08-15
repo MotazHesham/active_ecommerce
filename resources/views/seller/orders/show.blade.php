@@ -8,7 +8,7 @@
         </div>
 
         <div class="card-body">
-            <div class="row gutters-5">
+            <div class="row gutters-5 mb-3">
                 <div class="col text-md-left text-center">
                 </div>
                 @php
@@ -52,6 +52,13 @@
                             <input type="text" class="form-control" value="{{ translate(ucfirst(str_replace('_', ' ', $delivery_status))) }}" disabled>
                         @endif
                     </div>
+                    <div class="col-md-3 ml-auto">
+                        <label for="update_tracking_code">
+                            {{ translate('Tracking Code (optional)') }}
+                        </label>
+                        <input type="text" class="form-control" id="update_tracking_code"
+                            value="{{ $order->tracking_code }}">
+                    </div>
                 @endif
             </div>
             <div class="row gutters-5 mt-2">
@@ -89,8 +96,8 @@
                                 height="100"></a>
                     @endif
                 </div>
-                <div class="col-md-4 ml-auto">
-                    <table>
+                <div class="col-md-4">
+                    <table class="ml-auto">
                         <tbody>
                             <tr>
                                 <td class="text-main text-bold">{{ translate('Order #') }}</td>

@@ -9,9 +9,10 @@ class ShopCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
                     'id' => $data->id,
+                    'slug' => $data->slug,
                     'name' => $data->name,
                     'logo' => uploaded_asset($data->logo),
                     'rating' => $data->rating,
@@ -28,7 +29,8 @@ class ShopCollection extends ResourceCollection
         ];
     }
 
-    protected function convertPhotos($data){
+    protected function convertPhotos($data)
+    {
         $result = array();
         foreach ($data as $key => $item) {
             array_push($result, uploaded_asset($item));

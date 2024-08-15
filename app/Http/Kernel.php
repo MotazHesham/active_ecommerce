@@ -10,6 +10,7 @@ use App\Http\Middleware\CheckoutMiddleware;
 use App\Http\Middleware\IsUnbanned;
 use App\Http\Middleware\AppLanguage;
 use App\Http\Middleware\IsAppUserUnbanned;
+use App\Http\Middleware\PreventDatabaseAction;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 
@@ -67,6 +68,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
+        'prevent_db_action' => PreventDatabaseAction::class,
         'app_language' => AppLanguage::class,
         'app_user_unbanned' => IsAppUserUnbanned::class,
         'admin' => IsAdmin::class,

@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 use App;
 
 class FlashDeal extends Model
 {
+    use PreventDemoModeChanges;
+
     protected $with = ['flash_deal_translations'];
 
     public function getTranslation($field = '', $lang = false){

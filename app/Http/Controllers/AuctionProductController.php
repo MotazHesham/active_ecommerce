@@ -97,7 +97,7 @@ class AuctionProductController extends Controller
     }
     // Auction products list admin panel end
 
-    // Auction Products list in Seller panel 
+    // Auction Products list in Seller panel
     public function auction_product_list_seller(Request $request)
     {
         if (get_setting('seller_auction_product') == 0) {
@@ -157,10 +157,6 @@ class AuctionProductController extends Controller
     public function product_store_admin(ProductRequest $request)
     {
         (new AuctionService)->store($request);
-        flash(translate('Product has been inserted successfully'))->success();
-
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
         return redirect()->route('auction.inhouse_products');
     }
 
@@ -177,10 +173,6 @@ class AuctionProductController extends Controller
         }
 
         (new AuctionService)->store($request);
-        flash(translate('Product has been inserted successfully'))->success();
-
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
         return redirect()->route('auction_products.seller.index');
     }
 
@@ -193,20 +185,12 @@ class AuctionProductController extends Controller
     public function product_destroy_admin($id)
     {
         (new AuctionService)->destroy($id);
-        flash(translate('Product has been deleted successfully'))->success();
-            
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
         return redirect()->route('auction.inhouse_products');
     }
 
     public function product_destroy_seller($id)
     {
         (new AuctionService)->destroy($id);
-        flash(translate('Product has been deleted successfully'))->success();
-            
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
         return redirect()->route('auction_products.seller.index');
     }
 
@@ -252,20 +236,12 @@ class AuctionProductController extends Controller
     public function product_update_admin(ProductRequest $request, $id)
     {
         (new AuctionService)->update($request, $id);
-        flash(translate('Product has been Updated successfully'))->success();
-
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
         return back();
     }
 
     public function product_update_seller(ProductRequest $request, $id)
     {
         (new AuctionService)->update($request, $id);
-        flash(translate('Product has been Updated successfully'))->success();
-
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
         return back();
     }
 
@@ -301,22 +277,27 @@ class AuctionProductController extends Controller
     public function auction_product_details(Request $request, $slug)
     {
         $detailedProduct  = Product::where('slug', $slug)->first();
-        $product_queries = ProductQuery::where('product_id', $detailedProduct->id)->where('customer_id', '!=', Auth::id())->latest('id')->paginate(3);
-        $total_query = ProductQuery::where('product_id', $detailedProduct->id)->count();
-        $reviews = $detailedProduct->reviews()->paginate(3);
-
-        // review status
-        $review_status = 0;
-        if (Auth::check()) {
-            $OrderDetail = OrderDetail::with(['order' => function ($q) {
-                $q->where('user_id', Auth::id());
-            }])->where('product_id', $detailedProduct->id)->where('delivery_status', 'delivered')->first();
-            $review_status = $OrderDetail ? 1 : 0;
-        }
-
         if ($detailedProduct != null) {
+            $product_queries = ProductQuery::where('product_id', $detailedProduct->id)->where('customer_id', '!=', Auth::id())->latest('id')->paginate(3);
+            $total_query = ProductQuery::where('product_id', $detailedProduct->id)->count();
+            $reviews = $detailedProduct->reviews()->paginate(3);
+
+            // review status
+            $review_status = 0;
+            if (Auth::check()) {
+                $OrderDetail = OrderDetail::with(['order' => function ($q) {
+                    $q->where('user_id', Auth::id());
+                }])->where('product_id', $detailedProduct->id)->where('delivery_status', 'delivered')->first();
+                $review_status = $OrderDetail ? 1 : 0;
+            }
+
+            if(get_setting('last_viewed_product_activation') == 1 && Auth::check() && auth()->user()->user_type == 'customer'){
+                lastViewedProducts($detailedProduct->id, auth()->user()->id);
+            }
+
             return view('frontend.product_details', compact('detailedProduct', 'product_queries', 'total_query', 'reviews', 'review_status'));
         }
+
         abort(404);
     }
 

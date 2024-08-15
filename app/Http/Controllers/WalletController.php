@@ -78,7 +78,7 @@ class WalletController extends Controller
             $wallets = $wallets->where('approval', $request->type);
             $type = $request->type;
         }
-        $wallets = $wallets->paginate(10);
+        $wallets = $wallets->orderBy('id','desc')->paginate(10);
         return view('manual_payment_methods.wallet_request', compact('wallets', 'type'));
     }
 

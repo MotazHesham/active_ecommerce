@@ -24,7 +24,7 @@
             <div class="col text-center text-md-left">
                 <h5 class="mb-md-0 h6">{{ translate('All blog posts') }}</h5>
             </div>
-            
+
             <div class="col-md-2">
                 <div class="form-group mb-0">
                     <input type="text" class="form-control form-control-sm" id="search" name="search"@isset($sort_search) value="{{ $sort_search }}" @endisset placeholder="{{ translate('Type & Enter') }}">
@@ -65,9 +65,9 @@
                         </td>
                         <td>
                             <label class="aiz-switch aiz-switch-success mb-0">
-                                <input type="checkbox" 
+                                <input type="checkbox"
                                     @can('publish_blog') onchange="change_status(this)" @endcan
-                                    value="{{ $blog->id }}" 
+                                    value="{{ $blog->id }}"
                                     <?php if($blog->status == 1) echo "checked";?>
                                     @cannot('publish_blog') disabled @endcan
                                 >
@@ -107,6 +107,12 @@
 
     <script type="text/javascript">
         function change_status(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             var status = 0;
             if(el.checked){
                 var status = 1;

@@ -12,15 +12,14 @@
                 </svg>
             </a>
         </div>
-        
+
     </div>
-    <div class="d-flex justify-content-between align-items-stretch flex-grow-xl-1">
+    <div class="d-flex justify-content-between align-items-stretch flex-grow-1">
         <div class="d-flex justify-content-around align-items-center align-items-stretch">
             <!-- Browse Website -->
             <div class="aiz-topbar-item mr-3">
                 <div class="d-flex align-items-center">
-                    {{-- <a class="btn btn-topbar has-transition btn-icon btn-circle btn-light p-0 hov-bg-primary d-flex align-items-center justify-content-center" --}}
-                    <a class="btn btn-topbar has-transition btn-icon btn-circle btn-light p-0 d-flex align-items-center justify-content-center"
+                    <a class="btn btn-topbar has-transition btn-icon btn-circle btn-light p-0 hov-bg-primary hov-svg-white d-flex align-items-center justify-content-center"
                         href="{{ route('home') }}" target="_blank" data-toggle="tooltip" data-title="{{ translate('Browse Website') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                             <path id="_754bac7463b8b1afad8e10a2355d1700" data-name="754bac7463b8b1afad8e10a2355d1700" d="M56,48a8,8,0,1,0,8,8A8,8,0,0,0,56,48Zm-.829,14.808a6.858,6.858,0,0,1-4.39-11.256,7.6,7.6,0,0,1,.077.93,2.966,2.966,0,0,0,.382,2.26,3.729,3.729,0,0,1,.362,1.08c.1.341.5.519.77.729.552.423,1.081.916,1.666,1.288.387.246.628.368.515.84a2.98,2.98,0,0,1-.313.951,1.927,1.927,0,0,0,.321.861c.288.288.575.553.889.813C55.938,61.706,55.4,62.229,55.171,62.808Zm5.678-1.959a6.808,6.808,0,0,1-3.56,1.888,2.844,2.844,0,0,1,.842-1.129,2.865,2.865,0,0,0,.757-.937,6.506,6.506,0,0,1,.522-.893c.272-.419-.67-1.051-.975-1.184a10.052,10.052,0,0,1-1.814-1.13c-.435-.306-1.318.16-1.808-.054A9.462,9.462,0,0,1,53,56.166c-.6-.454-.574-.984-.574-1.654.472.017,1.144-.131,1.458.249.1.12.439.655.667.465.186-.155-.138-.779-.2-.925-.193-.451.439-.626.762-.932.422-.4,1.326-1.024,1.254-1.309s-.9-1.1-1.394-.969c-.073.019-.719.7-.844.8q0-.332.01-.663c0-.14-.26-.283-.248-.373.031-.227.664-.64.821-.821-.11-.069-.487-.392-.6-.345-.276.115-.588.194-.863.309a1.756,1.756,0,0,0-.025-.274,6.792,6.792,0,0,1,1.743-.506l.542.218.382.454.382.394.334.108.53-.5L57,49.536v-.321a6.782,6.782,0,0,1,2.9,1.146c-.155.014-.326.037-.518.061a1.723,1.723,0,0,0-.268-.1c.251.54.513,1.073.779,1.606.284.569.915,1.18,1.026,1.781.131.708.04,1.352.111,2.185a3.732,3.732,0,0,0,.9,1.714,1.812,1.812,0,0,0,.707.086A6.815,6.815,0,0,1,60.849,60.849Z" transform="translate(-48 -48)" fill="#717580"/>
@@ -32,8 +31,7 @@
             <!-- POS -->
             <div class="aiz-topbar-item mr-3">
                 <div class="d-flex align-items-center">
-                    {{-- <a class="btn btn-topbar has-transition btn-icon btn-circle btn-light p-0 hov-bg-primary d-flex align-items-center justify-content-center"  --}}
-                    <a class="btn btn-topbar has-transition btn-icon btn-circle btn-light p-0 d-flex align-items-center justify-content-center" 
+                    <a class="btn btn-topbar has-transition btn-icon btn-circle btn-light p-0 hov-bg-primary hov-svg-white d-flex align-items-center justify-content-center"
                         href="{{ route('poin-of-sales.index') }}" target="_blank" data-toggle="tooltip" data-title="{{ translate('POS') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="13.79" height="16" viewBox="0 0 13.79 16">
                             <g id="_371925cdd3f531725a9fa8f3ebf8fe9e" data-name="371925cdd3f531725a9fa8f3ebf8fe9e" transform="translate(-2.26 0)">
@@ -48,29 +46,10 @@
             </div>
             @endif
             <!-- Clear Cache -->
-            <div class="d-flex justify-content-around align-items-center align-items-stretch">
-                <div class="aiz-topbar-item d-none d-sm-block">
-                    <div class="d-flex align-items-center h-100">
-                        <a class="btn btn-soft-blue btn-sm d-flex align-items-center rounded-2 hov-svg-white"
-                            href="{{ route('cache.clear') }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16.023" height="16" viewBox="0 0 16.023 16">
-                                <g id="Group_27930" data-name="Group 27930" transform="translate(16597 13026)">
-                                  <g id="Group_27929" data-name="Group 27929" transform="translate(-16597 -13026)">
-                                    <path id="Path_40670" data-name="Path 40670" d="M2.795,1,1.265,8H14.8L13.366,1H2.795M1.989,0H14.183l1.841,9h-16Z" transform="translate(0)" fill="#3390f3"/>
-                                    <path id="Path_40671" data-name="Path 40671" d="M1,.928V5H15V.928H1m-1-1H16V6H0Z" transform="translate(0 10)" fill="#3390f3"/>
-                                  </g>
-                                  <path id="Rectangle_20177" data-name="Rectangle 20177" d="M0,0H2V1H0Z" transform="translate(-16585 -13014)" fill="#3390f3"/>
-                                </g>
-                            </svg>
-                            <span class="fw-500 ml-2 mr-0 d-none d-md-block">{{ translate('Clear Cache') }}</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {{-- <div class="aiz-topbar-item mr-3">
+            <div class="aiz-topbar-item mr-3">
                 <div class="d-flex align-items-center">
-                    <a class="btn btn-topbar has-transition btn-icon btn-circle btn-light p-0 hov-bg-primary d-flex align-items-center justify-content-center" 
-                        href="{{ route('cache.clear') }}" target="_blank" data-toggle="tooltip" data-title="{{ translate('Clear Cache') }}">
+                    <a class="btn btn-topbar has-transition btn-icon btn-circle btn-light p-0 hov-bg-primary hov-svg-white d-flex align-items-center justify-content-center"
+                        href="{{ route('cache.clear') }}" data-toggle="tooltip" data-title="{{ translate('Clear Cache') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                             <path id="_74846e5be5db5b666d3893933be03656" data-name="74846e5be5db5b666d3893933be03656" d="M7.719,8.911H8.9V10.1H7.719v1.185H6.539V10.1H5.36V8.911h1.18V7.726h1.18ZM5.36,13.652h1.18v1.185H5.36v1.185H4.18V14.837H3V13.652H4.18V12.467H5.36Zm13.626-2.763H10.138V10.3a1.182,1.182,0,0,1,1.18-1.185h2.36V2h1.77V9.111h2.36a1.182,1.182,0,0,1,1.18,1.185ZM18.4,18H16.044a9.259,9.259,0,0,0,.582-2.963.59.59,0,1,0-1.18,0A7.69,7.69,0,0,1,14.755,18H12.5a9.259,9.259,0,0,0,.582-2.963.59.59,0,1,0-1.18,0A7.69,7.69,0,0,1,11.216,18H8.958a22.825,22.825,0,0,0,1.163-5.926H18.99A19.124,19.124,0,0,1,18.4,18Z" transform="translate(-3 -2)" fill="#717580"/>
                         </svg>
@@ -80,88 +59,120 @@
             <!-- Topbar menus -->
             <div class="aiz-topbar-item mr-2 d-none d-xl-block">
                 <div class="d-flex align-items-center h-100">
-                    <a class="aiz-topbar-menu fs-13 fw-600 d-flex align-items-center justify-content-center {{ areActiveRoutes(['admin.dashboard']) }}" 
+                    <a class="aiz-topbar-menu fs-13 fw-600 d-flex align-items-center justify-content-center {{ areActiveRoutes(['admin.dashboard']) }}"
                         href="{{ route('admin.dashboard') }}">{{ translate('Dashboard') }}</a>
-                    <a class="aiz-topbar-menu fs-13 fw-600 d-flex align-items-center justify-content-center {{ areActiveRoutes(['all_orders.index']) }}" 
-                        href="{{ route('all_orders.index') }}">{{ translate('Orders') }}</a>
-                    <a class="aiz-topbar-menu fs-13 fw-600 d-flex align-items-center justify-content-center {{ areActiveRoutes(['admin.dashboard']) }}" 
-                        href="{{ route('admin.dashboard') }}">{{ translate('Earnings') }}</a>
-                    <a class="aiz-topbar-menu fs-13 fw-600 d-flex align-items-center justify-content-center {{ (url()->current() == url('/admin/website/custom-pages/edit/home')) ? 'active' : '' }}" 
-                        href="{{ route('custom-pages.edit', ['id'=>'home', 'lang'=>env('DEFAULT_LANGUAGE'), 'page'=>'home']) }}">{{ translate('Homepage Settings') }}</a>
+                    @can('view_all_orders')
+                        <a class="aiz-topbar-menu fs-13 fw-600 d-flex align-items-center justify-content-center {{ areActiveRoutes(['all_orders.index']) }}"
+                            href="{{ route('all_orders.index') }}">{{ translate('Orders') }}</a>
+                    @endcan
+                    @can('earning_report')
+                        <a class="aiz-topbar-menu fs-13 fw-600 d-flex align-items-center justify-content-center {{ areActiveRoutes(['earning_payout_report.index']) }}"
+                            href="{{ route('earning_payout_report.index') }}">{{ translate('Earnings') }}</a>
+                    @endcan
+                    @can('edit_website_page')
+                        <a class="aiz-topbar-menu fs-13 fw-600 d-flex align-items-center justify-content-center {{ (url()->current() == url('/admin/website/custom-pages/edit/home')) ? 'active' : '' }}"
+                            href="{{ route('custom-pages.edit', ['id'=>'home', 'lang'=>env('DEFAULT_LANGUAGE'), 'page'=>'home']) }}">{{ translate('Homepage Settings') }}</a>
+                    @endcan
                 </div>
             </div>
-            <!-- Add New product -->
+            <!-- Add New Button -->
             <div class="d-flex justify-content-around align-items-center align-items-stretch">
                 <div class="aiz-topbar-item d-none d-sm-block">
-                    <div class="d-flex align-items-center h-100">
-                        <a class="btn btn-soft-blue btn-sm d-flex align-items-center rounded-2 hov-svg-white"
-                            href="{{ route('products.create') }}">
-                            <span class="fw-500 mx-2 mr-0 d-none d-md-block">{{ translate('Add New') }}</span>
-                            <i class="las fs-18 la-plus"></i>
+                    <div class="d-flex align-items-center h-100 dropdown">
+                        <a class="dropdown-toggle no-arrow h-100" data-toggle="dropdown" href="javascript:void(0);"
+                            role="button" aria-haspopup="false" aria-expanded="false">
+                            <span class="btn btn-soft-blue btn-sm d-flex align-items-center rounded-2 hov-svg-white">
+                                <span class="fw-500 mx-2 mr-0 d-none d-md-block">{{ translate('Add New') }}</span>
+                                <i class="las fs-18 la-plus"></i>
+                            </span>
                         </a>
+
+                        <div class="dropdown-menu dropdown-menu-left dropdown-menu-animated dropdown-menu-md" style="top: 15px !important;">
+                            @can('add_new_product')
+                                <a href="{{ route('products.create') }}" class="dropdown-item">
+                                    <i class="las la-plus"></i>
+                                    <span>{{ translate('New Product') }}</span>
+                                </a>
+                            @endcan
+                            @can('add_brand')
+                                <a href="{{ route('categories.create') }}" class="dropdown-item">
+                                    <i class="las la-plus"></i>
+                                    <span>{{ translate('New Category') }}</span>
+                                </a>
+                            @endcan
+                            @can('add_product_category')
+                                <a href="{{ route('brands.index') }}" class="dropdown-item">
+                                    <i class="las la-plus"></i>
+                                    <span>{{ translate('New Brand') }}</span>
+                                </a>
+                            @endcan
+                        </div>
+
                     </div>
                 </div>
-            </div> --}}
+            </div>
         </div>
         <div class="d-flex justify-content-around align-items-center align-items-stretch">
             <!-- Notifications -->
-            <div class="aiz-topbar-item ml-2 ml-md-3">
-                <div class="align-items-stretch d-flex dropdown">
-                    <a class="dropdown-toggle no-arrow" data-toggle="dropdown" href="javascript:void(0);" role="button"
-                        aria-haspopup="false" aria-expanded="false">
-                        <span class="btn btn-topbar btn-circle btn-light p-0 d-flex justify-content-center align-items-center" data-toggle="tooltip" data-title="{{ translate('Notification') }}">
-                            <span class="d-flex align-items-center position-relative">
-                                <div class="px-2 hov-svg-dark">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16">
-                                        <g id="Group_23884" data-name="Group 23884" transform="translate(-677 5110)">
-                                          <path id="Union_38" data-name="Union 38" d="M5.5,16a.5.5,0,0,1,0-1h3a.5.5,0,1,1,0,1Zm-5-2a.5.5,0,0,1,0-1H2V7A5.008,5.008,0,0,1,6.5,2.025V.5a.5.5,0,1,1,1,0V2.025A5.007,5.007,0,0,1,12,7H11A4,4,0,1,0,3,7v6h8V7h1v6h1.5a.5.5,0,1,1,0,1Z" transform="translate(677 -5110)" fill="#9da3ae"/>
-                                        </g>
-                                    </svg>
-                                </div>
-                                @if (Auth::user()->unreadNotifications->count() > 0)
-                                    <span class="badge badge-sm badge-dot badge-circle badge-danger position-absolute absolute-top-right"></span>
-                                @endif
+            @can('view_notifications')
+                <div class="aiz-topbar-item mr-3">
+                    <div class="align-items-stretch d-flex dropdown">
+                        <a class="dropdown-toggle no-arrow" data-toggle="dropdown" href="javascript:void(0);" role="button"
+                            aria-haspopup="false" aria-expanded="false">
+                            <span class="btn btn-topbar btn-circle btn-light p-0 d-flex justify-content-center align-items-center" data-toggle="tooltip" data-title="{{ translate('Notification') }}">
+                                <span class="d-flex align-items-center position-relative">
+                                    <div class="px-2 hov-svg-dark">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16">
+                                            <g id="Group_23884" data-name="Group 23884" transform="translate(-677 5110)">
+                                            <path id="Union_38" data-name="Union 38" d="M5.5,16a.5.5,0,0,1,0-1h3a.5.5,0,1,1,0,1Zm-5-2a.5.5,0,0,1,0-1H2V7A5.008,5.008,0,0,1,6.5,2.025V.5a.5.5,0,1,1,1,0V2.025A5.007,5.007,0,0,1,12,7H11A4,4,0,1,0,3,7v6h8V7h1v6h1.5a.5.5,0,1,1,0,1Z" transform="translate(677 -5110)" fill="#9da3ae"/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    @if (auth()->user()->unreadNotifications->count() > 0)
+                                        <span class="badge badge-sm badge-dot badge-circle badge-danger position-absolute absolute-top-right"></span>
+                                    @endif
+                                </span>
                             </span>
-                        </span>
-                    </a>
+                        </a>
 
-                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated dropdown-menu-xl py-0">
-                        <div class="notifications">
-                            <ul class="nav nav-tabs nav-justified" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark active" data-toggle="tab" data-type="order" href="javascript:void();"
-                                        data-target="#orders-notifications" role="tab" id="orders-tab">{{ translate('Orders') }}</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" data-toggle="tab" data-type="seller" href="javascript:void();"
-                                        data-target="#sellers-notifications" role="tab" id="sellers-tab">{{ translate('Sellers') }}</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" data-toggle="tab" data-type="seller" href="javascript:void();"
-                                        data-target="#payouts-notifications" role="tab" id="sellers-tab">{{ translate('Payouts') }}</a>
-                                </li>
-                            </ul>
-                            <div class="tab-content c-scrollbar-light overflow-auto" style="height: 75vh; max-height: 400px; overflow-y: auto;">
-                                <div class="tab-pane active" id="orders-notifications" role="tabpanel">
-                                    <x-notification :notifications="auth()->user()->unreadNotifications()->where('type', 'App\Notifications\OrderNotification')->take(20)->get()" />
-                                </div>
-                                <div class="tab-pane" id="sellers-notifications" role="tabpanel">
-                                    <x-notification :notifications="auth()->user()->unreadNotifications()->where('type', 'like', '%shop%')->take(20)->get()" />
-                                </div>
-                                <div class="tab-pane" id="payouts-notifications" role="tabpanel">
-                                    <x-notification :notifications="auth()->user()->unreadNotifications()->where('type', 'App\Notifications\PayoutNotification')->take(20)->get()" />
+                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated dropdown-menu-xl py-0">
+                            <div class="notifications">
+                                <ul class="nav nav-tabs nav-justified" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark active" data-toggle="tab" data-type="order" href="javascript:void(0);"
+                                            data-target="#orders-notifications" role="tab" id="orders-tab">{{ translate('Orders') }}</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" data-toggle="tab" data-type="seller" href="javascript:void(0);"
+                                            data-target="#sellers-notifications" role="tab" id="sellers-tab">{{ translate('Sellers') }}</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" data-toggle="tab" data-type="seller" href="javascript:void(0);"
+                                            data-target="#payouts-notifications" role="tab" id="sellers-tab">{{ translate('Payouts') }}</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content c-scrollbar-light overflow-auto" style="height: 75vh; max-height: 400px; overflow-y: auto;">
+                                    <div class="tab-pane active" id="orders-notifications" role="tabpanel">
+                                        <x-unread_notification :notifications="auth()->user()->unreadNotifications()->where('type', 'App\Notifications\OrderNotification')->take(20)->get()" />
+                                    </div>
+                                    <div class="tab-pane" id="sellers-notifications" role="tabpanel">
+                                        <x-unread_notification :notifications="auth()->user()->unreadNotifications()->where('type', 'like', '%shop%')->take(20)->get()" />
+                                    </div>
+                                    <div class="tab-pane" id="payouts-notifications" role="tabpanel">
+                                        <x-unread_notification :notifications="auth()->user()->unreadNotifications()->where('type', 'App\Notifications\PayoutNotification')->take(20)->get()" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="text-center border-top">
-                            <a href="{{ route('admin.all-notification') }}" class="text-reset d-block py-2">
-                                {{ translate('View All Notifications') }}
-                            </a>
+
+                            <div class="text-center border-top">
+                                <a href="{{ route('admin.all-notifications') }}" class="text-reset d-block py-2">
+                                    {{ translate('View All Notifications') }}
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endcan
 
             <!-- language -->
             @php
@@ -171,7 +182,7 @@
                     $locale = env('DEFAULT_LANGUAGE');
                 }
             @endphp
-            <div class="aiz-topbar-item ml-2 ml-md-3">
+            <div class="aiz-topbar-item mr-3">
                 <div class="align-items-stretch d-flex dropdown" id="lang-change">
                     <a class="dropdown-toggle no-arrow" data-toggle="dropdown" href="javascript:void(0);"
                         role="button" aria-haspopup="false" aria-expanded="false">
@@ -195,7 +206,7 @@
                 </div>
             </div>
             <!-- User -->
-            <div class="aiz-topbar-item ml-2 ml-md-3">
+            <div class="aiz-topbar-item">
                 <div class="align-items-stretch d-flex dropdown">
                     <!-- Image & Name -->
                     <a class="dropdown-toggle no-arrow text-dark" data-toggle="dropdown" href="javascript:void(0);"

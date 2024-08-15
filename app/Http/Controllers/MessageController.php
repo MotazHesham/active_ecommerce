@@ -36,17 +36,20 @@ class MessageController extends Controller
      */
     public function store(Request $request)
     {
+        $authUser = Auth::user();
         $message = new Message;
         $message->conversation_id = $request->conversation_id;
-        $message->user_id = Auth::user()->id;
+        $message->user_id = $authUser->id;
         $message->message = $request->message;
         $message->save();
         $conversation = $message->conversation;
-        if ($conversation->sender_id == Auth::user()->id) {
-            $conversation->receiver_viewed ="1";
-        }
-        elseif($conversation->receiver_id == Auth::user()->id) {
+        if ($conversation->sender_id == $authUser->id) {
             $conversation->sender_viewed ="1";
+            $conversation->receiver_viewed ="0";
+        }
+        elseif($conversation->receiver_id == $authUser->id || $authUser == 'staff') {
+            $conversation->sender_viewed ="0";
+            $conversation->receiver_viewed ="1";
         }
         $conversation->save();
         

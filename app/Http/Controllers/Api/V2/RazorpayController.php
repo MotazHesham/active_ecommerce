@@ -3,18 +3,14 @@
 
 namespace App\Http\Controllers\Api\V2;
 
-
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\CustomerPackageController;
-use App\Http\Controllers\WalletController;
 use App\Models\CombinedOrder;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Razorpay\Api\Api;
 
 class RazorpayController
 {
-
     public function payWithRazorpay(Request $request)
     {
         $payment_type = $request->payment_type;
@@ -23,11 +19,6 @@ class RazorpayController
         $user_id = $request->user_id;
         $user = User::find($user_id);
 
-        $package_id = 0;
-        if (isset($request->package_id)) {
-            $package_id = $request->package_id;
-        }
-
         $api = new Api(env('RAZOR_KEY'), env('RAZOR_SECRET'));
         $res = $api->order->create(array('receipt' => '123', 'amount' => round($amount * 100), 'currency' => 'INR', 'notes' => array('key1' => 'value3', 'key2' => 'value2')));
 
@@ -35,11 +26,14 @@ class RazorpayController
             $combined_order = CombinedOrder::find($combined_order_id);
             $shipping_address = json_decode($combined_order->shipping_address, true);
             return view('frontend.razorpay.order_payment', compact('user', 'combined_order', 'shipping_address', 'res'));
+        } elseif ($payment_type == 'order_re_payment') {
+            $order = Order::find($request->order_id);
+            $amount = $order->grand_total;
+            return view('frontend.razorpay.wallet_payment', compact('user', 'amount', 'res'));
         } elseif ($payment_type == 'wallet_payment') {
-
             return view('frontend.razorpay.wallet_payment',  compact('user', 'amount', 'res'));
         } elseif ($payment_type == 'seller_package_payment' || $payment_type == "customer_package_payment") {
-
+            $package_id = $request->package_id;
             return view('frontend.razorpay.wallet_payment',  compact('user', 'amount', 'package_id', 'res'));
         }
     }
@@ -86,20 +80,19 @@ class RazorpayController
             $payment_type = $request->payment_type;
 
             if ($payment_type == 'cart_payment') {
-
                 checkout_done($request->combined_order_id, $request->payment_details);
             }
-
-            if ($payment_type == 'wallet_payment') {
-
+            elseif ($payment_type == 'order_re_payment') {
+                order_re_payment_done($request->order_id, 'Razorpay', $request->payment_details);
+            }
+            elseif ($payment_type == 'wallet_payment') {
                 wallet_payment_done($request->user_id, $request->amount, 'Razorpay', $request->payment_details);
             }
-            if ($payment_type == 'seller_package_payment') {
-                seller_purchase_payment_done($request->user_id, $request->package_id, $request->amount, 'Razorpay', $request->payment_details);
+            elseif ($payment_type == 'seller_package_payment') {
+                seller_purchase_payment_done($request->user_id, $request->package_id, 'Razorpay', $request->payment_details);
             }
-
-            if ($payment_type == 'customer_package_payment') {
-                customer_purchase_payment_done($request->user_id, $request->package_id);
+            elseif ($payment_type == 'customer_package_payment') {
+                customer_purchase_payment_done($request->user_id, $request->package_id, 'Razorpay', $request->payment_details);
             }
 
             return response()->json(['result' => true, 'message' => translate("Payment is successful")]);

@@ -12,7 +12,7 @@
                     $total = 0;
                     $total += $detailedProduct->reviews->count();
                 @endphp
-                <span class="rating rating-mr-1">
+                <span class="rating rating-mr-2">
                     {{ renderStarRating($detailedProduct->rating) }}
                 </span>
                 <span class="ml-1 opacity-50 fs-14">({{ $total }}
@@ -81,7 +81,7 @@
     <!-- Brand Logo & Name -->
     @if ($detailedProduct->brand != null)
         <div class="d-flex flex-wrap align-items-center mb-3">
-            <span class="text-secondary fs-14 fw-400 mr-4 w-50px">{{ translate('Brand') }}</span><br>
+            <span class="text-secondary fs-14 fw-400 mr-4 w-80px">{{ translate('Brand') }}</span><br>
             <a href="{{ route('products.brand', $detailedProduct->brand->slug) }}"
                 class="text-reset hov-text-primary fs-14 fw-700">{{ $detailedProduct->brand->name }}</a>
         </div>
@@ -92,7 +92,7 @@
         <div class="d-flex align-items-center mr-4">
             <!-- Shop Name -->
             @if ($detailedProduct->added_by == 'seller' && get_setting('vendor_system_activation') == 1)
-                <span class="text-secondary fs-14 fw-400 mr-4 w-50px">{{ translate('Sold by') }}</span>
+                <span class="text-secondary fs-14 fw-400 mr-4 w-80px">{{ translate('Sold by') }}</span>
                 <a href="{{ route('shop.visit', $detailedProduct->user->shop->slug) }}"
                     class="text-reset hov-text-primary fs-14 fw-700">{{ $detailedProduct->user->shop->name }}</a>
             @else
@@ -131,9 +131,11 @@
             $sizeChartId = ($detailedProduct->main_category && $detailedProduct->main_category->sizeChart) ? $detailedProduct->main_category->sizeChart->id : 0;
             $sizeChartName = ($detailedProduct->main_category && $detailedProduct->main_category->sizeChart) ? $detailedProduct->main_category->sizeChart->name : null;
         @endphp
-        <div class=" ml-4">
-            <a href="javascript:void(1);" onclick="showSizeChartDetail({{ $sizeChartId }}, '{{ $sizeChartName }}')" class="animate-underline-primary">{{ translate('Show size guide') }}</a>
-        </div>
+        @if($sizeChartId != 0)
+            <div class=" ml-4">
+                <a href="javascript:void(1);" onclick='showSizeChartDetail({{ $sizeChartId }}, "{{ $sizeChartName }}")' class="animate-underline-primary">{{ translate('Show size guide') }}</a>
+            </div>
+        @endif
     </div>
 
     <hr>
@@ -482,11 +484,11 @@
                 @else
                     <button type="button"
                         class="btn btn-secondary-base mr-2 add-to-cart fw-600 min-w-150px rounded-0 text-white"
-                        @if (Auth::check()) onclick="addToCart()" @else onclick="showLoginModal()" @endif>
+                        @if (Auth::check() || get_Setting('guest_checkout_activation') == 1) onclick="addToCart()" @else onclick="showLoginModal()" @endif>
                         <i class="las la-shopping-bag"></i> {{ translate('Add to cart') }}
                     </button>
                     <button type="button" class="btn btn-primary buy-now fw-600 add-to-cart min-w-150px rounded-0"
-                        @if (Auth::check()) onclick="buyNow()" @else onclick="showLoginModal()" @endif>
+                        @if (Auth::check() || get_Setting('guest_checkout_activation') == 1) onclick="addToCart()" @else onclick="showLoginModal()" @endif>
                         <i class="la la-shopping-cart"></i> {{ translate('Buy Now') }}
                     </button>
                 @endif
@@ -496,11 +498,11 @@
             @elseif ($detailedProduct->digital == 1)
                 <button type="button"
                     class="btn btn-secondary-base mr-2 add-to-cart fw-600 min-w-150px rounded-0 text-white"
-                    @if (Auth::check()) onclick="addToCart()" @else onclick="showLoginModal()" @endif>
+                    @if (Auth::check() || get_Setting('guest_checkout_activation') == 1) onclick="addToCart()" @else onclick="showLoginModal()" @endif>
                     <i class="las la-shopping-bag"></i> {{ translate('Add to cart') }}
                 </button>
                 <button type="button" class="btn btn-primary buy-now fw-600 add-to-cart min-w-150px rounded-0"
-                    @if (Auth::check()) onclick="buyNow()" @else onclick="showLoginModal()" @endif>
+                    @if (Auth::check() || get_Setting('guest_checkout_activation') == 1) onclick="addToCart()" @else onclick="showLoginModal()" @endif>
                     <i class="la la-shopping-cart"></i> {{ translate('Buy Now') }}
                 </button>
             @endif

@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 use App;
 
 class Role extends Model
 {
+  use PreventDemoModeChanges;
+
     protected $with = ['role_translations'];
 
     public function getTranslation($field = '', $lang = false){

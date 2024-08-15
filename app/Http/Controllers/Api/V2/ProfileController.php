@@ -176,9 +176,7 @@ class ProfileController extends Controller
 
             $user->avatar_original = $upload->id;
             $user->save();
-
-
-
+            
             return response()->json([
                 'result' => true,
                 'message' => translate("Image updated"),
@@ -308,8 +306,6 @@ class ProfileController extends Controller
 
     public function checkIfPhoneAndEmailAvailable()
     {
-
-
         $phone_available = false;
         $email_available = false;
         $phone_available_message = translate("User phone number not found");

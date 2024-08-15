@@ -31,6 +31,7 @@
 		                        <input type="hidden" name="header_logo" class="selected-files" value="{{ get_setting('header_logo') }}">
 		                    </div>
 		                    <div class="file-preview"></div>
+                            <small class="text-muted">{{ translate("Minimum dimensions required: 244px width X 40px height.") }}</small>
 						</div>
 	                </div>
 					<!-- Show Language Switcher -->
@@ -80,7 +81,7 @@
 			                        <input type="hidden" name="topbar_banner" class="selected-files" value="{{ get_setting('topbar_banner') }}">
 			                    </div>
 			                    <div class="file-preview"></div>
-                                <small>{{ translate('Will be shown in large device') }}</small>
+                                <small class="text-muted">{{ translate('Will be shown in large device. Minimum dimensions required: 1920px width X 60px height.') }}</small>
 							</div>
 		                </div>
 						<!-- Topbar Banner Medium -->
@@ -96,7 +97,7 @@
 			                        <input type="hidden" name="topbar_banner_medium" class="selected-files" value="{{ get_setting('topbar_banner_medium') }}">
 			                    </div>
 			                    <div class="file-preview"></div>
-                                <small>{{ translate('Will be shown in medium device') }}</small>
+                                <small class="text-muted">{{ translate('Will be shown in medium device. Minimum dimensions required: 810px width X 40px height.') }}</small>
 							</div>
 		                </div>
 						<!-- Topbar Banner Small -->
@@ -112,7 +113,7 @@
 			                        <input type="hidden" name="topbar_banner_small" class="selected-files" value="{{ get_setting('topbar_banner_small') }}">
 			                    </div>
 			                    <div class="file-preview"></div>
-                                <small>{{ translate('Will be shown in small device') }}</small>
+                                <small class="text-muted">{{ translate('Will be shown in small device. Minimum dimensions required: 428px width X 40px height.') }}</small>
 							</div>
 		                </div>
 						<!-- Topbar Banner Link -->

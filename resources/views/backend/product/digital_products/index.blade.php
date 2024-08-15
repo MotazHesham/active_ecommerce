@@ -126,6 +126,12 @@
         });
 
         function update_todays_deal(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var status = 1;
             }
@@ -143,6 +149,11 @@
         }
 
         function update_published(el){
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var status = 1;
             }
@@ -160,6 +171,12 @@
         }
 
         function update_approved(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var approved = 1;
             }
@@ -167,8 +184,8 @@
                 var approved = 0;
             }
             $.post('{{ route('products.approved') }}', {
-                _token      :   '{{ csrf_token() }}', 
-                id          :   el.value, 
+                _token      :   '{{ csrf_token() }}',
+                id          :   el.value,
                 approved    :   approved
             }, function(data){
                 if(data == 1){
@@ -179,8 +196,14 @@
                 }
             });
         }
-        
+
         function update_featured(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var status = 1;
             }

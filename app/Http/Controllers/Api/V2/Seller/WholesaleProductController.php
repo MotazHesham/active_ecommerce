@@ -3,17 +3,13 @@
 namespace App\Http\Controllers\Api\V2\Seller;
 
 use Illuminate\Http\Request;
-use CoreComponentRepository;
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductTranslation;
 use App\Services\WholesaleService;
 use App\Services\ProductTaxService;
-use App\Services\ProductFlashDealService;
 use App\Http\Requests\WholesaleProductRequest;
 use App\Http\Resources\V2\Seller\ProductCollection;
 use App\Http\Resources\V2\Seller\WholesaleProductDetailsCollection;
-use Auth;
 
 class WholesaleProductController extends Controller
 {
@@ -21,15 +17,11 @@ class WholesaleProductController extends Controller
     {
     }
 
-
     // Wholesale Products list in Seller panel 
     public function wholesale_products()
     {
-
         $products = Product::where('wholesale_product', 1)->where('user_id', auth()->user()->id)->orderBy('created_at', 'desc');
-
         $products = $products->paginate(15);
-
         return new ProductCollection($products);
     }
 
@@ -61,6 +53,10 @@ class WholesaleProductController extends Controller
             ]));
         }
 
+        (new FrequentlyBoughtProductService)->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+        ]));
+        
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
@@ -70,7 +66,6 @@ class WholesaleProductController extends Controller
         return $this->success("Product successfully created.");
     }
 
-
     public function product_edit(Request $request, $id)
     {
         $product = Product::findOrFail($id);
@@ -78,17 +73,11 @@ class WholesaleProductController extends Controller
         return new WholesaleProductDetailsCollection($product);
     }
 
-
-
-
     public function product_update(WholesaleProductRequest $request, $id)
     {
         (new WholesaleService)->update($request, $id);
-
         return $this->success(translate('Product has been updated successfully'));
     }
-
-
 
     public function product_destroy($id)
     {

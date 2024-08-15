@@ -51,7 +51,7 @@ class AddressController extends Controller
         $address->longitude     = $request->longitude;
         $address->latitude      = $request->latitude;
         $address->postal_code   = $request->postal_code;
-        $address->phone         = $request->phone;
+        $address->phone         = '+'.$request->country_code.$request->phone;
         $address->save();
 
         flash(translate('Address info Stored successfully'))->success();
@@ -81,7 +81,7 @@ class AddressController extends Controller
         $data['states'] = State::where('status', 1)->where('country_id', $data['address_data']->country_id)->get();
         $data['cities'] = City::where('status', 1)->where('state_id', $data['address_data']->state_id)->get();
 
-        $returnHTML = view('frontend.'.get_setting('homepage_select').'.partials.address_edit_modal', $data)->render();
+        $returnHTML = view('frontend.partials.address.address_edit_modal', $data)->render();
         return response()->json(array('data' => $data, 'html' => $returnHTML));
         //        return ;
     }

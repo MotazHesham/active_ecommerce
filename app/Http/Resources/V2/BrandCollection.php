@@ -9,9 +9,10 @@ class BrandCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
                     'id' => $data->id,
+                    'slug' => $data->slug,
                     'name' => $data->getTranslation('name'),
                     'logo' => uploaded_asset($data->logo),
                     'links' => [

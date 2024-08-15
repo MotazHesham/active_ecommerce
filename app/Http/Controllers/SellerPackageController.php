@@ -182,21 +182,23 @@ class SellerPackageController extends Controller
 
     public function purchase_payment_done($payment_data, $payment)
     {
-        $seller = Auth::user()->shop;
+        $user = auth()->user();
+        $seller = $user->shop;
         $seller->seller_package_id = Session::get('payment_data')['seller_package_id'];
         $seller_package = SellerPackage::findOrFail(Session::get('payment_data')['seller_package_id']);
         $seller->product_upload_limit = $seller_package->product_upload_limit;
         $seller->package_invalid_at = date('Y-m-d', strtotime($seller->package_invalid_at . ' +' . $seller_package->duration . 'days'));
         $seller->save();
 
-        $seller_package = new SellerPackagePayment;
-        $seller_package->user_id = Auth::user()->id;
-        $seller_package->seller_package_id = Session::get('payment_data')['seller_package_id'];
-        $seller_package->payment_method = Session::get('payment_data')['payment_method'];
-        $seller_package->payment_details = $payment;
-        $seller_package->approval = 1;
-        $seller_package->offline_payment = 2;
-        $seller_package->save();
+        $seller_package_payment = new SellerPackagePayment;
+        $seller_package_payment->user_id = $user->id;
+        $seller_package_payment->seller_package_id = $seller_package->id;
+        $seller_package_payment->amount = $seller_package->amount;
+        $seller_package_payment->payment_method = Session::get('payment_data')['payment_method'];
+        $seller_package_payment->payment_details = $payment;
+        $seller_package_payment->approval = 1;
+        $seller_package_payment->offline_payment = 2;
+        $seller_package_payment->save();
 
         flash(translate('Package purchasing successful'))->success();
         return redirect()->route('seller.dashboard');
@@ -211,6 +213,7 @@ class SellerPackageController extends Controller
                     $product->save();
                 }
                 $shop->seller_package_id = null;
+                $shop->package_invalid_at = null;
                 $shop->save();
             }
         }
@@ -220,20 +223,22 @@ class SellerPackageController extends Controller
     public function purchase_package_offline(Request $request)
     {
         $seller_package = SellerPackage::findOrFail($request->package_id);
-
-        if (Auth::user()->shop->seller_package != null && $seller_package->product_upload_limit < Auth::user()->shop->seller_package->product_upload_limit) {
+        $user = auth()->user();
+        if ($user->shop->seller_package != null && $seller_package->product_upload_limit < $user->shop->seller_package->product_upload_limit) {
             flash(translate('You have more uploaded products than this package limit. You need to remove excessive products to downgrade.'))->warning();
             return redirect()->route('seller.seller_packages_list');
         }
-        $seller_package = new SellerPackagePayment;
-        $seller_package->user_id = Auth::user()->id;
-        $seller_package->seller_package_id = $request->package_id;
-        $seller_package->payment_method = $request->payment_option;
-        $seller_package->payment_details = $request->trx_id;
-        $seller_package->approval = 0;
-        $seller_package->offline_payment = 1;
-        $seller_package->reciept = $request->photo;
-        $seller_package->save();
+        $seller_package_payment = new SellerPackagePayment;
+        $seller_package_payment->user_id = $user->id;
+        $seller_package_payment->seller_package_id = $request->package_id;
+        $seller_package_payment->amount = $seller_package->amount;
+        $seller_package_payment->payment_method = $request->payment_option;
+        $seller_package_payment->payment_details = $request->trx_id;
+        $seller_package_payment->approval = 0;
+        $seller_package_payment->offline_payment = 1;
+        $seller_package_payment->reciept = $request->photo;
+        $seller_package_payment->save();
+
         flash(translate('Offline payment has been done. Please wait for response.'))->success();
         return redirect()->route('seller.products');
     }

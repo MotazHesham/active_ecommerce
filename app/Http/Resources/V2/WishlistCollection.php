@@ -15,6 +15,7 @@ class WishlistCollection extends ResourceCollection
                     'product' => [
                         'id' => $data->product->id,
                         'name' => $data->product->name,
+                        'slug' => $data->product->slug,
                         'thumbnail_image' => uploaded_asset($data->product->thumbnail_img),
                         'base_price' => format_price(home_base_price($data->product, false)) ,
                         'rating' => (double) $data->product->rating,

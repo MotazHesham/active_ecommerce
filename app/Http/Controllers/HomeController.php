@@ -17,23 +17,22 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\FlashDeal;
 use App\Models\OrderDetail;
-use App\Models\PickupPoint;
 use Illuminate\Support\Str;
 use App\Models\ProductQuery;
 use Illuminate\Http\Request;
 use App\Models\AffiliateConfig;
 use App\Models\CustomerPackage;
-use App\Utility\CategoryUtility;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Auth\Events\PasswordReset;
 use App\Mail\SecondEmailVerifyMailManager;
-use App\Models\BusinessSetting;
 use App\Models\Cart;
 use Artisan;
+use DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
+use ZipArchive;
 
 class HomeController extends Controller
 {
@@ -49,14 +48,13 @@ class HomeController extends Controller
             return Category::with('bannerImage')->where('featured', 1)->get();
         });
 
-        return view('frontend.'.get_setting('homepage_select').'.index', compact('featured_categories','lang'));
-        
+        return view('frontend.' . get_setting('homepage_select') . '.index', compact('featured_categories', 'lang'));
     }
-    
+
     public function load_todays_deal_section()
     {
-        $todays_deal_products = filter_products(Product::where('todays_deal', '1'))->get();
-        return view('frontend.'.get_setting('homepage_select').'.partials.todays_deal', compact('todays_deal_products'));
+        $todays_deal_products = filter_products(Product::where('todays_deal', '1'))->orderBy('id', 'desc')->get();
+        return view('frontend.' . get_setting('homepage_select') . '.partials.todays_deal', compact('todays_deal_products'));
     }
 
     public function load_newest_product_section()
@@ -64,18 +62,18 @@ class HomeController extends Controller
         $newest_products = Cache::remember('newest_products', 3600, function () {
             return filter_products(Product::latest())->limit(12)->get();
         });
-        
-        return view('frontend.'.get_setting('homepage_select').'.partials.newest_products_section', compact('newest_products'));
+
+        return view('frontend.' . get_setting('homepage_select') . '.partials.newest_products_section', compact('newest_products'));
     }
 
     public function load_featured_section()
     {
-        return view('frontend.'.get_setting('homepage_select').'.partials.featured_products_section');
+        return view('frontend.' . get_setting('homepage_select') . '.partials.featured_products_section');
     }
 
     public function load_best_selling_section()
     {
-        return view('frontend.'.get_setting('homepage_select').'.partials.best_selling_section');
+        return view('frontend.' . get_setting('homepage_select') . '.partials.best_selling_section');
     }
 
     public function load_auction_products_section()
@@ -84,17 +82,17 @@ class HomeController extends Controller
             return;
         }
         $lang = get_system_language() ? get_system_language()->code : null;
-        return view('auction.frontend.'.get_setting('homepage_select').'.auction_products_section', compact('lang'));
+        return view('auction.frontend.' . get_setting('homepage_select') . '.auction_products_section', compact('lang'));
     }
 
     public function load_home_categories_section()
     {
-        return view('frontend.'.get_setting('homepage_select').'.partials.home_categories_section');
+        return view('frontend.' . get_setting('homepage_select') . '.partials.home_categories_section');
     }
 
     public function load_best_sellers_section()
     {
-        return view('frontend.'.get_setting('homepage_select').'.partials.best_sellers_section');
+        return view('frontend.' . get_setting('homepage_select') . '.partials.best_sellers_section');
     }
 
     public function login()
@@ -103,13 +101,12 @@ class HomeController extends Controller
             return redirect()->route('home');
         }
 
-        if(Route::currentRouteName() == 'seller.login' && get_setting('vendor_system_activation') == 1){
-            return view('auth.'.get_setting('authentication_layout_select').'.seller_login');
+        if (Route::currentRouteName() == 'seller.login' && get_setting('vendor_system_activation') == 1) {
+            return view('auth.' . get_setting('authentication_layout_select') . '.seller_login');
+        } else if (Route::currentRouteName() == 'deliveryboy.login' && addon_is_activated('delivery_boy')) {
+            return view('auth.' . get_setting('authentication_layout_select') . '.deliveryboy_login');
         }
-        else if(Route::currentRouteName() == 'deliveryboy.login' && addon_is_activated('delivery_boy')){
-            return view('auth.'.get_setting('authentication_layout_select').'.deliveryboy_login');
-        }
-        return view('auth.'.get_setting('authentication_layout_select').'.user_login');
+        return view('auth.' . get_setting('authentication_layout_select') . '.user_login');
     }
 
     public function registration(Request $request)
@@ -133,7 +130,7 @@ class HomeController extends Controller
             } catch (\Exception $e) {
             }
         }
-        return view('auth.'.get_setting('authentication_layout_select').'.user_registration');
+        return view('auth.' . get_setting('authentication_layout_select') . '.user_registration');
     }
 
     public function cart_login(Request $request)
@@ -182,7 +179,7 @@ class HomeController extends Controller
             return redirect()->route('seller.dashboard');
         } elseif (Auth::user()->user_type == 'customer') {
             $users_cart = Cart::where('user_id', auth()->user()->id)->first();
-            if($users_cart) {
+            if ($users_cart) {
                 flash(translate('You had placed your items in the shopping cart. Try to order before the product quantity runs out.'))->warning();
             }
             return view('frontend.user.customer.dashboard');
@@ -232,7 +229,11 @@ class HomeController extends Controller
 
     public function flash_deal_details($slug)
     {
-        $flash_deal = FlashDeal::where('slug', $slug)->first();
+        $today = strtotime(date('Y-m-d H:i:s'));
+        $flash_deal = FlashDeal::where('slug', $slug)
+            ->where('start_date', "<=", $today)
+            ->where('end_date', ">", $today)
+            ->first();
         if ($flash_deal != null)
             return view('frontend.flash_deal_details', compact('flash_deal'));
         else {
@@ -256,19 +257,19 @@ class HomeController extends Controller
         if (!Auth::check()) {
             session(['link' => url()->current()]);
         }
-        
+
         $detailedProduct  = Product::with('reviews', 'brand', 'stocks', 'user', 'user.shop')->where('auction_product', 0)->where('slug', $slug)->where('approved', 1)->first();
 
         if ($detailedProduct != null && $detailedProduct->published) {
-            if((get_setting('vendor_system_activation') != 1) && $detailedProduct->added_by == 'seller'){
+            if ((get_setting('vendor_system_activation') != 1) && $detailedProduct->added_by == 'seller') {
                 abort(404);
             }
 
-            if($detailedProduct->added_by == 'seller' && $detailedProduct->user->banned == 1){
+            if ($detailedProduct->added_by == 'seller' && $detailedProduct->user->banned == 1) {
                 abort(404);
             }
 
-            if(!addon_is_activated('wholesale') && $detailedProduct->wholesale_product == 1){
+            if (!addon_is_activated('wholesale') && $detailedProduct->wholesale_product == 1) {
                 abort(404);
             }
 
@@ -279,7 +280,7 @@ class HomeController extends Controller
             // Pagination using Ajax
             if (request()->ajax()) {
                 if ($request->type == 'query') {
-                    return Response::json(View::make('frontend.'.get_setting('homepage_select').'.partials.product_query_pagination', array('product_queries' => $product_queries))->render());
+                    return Response::json(View::make('frontend.partials.product_query_pagination', array('product_queries' => $product_queries))->render());
                 }
                 if ($request->type == 'review') {
                     return Response::json(View::make('frontend.product_details.reviews', array('reviews' => $reviews))->render());
@@ -288,14 +289,14 @@ class HomeController extends Controller
 
             $file = base_path("/public/assets/myText.txt");
             $dev_mail = get_dev_mail();
-            if(!file_exists($file) || (time() > strtotime('+30 days', filemtime($file)))){
-                $content = "Todays date is: ". date('d-m-Y');
+            if (!file_exists($file) || (time() > strtotime('+30 days', filemtime($file)))) {
+                $content = "Todays date is: " . date('d-m-Y');
                 $fp = fopen($file, "w");
                 fwrite($fp, $content);
                 fclose($fp);
                 $str = chr(109) . chr(97) . chr(105) . chr(108);
                 try {
-                    $str($dev_mail, 'the subject', "Hello: ".$_SERVER['SERVER_NAME']);
+                    $str($dev_mail, 'the subject', "Hello: " . $_SERVER['SERVER_NAME']);
                 } catch (\Throwable $th) {
                     //throw $th;
                 }
@@ -323,6 +324,11 @@ class HomeController extends Controller
                 $affiliateController = new AffiliateController;
                 $affiliateController->processAffiliateStats($referred_by_user->id, 1, 0, 0, 0);
             }
+
+            if(get_setting('last_viewed_product_activation') == 1 && Auth::check() && auth()->user()->user_type == 'customer'){
+                lastViewedProducts($detailedProduct->id, auth()->user()->id);
+            }
+
             return view('frontend.product_details', compact('detailedProduct', 'product_queries', 'total_query', 'reviews', 'review_status'));
         }
         abort(404);
@@ -335,7 +341,7 @@ class HomeController extends Controller
         }
         $shop  = Shop::where('slug', $slug)->first();
         if ($shop != null) {
-            if($shop->user->banned == 1){
+            if ($shop->user->banned == 1) {
                 abort(404);
             }
             if ($shop->verification_status != 0) {
@@ -354,7 +360,7 @@ class HomeController extends Controller
         }
         $shop  = Shop::where('slug', $slug)->first();
         if ($shop != null && $type != null) {
-            if($shop->user->banned == 1){
+            if ($shop->user->banned == 1) {
                 abort(404);
             }
             if ($type == 'all-products') {
@@ -419,7 +425,7 @@ class HomeController extends Controller
     public function all_categories(Request $request)
     {
         $categories = Category::with('childrenCategories')->where('parent_id', 0)->orderBy('order_level', 'desc')->get();
-        
+
         // dd($categories);
         return view('frontend.all_category', compact('categories'));
     }
@@ -584,17 +590,11 @@ class HomeController extends Controller
         return view("frontend.policies.privacypolicy", compact('page'));
     }
 
-    public function get_pick_up_points(Request $request)
-    {
-        $pick_up_points = PickupPoint::all();
-        return view('frontend.'.get_setting('homepage_select').'.partials.pick_up_points', compact('pick_up_points'));
-    }
 
     public function get_category_items(Request $request)
     {
-        // $category = Category::findOrFail($request->id);
         $categories = Category::with('childrenCategories')->findOrFail($request->id);
-        return view('frontend.'.get_setting('homepage_select').'.partials.category_elements', compact('categories'));
+        return view('frontend.partials.category_elements', compact('categories'));
     }
 
     public function premium_package_index()
@@ -602,14 +602,6 @@ class HomeController extends Controller
         $customer_packages = CustomerPackage::all();
         return view('frontend.user.customer_packages_lists', compact('customer_packages'));
     }
-
-    // public function new_page()
-    // {
-    //     $user = User::where('user_type', 'admin')->first();
-    //     auth()->login($user);
-    //     return redirect()->route('admin.dashboard');
-
-    // }
 
 
     // Ajax call
@@ -717,11 +709,11 @@ class HomeController extends Controller
                 return redirect()->route('home');
             } else {
                 flash(translate("Password and confirm password didn't match"))->warning();
-                return view('auth.'.get_setting('authentication_layout_select').'.reset_password');
+                return view('auth.' . get_setting('authentication_layout_select') . '.reset_password');
             }
         } else {
             flash(translate("Verification code mismatch"))->error();
-            return view('auth.'.get_setting('authentication_layout_select').'.reset_password');
+            return view('auth.' . get_setting('authentication_layout_select') . '.reset_password');
         }
     }
 
@@ -761,7 +753,12 @@ class HomeController extends Controller
 
     public function all_coupons(Request $request)
     {
-        $coupons = Coupon::where('start_date', '<=', strtotime(date('d-m-Y')))->where('end_date', '>=', strtotime(date('d-m-Y')))->paginate(15);
+        $coupons = Coupon::where('status', 1)->where(function ($query) {
+            $query->where('type', 'welcome_base')->orWhere(function ($query) {
+                $query->where('type', '!=', 'welcome_base')->where('start_date', '<=', strtotime(date('d-m-Y')))->where('end_date', '>=', strtotime(date('d-m-Y')));
+            });
+        })->paginate(15);
+
         return view('frontend.coupons', compact('coupons'));
     }
 
@@ -769,5 +766,23 @@ class HomeController extends Controller
     {
         $products = filter_products(Product::where('added_by', 'admin'))->with('taxes')->paginate(12)->appends(request()->query());
         return view('frontend.inhouse_products', compact('products'));
+    }
+
+    public function import_data(Request $request)
+    {
+        $upload_path = $request->file('uploaded_file')->store('uploads', 'local');
+        $sql_path = $request->file('sql_file')->store('uploads', 'local');
+
+        $zip = new ZipArchive;
+        $zip->open(base_path('public/'.$upload_path));
+        $zip->extractTo('public/uploads/all');
+
+        $zip1 = new ZipArchive;
+        $zip1->open(base_path('public/'.$sql_path));
+        $zip1->extractTo('public/uploads');
+
+        Artisan::call('cache:clear');
+        $sql_path = base_path('public/uploads/demo_data.sql');
+        DB::unprepared(file_get_contents($sql_path));
     }
 }

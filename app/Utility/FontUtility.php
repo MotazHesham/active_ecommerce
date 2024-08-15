@@ -71,7 +71,7 @@ class FontUtility
             // Chinese font
             $font_family = "'sun-exta','gb'";
         } elseif (
-            $currency_code == 'kyat' ||
+            $currency_code == 'MMK' ||
             $language_code == 'mm'
         ) {
             // Myanmar font

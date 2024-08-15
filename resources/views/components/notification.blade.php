@@ -1,92 +1,111 @@
-@props(['notifications', 'is_linkable' => false])
+@props(['notifications'])
+<div class="form-group">
+    <div class="aiz-checkbox-inline ml-3">
+        <label class="aiz-checkbox">
+            <input type="checkbox" class="check-all">
+            <span class="aiz-square-check"></span>{{ translate('Select All') }}
+        </label>
+    </div>
+</div>
 
-
+@php
+    $notificationShowDesign = get_setting('notification_show_type');
+    if($notificationShowDesign != 'only_text'){
+        $notifyImageDesign = '';
+        if($notificationShowDesign == 'design_2'){
+            $notifyImageDesign = 'rounded-1';
+        }
+        elseif($notificationShowDesign == 'design_3'){
+            $notifyImageDesign = 'rounded-circle';
+        }
+    }
+@endphp
 @forelse($notifications as $notification)
     <li class="list-group-item d-flex justify-content-between align-items- py-3">
         <div class="media text-inherit">
             <div class="media-body">
-                <p class="mb-1 text-truncate-2">
-                    @php $user_type = auth()->user()->user_type; @endphp
+                @php
+                    $user_type = auth()->user()->user_type;
+                    $notificationType = get_notification_type($notification->notification_type_id, 'id');
+                    $notifyContent = $notificationType->getTranslation('default_text');
+                @endphp
+                <div class="d-flex">
+                    <div class="form-group d-inline-block">
+                        <label class="aiz-checkbox">
+                            <input type="checkbox" class="check-one" name='id[]' value="{{$notification->id}}">
+                            <span class="aiz-square-check"></span>
+                        </label>
+                    </div>
 
-                    @if ($notification->type == 'App\Notifications\OrderNotification')
-                        {{ translate('Order code: ') }}
-                        @if ($is_linkable)
+                    @if($notificationShowDesign != 'only_text')
+                        <div class="size-35px mr-2">
+                            <img
+                                src="{{ uploaded_asset($notificationType->image) }}"
+                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/notification.png') }}';"
+                                class="img-fit h-100 {{ $notifyImageDesign }}" >
+                        </div>
+                    @endif
+                    <div>
+                        {{-- Order Related Notifications --}}
+                        @if ($notification->type == 'App\Notifications\OrderNotification')
+                        @php
+                            $orderCode  = $notification->data['order_code'];
+                            $route = $user_type == 'admin' ?
+                                    route('all_orders.show', encrypt($orderCode)) :
+                                    route('seller.orders.show', encrypt($orderCode));
+                            $orderCode = "<a href='".$route."'>".$orderCode."</a>";
+                            $notifyContent = str_replace('[[order_code]]', $orderCode, $notifyContent);
+                        @endphp
+
+                        {{-- Shop Verification Related Notifications --}}
+                        @elseif ($notification->type == 'App\Notifications\ShopVerificationNotification')
                             @php
-                                if ($user_type == 'admin'){
-                                    $route = route('all_orders.show', encrypt($notification->data['order_id']));
-                                }
-                                if ($user_type == 'seller'){
-                                    $route = route('seller.orders.show', encrypt($notification->data['order_id']));
+                                if($notification->data['status'] == 'submitted'){
+                                    $route = route('sellers.show_verification_request', $notification->data['id']);
+                                    $shopName = "<a href='".$route."'>".$notification->data['name']."</a>";
+                                    $notifyContent = str_replace('[[shop_name]]', $shopName, $notifyContent);
                                 }
                             @endphp
-                            <a href="{{ $route }}">
-                        @endif
 
-                        {{ $notification->data['order_code'] }}
-
-                        @if ($is_linkable)
-                            </a>
-                        @endif
-                        
-                        {{ translate(' has been ' . ucfirst(str_replace('_', ' ', $notification->data['status']))) }}
-                        
-                    @elseif ($notification->type == 'App\Notifications\ShopVerificationNotification')
-                        @if ($user_type == 'admin')
-                            @if ($is_linkable)
-                                <a href="{{ route('sellers.show_verification_request', $notification->data['id']) }}">
-                            @endif
-                            {{ $notification->data['name'] }}: 
-                            @if ($is_linkable)
-                                </a>
-                            @endif
-                        @else
-                            {{ translate('Your ') }}
-                        @endif
-                        {{ translate('verification request has been '.$notification->data['status']) }}
-                    @elseif ($notification->type == 'App\Notifications\ShopProductNotification')
-                        @php 
-                            $product_id     = $notification->data['id'];
-                            $product_type   = $notification->data['type'];
-                            $product_name   = $notification->data['name'];
-                            $lang           = env('DEFAULT_LANGUAGE');
-
-                            $route = $user_type == 'admin'
+                        {{-- Shop Product Related Notifications --}}
+                        @elseif ($notification->type == 'App\Notifications\ShopProductNotification')
+                            @php
+                                $product_id     = $notification->data['id'];
+                                $product_type   = $notification->data['type'];
+                                $lang           = env('DEFAULT_LANGUAGE');
+                                $route = $user_type == 'admin'
                                     ? ( $product_type == 'physical'
                                         ? route('products.seller.edit', ['id'=>$product_id, 'lang'=>$lang])
                                         : route('digitalproducts.edit', ['id'=>$product_id, 'lang'=>$lang] ))
                                     : ( $product_type == 'physical'
-                                        ? route('seller.products.edit', ['id'=>$product_id, 'lang'=>$lang]) 
+                                        ? route('seller.products.edit', ['id'=>$product_id, 'lang'=>$lang])
                                         : route('seller.digitalproducts.edit',  ['id'=>$product_id, 'lang'=>$lang] ));
-                        @endphp
+                                $productName = "<a href='".$route."'>".$notification->data['name']."</a>";
 
-                        {{ translate('Product : ') }}
-                        @if ($is_linkable)
-                            <a href="{{ $route }}">{{ $product_name }}</a>
-                        @else
-                            {{ $product_name }}
-                        @endif
-                        
-                        {{ translate(' is').' '.$notification->data['status'] }}
-                    @elseif ($notification->type == 'App\Notifications\PayoutNotification')
-                        @php 
-                            $route = $user_type == 'admin'
+                                $notifyContent = str_replace('[[product_name]]', $productName, $notifyContent);
+                            @endphp
+
+                        {{-- Seller Payout Notifications --}}
+                        @elseif ($notification->type == 'App\Notifications\PayoutNotification')
+                            @php
+                                $amount = single_price($notification->data['payment_amount']);
+                                $route = $user_type == 'admin'
                                     ? ( $notification->data['status'] == 'pending' ? route('withdraw_requests_all') : route('sellers.payment_histories'))
                                     : ( $notification->data['status'] == 'pending' ? route('seller.money_withdraw_requests.index') : route('seller.payments.index'));
-                            
-                        @endphp
+                                $shopName = "<a href='".$route."'>".$notification->data['name']."</a>";
 
-                         {{ $user_type == 'admin' ? $notification->data['name'].': ' : translate('Your') }}
-                         @if ($is_linkable )
-                             <a href="{{ $route }}">{{ translate('payment') }}</a>
-                         @else
-                             {{ translate('payment') }}
-                         @endif
-                         {{ single_price($notification->data['payment_amount']).' '.translate('is').' '.translate($notification->data['status']) }}
-                    @endif
-                </p>
-                <small class="text-muted">
-                    {{ date('F j Y, g:i a', strtotime($notification->created_at)) }}
-                </small>
+                                $notifyContent = str_replace('[[shop_name]]', $shopName, $notifyContent);
+                                $notifyContent = str_replace('[[amount]]', $amount, $notifyContent);
+                            @endphp
+                        @endif
+                        <p class="mb-1 text-truncate-2">
+                            {!! $notifyContent !!}
+                        </p>
+                        <small class="text-muted">
+                            {{ date('F j Y, g:i a', strtotime($notification->created_at)) }}
+                        </small>
+                    </div>
+                </div>
             </div>
         </div>
     </li>

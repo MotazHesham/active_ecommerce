@@ -123,27 +123,28 @@ class NgeniusUtility
             // success
 
             $payment = json_encode($orderStatusResponse);
-
+            $paymentData = session()->get('payment_data');
             //dd($payment_type, Session::get('order_id'),Session::get('payment_data'), $payment);
 
             if ($payment_type == 'cart_payment') {
                 $checkoutController = new CheckoutController;
                 return $checkoutController->checkout_done(session()->get('combined_order_id'), $payment);
             }
-
-            if ($payment_type == 'wallet_payment') {
+            elseif ($payment_type == 'order_re_payment') {
+                $checkoutController = new CheckoutController;
+                return $checkoutController->orderRePaymentDone($paymentData, $payment);
+            }
+            elseif ($payment_type == 'wallet_payment') {
                 $walletController = new WalletController;
-                return $walletController->wallet_payment_done(Session::get('payment_data'), $payment);
+                return $walletController->wallet_payment_done($paymentData, $payment);
             }
-
-            if ($payment_type == 'customer_package_payment') {
+            elseif ($payment_type == 'customer_package_payment') {
                 $customer_package_controller = new CustomerPackageController;
-                return $customer_package_controller->purchase_payment_done(session()->get('payment_data'), $payment);
+                return $customer_package_controller->purchase_payment_done($paymentData, $payment);
             }
-
-            if ($payment_type == 'seller_package_payment') {
+            elseif ($payment_type == 'seller_package_payment') {
                 $seller_package_controller = new \App\Http\Controllers\SellerPackageController;
-                return $seller_package_controller->purchase_payment_done(session()->get('payment_data'), $payment);
+                return $seller_package_controller->purchase_payment_done($paymentData, $payment);
             }
 
         }

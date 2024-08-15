@@ -66,7 +66,7 @@
                                             <a href="{{ route('shop.visit', $shop->slug) }}" class="text-reset hov-text-primary" tabindex="0">{{ $shop->name }}</a>
                                         </h2>
                                         <!-- Shop Rating -->
-                                        <div class="rating rating-mr-1 text-dark mb-3">
+                                        <div class="rating rating-mr-2 text-dark mb-3">
                                             {{ renderStarRating($shop->rating) }}
                                             <span class="opacity-60 fs-14">({{ $shop->num_of_reviews }}
                                                 {{ translate('Reviews') }})</span>

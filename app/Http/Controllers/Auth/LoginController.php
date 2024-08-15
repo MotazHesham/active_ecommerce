@@ -103,6 +103,7 @@ class LoginController extends Controller
         }
 
         if (session('temp_user_id') != null) {
+            Cart::where('user_id', auth()->user()->id)->delete(); // If previous data is available for this user, delete first
             Cart::where('temp_user_id', session('temp_user_id'))
                 ->update([
                     'user_id' => auth()->user()->id,
@@ -180,6 +181,9 @@ class LoginController extends Controller
         }
 
         if (session('temp_user_id') != null) {
+            // Deleting cart data if the user has already cart data.
+            Cart::where('user_id', auth()->user()->id)->delete();
+
             Cart::where('temp_user_id', session('temp_user_id'))
                 ->update([
                     'user_id' => auth()->user()->id,
@@ -252,14 +256,18 @@ class LoginController extends Controller
     public function authenticated()
     {
         if (session('temp_user_id') != null) {
-            Cart::where('temp_user_id', session('temp_user_id'))
+            if(auth()->user()->user_type == 'customer'){
+                Cart::where('temp_user_id', session('temp_user_id'))
                 ->update(
                     [
                         'user_id' => auth()->user()->id,
                         'temp_user_id' => null
                     ]
                 );
-
+            }
+            else {
+                Cart::where('temp_user_id', session('temp_user_id'))->delete();
+            }
             Session::forget('temp_user_id');
         }
 
@@ -374,7 +382,7 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except(['logout', 'account_deletion']);
     }
-    
+
     public function handle_demo_login()
     {
         return view('frontend.handle_demo_login');

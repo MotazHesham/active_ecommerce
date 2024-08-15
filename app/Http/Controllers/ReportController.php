@@ -141,4 +141,5 @@ class ReportController extends Controller
 
         return view('backend.reports.wallet_history_report', compact('wallets', 'users_with_wallet', 'user_id', 'date_range'));
     }
+
 }

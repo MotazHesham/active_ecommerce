@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Product;
+use App\Traits\PreventDemoModeChanges;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -10,6 +11,8 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class ProductsExport implements FromCollection, WithMapping, WithHeadings
 {
+    use PreventDemoModeChanges;
+
     public function collection()
     {
         return Product::all();
@@ -27,7 +30,6 @@ class ProductsExport implements FromCollection, WithMapping, WithHeadings
             'video_provider',
             'video_link',
             'unit_price',
-            'purchase_price',
             'unit',
             'current_stock',
             'est_shipping_days',
@@ -55,9 +57,7 @@ class ProductsExport implements FromCollection, WithMapping, WithHeadings
             $product->video_provider,
             $product->video_link,
             $product->unit_price,
-            $product->purchase_price,
             $product->unit,
-//            $product->current_stock,
             $qty,
             $product->est_shipping_days,
             $product->meta_title,

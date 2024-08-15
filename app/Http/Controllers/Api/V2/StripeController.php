@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\WalletController;
 use App\Models\CombinedOrder;
 use App\Models\Currency;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Stripe\Exception\CardException;
 use Stripe\PaymentIntent;
@@ -38,6 +39,9 @@ class StripeController extends Controller
         if ($request->payment_type == 'cart_payment') {
             $combined_order = CombinedOrder::find($request->combined_order_id);
             $amount = round($combined_order->grand_total * 100);
+        } elseif ($request->payment_type == 'order_re_payment') {
+            $order = Order::findOrFail($request->order_id);
+            $amount = round($order->grand_total);
         } elseif ($request->payment_type == 'wallet_payment') {
             $amount = round($request->amount * 100);
         } elseif ($request->payment_type == 'customer_package_payment') {
@@ -49,6 +53,7 @@ class StripeController extends Controller
         $data = array();
         $data['payment_type'] = $request->payment_type;
         $data['combined_order_id'] = $request->combined_order_id;
+        $data['order_id'] = $request->order_id;
         $data['amount'] = $request->amount;
         $data['user_id'] = $request->user_id;
         $data['package_id'] = $request->package_id;
@@ -94,17 +99,14 @@ class StripeController extends Controller
 
             if ($payment_type == 'cart_payment') {
                 checkout_done($decoded_reference_data->combined_order_id, json_encode($payment));
-            }
-
-            if ($payment_type == 'wallet_payment') {
+            } elseif ($payment_type == 'order_re_payment') {
+                order_re_payment_done($decoded_reference_data->order_id, 'Stripe', json_encode($payment));
+            } elseif ($payment_type == 'wallet_payment') {
                 wallet_payment_done($decoded_reference_data->user_id, $decoded_reference_data->amount, 'Stripe', json_encode($payment));
-            }
-
-            if ($payment_type == 'seller_package_payment') {
-                seller_purchase_payment_done($decoded_reference_data->user_id, $decoded_reference_data->package_id, $decoded_reference_data->amount, 'Stripe', json_encode($payment));
-            }
-            if ($payment_type == 'customer_package_payment') {
-                customer_purchase_payment_done($decoded_reference_data->user_id, $decoded_reference_data->package_id);
+            } elseif ($payment_type == 'seller_package_payment') {
+                seller_purchase_payment_done($decoded_reference_data->user_id, $decoded_reference_data->package_id, 'Stripe', json_encode($payment));
+            } elseif ($payment_type == 'customer_package_payment') {
+                customer_purchase_payment_done($decoded_reference_data->user_id, $decoded_reference_data->package_id, 'Stripe', json_encode($payment));
             }
 
             return response()->json(['result' => true, 'message' => translate("Payment is successful")]);

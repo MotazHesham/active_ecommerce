@@ -77,7 +77,7 @@
                                         $seller_product_variation[] = $cartItem['variation'];
                                     }
                                 }
-                                
+
                                 $pickup_point_list = array();
                                 if (get_setting('pickup_point') == 1) {
                                     $pickup_point_list = get_all_pickup_points();
@@ -225,14 +225,14 @@
                                                                 value="{{ $carrier->id }}"
                                                                 @if($carrier_key == 0) checked @endif
                                                             >
-                                                            <span class="d-flex p-3 aiz-megabox-elem rounded-0">
+                                                            <span class="d-flex flex-wrap p-3 aiz-megabox-elem rounded-0">
                                                                 <span class="aiz-rounded-check flex-shrink-0 mt-1"></span>
                                                                 <span class="flex-grow-1 pl-3 fw-600">
                                                                     <img src="{{ uploaded_asset($carrier->logo)}}" alt="Image" class="w-50px img-fit">
                                                                 </span>
                                                                 <span class="flex-grow-1 pl-3 fw-700">{{ $carrier->name }}</span>
                                                                 <span class="flex-grow-1 pl-3 fw-600">{{ translate('Transit in').' '.$carrier->transit_time }}</span>
-                                                                <span class="flex-grow-1 pl-3 fw-600">{{ single_price(carrier_base_price($carts, $carrier->id, get_admin()->id)) }}</span>
+                                                                <span class="flex-grow-1 pl-4 pl-sm-3 fw-600 mt-2 mt-sm-0 text-sm-right">{{ single_price(carrier_base_price($carts, $carrier->id, $key)) }}</span>
                                                             </span>
                                                         </label>
                                                     </div>
@@ -373,7 +373,7 @@
                                                         @endif
                                                     </div>
                                                 </div>
-                                                
+
                                                 <!-- Carrier Wise Shipping -->
                                                 @if (get_setting('shipping_type') == 'carrier_wise_shipping')
                                                     <div class="row pt-3 carrier_id_{{ $key }}">
@@ -386,14 +386,14 @@
                                                                         value="{{ $carrier->id }}"
                                                                         @if($carrier_key == 0) checked @endif
                                                                     >
-                                                                    <span class="d-flex p-3 aiz-megabox-elem rounded-0">
+                                                                    <span class="d-flex flex-wrap p-3 aiz-megabox-elem rounded-0">
                                                                         <span class="aiz-rounded-check flex-shrink-0 mt-1"></span>
                                                                         <span class="flex-grow-1 pl-3 fw-600">
                                                                             <img src="{{ uploaded_asset($carrier->logo)}}" alt="Image" class="w-50px img-fit">
                                                                         </span>
-                                                                        <span class="flex-grow-1 pl-3 fw-600">{{ $carrier->name }}</span>
+                                                                        <span class="flex-grow-1 pl-3 fw-700">{{ $carrier->name }}</span>
                                                                         <span class="flex-grow-1 pl-3 fw-600">{{ translate('Transit in').' '.$carrier->transit_time }}</span>
-                                                                        <span class="flex-grow-1 pl-3 fw-600">{{ single_price(carrier_base_price($carts, $carrier->id, $key)) }}</span>
+                                                                        <span class="flex-grow-1 pl-4 pl-sm-3 fw-600 mt-2 mt-sm-0 text-sm-right">{{ single_price(carrier_base_price($carts, $carrier->id, $key, $deliveryInfo)) }}</span>
                                                                     </span>
                                                                 </label>
                                                             </div>

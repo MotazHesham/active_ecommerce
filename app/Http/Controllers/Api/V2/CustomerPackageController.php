@@ -15,7 +15,7 @@ class CustomerPackageController extends Controller
             return CustomerPackageResource::collection($customer_packages);
     }
 
-public function purchase_package_free(Request $request)
+    public function purchase_package_free(Request $request)
     {
         $data['customer_package_id'] = $request->package_id;
         
@@ -40,15 +40,14 @@ public function purchase_package_free(Request $request)
 
     }
 
-
-
-
-
     public function purchase_package_offline(Request $request)
     {
+        $customer_package = CustomerPackage::findOrFail($request->package_id);
+
         $customer_package = new CustomerPackagePayment();
         $customer_package->user_id = auth()->user()->id;
         $customer_package->customer_package_id = $request->package_id;
+        $customer_package->amount = $customer_package->amount;
         $customer_package->payment_method = $request->payment_option;
         $customer_package->payment_details = $request->trx_id;
         $customer_package->approval = 0;

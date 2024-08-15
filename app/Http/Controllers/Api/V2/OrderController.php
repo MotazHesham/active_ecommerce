@@ -21,11 +21,9 @@ class OrderController extends Controller
 {
     public function store(Request $request, $set_paid = false)
     {
-
-
         if (get_setting('minimum_order_amount_check') == 1) {
             $subtotal = 0;
-            foreach (Cart::where('user_id', auth()->user()->id)->get() as $key => $cartItem) {
+            foreach (Cart::where('user_id', auth()->user()->id)->active()->get() as $key => $cartItem) {
                 $product = Product::find($cartItem['product_id']);
                 $subtotal += cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
             }
@@ -34,8 +32,7 @@ class OrderController extends Controller
             }
         }
 
-
-        $cartItems = Cart::where('user_id', auth()->user()->id)->get();
+        $cartItems = Cart::where('user_id', auth()->user()->id)->active()->get();
 
         if ($cartItems->isEmpty()) {
             return response()->json([
@@ -46,7 +43,6 @@ class OrderController extends Controller
         }
 
         $user = User::find(auth()->user()->id);
-
 
         $address = Address::where('id', $cartItems->first()->address_id)->first();
         $shippingAddress = [];
@@ -85,11 +81,6 @@ class OrderController extends Controller
             $order->combined_order_id = $combined_order->id;
             $order->user_id = $user->id;
             $order->shipping_address = $combined_order->shipping_address;
-
-            // $order->shipping_type = $cartItems->first()->shipping_type;
-            // if ($cartItems->first()->shipping_type == 'pickup_point') {
-            //     $order->pickup_point_id = $cartItems->first()->pickup_point;
-            // }
 
             $order->order_from = 'app';
             $order->payment_type = $request->payment_type;
@@ -147,9 +138,6 @@ class OrderController extends Controller
 
                 $shipping += $order_detail->shipping_cost;
 
-                // if ($cartItem['shipping_type'] == 'pickup_point') {
-                //     $order_detail->pickup_point_id = $cartItem['pickup_point'];
-                // }
                 //End of storing shipping cost
                 if (addon_is_activated('club_point')) {
                     $order_detail->earn_point = $product->earn_point;
@@ -162,7 +150,7 @@ class OrderController extends Controller
                 $product->save();
 
                 $order->seller_id = $product->user_id;
-                //======== Added By Kiron ==========
+              
                 $order->shipping_type = $cartItem['shipping_type'];
                 if ($cartItem['shipping_type'] == 'pickup_point') {
                     $order->pickup_point_id = $cartItem['pickup_point'];
@@ -177,8 +165,6 @@ class OrderController extends Controller
                     $seller->save();
                 }
 
-
-
                 if (addon_is_activated('affiliate_system')) {
                     if ($order_detail->product_referral_code) {
                         $referred_by_user = User::where('referral_code', $order_detail->product_referral_code)->first();
@@ -192,9 +178,6 @@ class OrderController extends Controller
             $order->grand_total = $subtotal + $tax + $shipping;
 
             if ($seller_product[0]->coupon_code != null) {
-                // if (Session::has('club_point')) {
-                //     $order->club_point = Session::get('club_point');
-                // }
                 $order->coupon_discount = $coupon_discount;
                 $order->grand_total -= $coupon_discount;
 
@@ -216,9 +199,7 @@ class OrderController extends Controller
         }
         $combined_order->save();
 
-
-
-        Cart::where('user_id', auth()->user()->id)->delete();
+        Cart::where('user_id', auth()->user()->id)->active()->delete();
 
         if (
             $request->payment_type == 'cash_on_delivery'
@@ -227,7 +208,6 @@ class OrderController extends Controller
         ) {
             NotificationUtility::sendOrderPlacedNotification($order);
         }
-
 
         return response()->json([
             'combined_order_id' => $combined_order->id,

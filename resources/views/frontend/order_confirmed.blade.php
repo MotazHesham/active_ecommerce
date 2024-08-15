@@ -244,3 +244,24 @@
         </div>
     </section>
 @endsection
+
+@section('script')
+    @if (get_setting('facebook_pixel') == 1)
+    <!-- Facebook Pixel purchase Event -->
+    <script>
+        $(document).ready(function(){
+            var currend_code = '{{ get_system_currency()->code }}';
+            var amount = 'single_price($combined_order->grand_total) }}';
+            fbq('track', 'Purchase',
+                {
+                    value: amount,
+                    currency: currend_code,
+                    content_type: 'product'
+                }
+            );
+        });
+    </script>
+    <!-- Facebook Pixel purchase Event -->
+    @endif
+@endsection
+        

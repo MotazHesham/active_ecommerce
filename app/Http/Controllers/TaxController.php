@@ -123,6 +123,8 @@ class TaxController extends Controller
      */
     public function destroy($id)
     {
+        $tax = Tax::findOrFail($id);
+        $tax->product_taxes()->delete();
         if (Tax::destroy($id)) {
             flash(translate('Tax has been deleted successfully'))->success();
             return redirect()->route('tax.index');

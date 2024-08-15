@@ -10,10 +10,10 @@
     <div class="col-lg-10 mx-auto">
         <div class="card">
             <div class="card-body p-0">
-              <ul class="nav nav-tabs nav-fill border-light">
+              <ul class="nav nav-tabs nav-fill language-bar">
                 @foreach (get_all_active_language() as $key => $language)
                   <li class="nav-item">
-                    <a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3" href="{{ route('flash_deals.edit', ['id'=>$flash_deal->id, 'lang'=> $language->code] ) }}">
+                    <a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3" href="{{ route('flash_deals.edit', ['id'=>$flash_deal->id, 'lang'=> $language->code] ) }}">
                       <img src="{{ static_asset('assets/img/flags/'.$language->code.'.png') }}" height="11" class="mr-1">
                       <span>{{$language->name}}</span>
                     </a>
@@ -59,6 +59,7 @@
                             </div>
                             <div class="file-preview box sm">
                             </div>
+                            <span class="small text-muted">{{ translate('This image is shown as cover banner in flash deal details page. Minimum dimensions required: 436px width X 443px height.') }}</span>
                         </div>
                     </div>
 
@@ -78,7 +79,7 @@
                         <label class="col-sm-3 col-from-label" for="products">{{translate('Products')}}</label>
                         <div class="col-sm-9">
                             <select name="products[]" id="products" class="form-control aiz-selectpicker" multiple required data-placeholder="{{ translate('Choose Products') }}" data-live-search="true" data-selected-text-format="count">
-                                @foreach(\App\Models\Product::where('published', 1)->where('approved', 1)->get() as $product)
+                                @foreach($products as $product)
                                     @php
                                         $flash_deal_product = \App\Models\FlashDealProduct::where('flash_deal_id', $flash_deal->id)->where('product_id', $product->id)->first();
                                     @endphp

@@ -23,15 +23,13 @@ class AuctionProductController extends Controller
             $products = $products->where('added_by', 'admin');
         }
         $products = $products->where('auction_start_date', '<=', strtotime("now"))->where('auction_end_date', '>=', strtotime("now"));
-
-
         return new AuctionMiniCollection($products->paginate(10));
     }
 
 
-    public function details_auction_product(Request $request, $id)
+    public function details_auction_product(Request $request, $slug)
     {
-        $detailedProduct  = Product::where('id', $id)->get();
+        $detailedProduct  = Product::where('slug', $slug)->get();
         return new AuctionProductDetailCollection($detailedProduct);
     }
 
@@ -44,7 +42,6 @@ class AuctionProductController extends Controller
 
     public function user_purchase_history(Request $request)
     {
-
         $orders = DB::table('orders')
             ->orderBy('code', 'desc')
             ->join('order_details', 'orders.id', '=', 'order_details.order_id')
@@ -57,9 +54,7 @@ class AuctionProductController extends Controller
         if ($request->delivery_status != "" || $request->delivery_status != null) {
             $orders =   $orders->where('orders.delivery_status', $request->delivery_status);
         }
-
         $orders = $orders->select('order_details.order_id as id')->paginate(15);
-
         return AuctionPurchaseHistory::collection($orders);
     }
 }

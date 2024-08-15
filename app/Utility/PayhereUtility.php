@@ -29,6 +29,12 @@ class PayhereUtility
         return view('frontend.payhere.checkout_form', compact('combined_order_id', 'amount', 'first_name', 'last_name', 'phone', 'email','address','city','hash_value'));
     }
 
+    public static  function create_order_re_payment_form($order_id, $amount, $first_name, $last_name, $phone, $email,$address,$city)
+    {
+        $hash_value = static::getHash($order_id , $amount);
+        return view('frontend.payhere.order_re_payment_form', compact('order_id', 'amount', 'first_name', 'last_name', 'phone', 'email','address','city','hash_value'));
+    }
+
     public static  function create_wallet_form($user_id,$order_id, $amount, $first_name, $last_name, $phone, $email,$address,$city)
     {
         $hash_value = static::getHash($order_id , $amount);
@@ -39,6 +45,12 @@ class PayhereUtility
     {
         $hash_value = static::getHash($order_id , $amount);
         return view('frontend.payhere.customer_package_form', compact('user_id','package_id','order_id', 'amount', 'first_name', 'last_name', 'phone', 'email','address','city','hash_value'));
+    }
+
+    public static  function create_seller_package_form($order_id, $amount, $first_name, $last_name, $phone, $email,$address,$city)
+    {
+        $hash_value = static::getHash($order_id , $amount);
+        return view('frontend.payhere.seller_package_form', compact('order_id', 'amount', 'first_name', 'last_name', 'phone', 'email','address','city','hash_value'));
     }
 
 

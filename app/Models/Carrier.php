@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 
 class Carrier extends Model
 {
-    use HasFactory;
+    use HasFactory, PreventDemoModeChanges;
+
 
     public function carrier_ranges(){
     	return $this->hasMany(CarrierRange::class);

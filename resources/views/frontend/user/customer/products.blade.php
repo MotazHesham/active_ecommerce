@@ -9,6 +9,7 @@
       </div>
     </div>
 
+    @php $authUser = auth()->user(); @endphp
     <div class="row gutters-16 mb-2">
         <!-- Remaining Uploads -->
         <div class="col-md-4 mx-auto mb-4" >
@@ -25,7 +26,7 @@
                 </svg>
                 <div class="py-2">
                     <div class="fs-14 fw-400 text-center">{{  translate('Remaining Uploads') }}</div>
-                    <div class="fs-30 fw-700 text-center">{{ max(0, Auth::user()->remaining_uploads) }}</div>
+                    <div class="fs-30 fw-700 text-center">{{ max(0, $authUser->remaining_uploads) }}</div>
                 </div>
             </div>
         </div>
@@ -44,7 +45,7 @@
         
         <!-- Current Package -->
         @php
-            $customer_package = get_single_customer_package(Auth::user()->customer_package_id);
+            $customer_package = get_single_customer_package($authUser->customer_package_id);
         @endphp
         <div class="col-md-4 mx-auto mb-4">
             <div class="text-center bg-light d-block p-4 h-100 border">

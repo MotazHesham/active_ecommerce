@@ -92,7 +92,7 @@
 
                         <div class="form-group">
                             <label for="country">{{translate('State')}}</label>
-                            <select class="select2 form-control aiz-selectpicker" name="state_id" data-toggle="select2" data-placeholder="Choose ..." data-live-search="true">
+                            <select class="select2 form-control aiz-selectpicker" name="state_id" data-toggle="select2" data-placeholder="Choose ..." data-live-search="true" required>
                                 @foreach ($states as $state)
                                     <option value="{{ $state->id }}">{{ $state->name }}</option>
                                 @endforeach
@@ -125,6 +125,12 @@
         }
 
         function update_status(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var status = 1;
             }

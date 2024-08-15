@@ -96,7 +96,7 @@ class AffiliateController extends Controller
     }
 
     public function config_store(Request $request){
-        if($request->type == 'validation_time') {
+        if($request->type == 'validation_time' || $request->type == 'minimum_affiliate_withdraw_amount') {
             //affiliate validation time
             $affiliate_config = AffiliateConfig::where('type', $request->type)->first();
             if($affiliate_config == null){
@@ -106,7 +106,7 @@ class AffiliateController extends Controller
             $affiliate_config->value = $request[$request->type];
             $affiliate_config->save();
 
-            flash("Validation time updated successfully")->success();
+            flash("Affiliate Configuration updated successfully")->success();
         } else {
 
             $form = array();
@@ -494,6 +494,12 @@ class AffiliateController extends Controller
     // Affiliate Withdraw Request
     public function withdraw_request_store(Request $request)
     {
+        $minimum_affiliate_withdraw_info = \App\Models\AffiliateConfig::where('type', 'minimum_affiliate_withdraw_amount')->first();
+        if(($minimum_affiliate_withdraw_info !=null  && ($request->amount < $minimum_affiliate_withdraw_info->value)) || ($request->amount > Auth::user()->affiliate_user->balance)){
+            flash(translate('Invalid withdraw Amount!'))->error();
+            return redirect()->route('affiliate.user.withdraw_request_history');
+        }
+
         $withdraw_request           = new AffiliateWithdrawRequest;
         $withdraw_request->user_id  = Auth::user()->id;
         $withdraw_request->amount   = $request->amount;

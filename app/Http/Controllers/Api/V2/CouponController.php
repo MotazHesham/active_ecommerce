@@ -18,7 +18,7 @@ class CouponController extends Controller
         if ($coupon != null && strtotime(date('d-m-Y')) >= $coupon->start_date && strtotime(date('d-m-Y')) <= $coupon->end_date && CouponUsage::where('user_id', auth()->user()->id)->where('coupon_id', $coupon->id)->first() == null) {
             $couponDetails = json_decode($coupon->details);
             if ($coupon->type == 'cart_base') {
-                $sum = Cart::where('user_id', auth()->user()->id)->sum('price');
+                $sum = Cart::where('user_id', auth()->user()->id)->active()->sum('price');
                 if ($sum > $couponDetails->min_buy) {
                     if ($coupon->discount_type == 'percent') {
                         $couponDiscount =  ($sum * $coupon->discount) / 100;
@@ -42,7 +42,7 @@ class CouponController extends Controller
                 }
             } elseif ($coupon->type == 'product_base') {
                 $couponDiscount = 0;
-                $cartItems = Cart::where('user_id', auth()->user()->id)->get();
+                $cartItems = Cart::where('user_id', auth()->user()->id)->active()->get();
                 foreach ($cartItems as $key => $cartItem) {
                     foreach ($couponDetails as $key => $couponDetail) {
                         if ($couponDetail->product_id == $cartItem->product_id) {
@@ -91,10 +91,10 @@ class CouponController extends Controller
     {
         $coupon = Coupon::where('id', $id)->first();
         if($coupon->type == 'product_base'){
-            $products = json_decode($coupon->details); 
+            $products = json_decode($coupon->details);
             $coupon_products = [];
-            foreach($products as $product) {                            
-                array_push($coupon_products, $product->product_id);                           
+            foreach($products as $product) {
+                array_push($coupon_products, $product->product_id);
             }
             $products = get_multiple_products($coupon_products);
             return new ProductMiniCollection($products);

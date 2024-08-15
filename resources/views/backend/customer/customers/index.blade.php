@@ -15,7 +15,7 @@
             <div class="col">
                 <h5 class="mb-0 h6">{{translate('Customers')}}</h5>
             </div>
-            
+
             <div class="dropdown mb-2 mb-md-0">
                 <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
                     {{translate('Bulk Action')}}
@@ -24,14 +24,14 @@
                     <a class="dropdown-item confirm-alert" href="javascript:void(0)"  data-target="#bulk-delete-modal">{{translate('Delete selection')}}</a>
                 </div>
             </div>
-            
+
             <div class="col-md-3">
                 <div class="form-group mb-0">
                     <input type="text" class="form-control" id="search" name="search"@isset($sort_search) value="{{ $sort_search }}" @endisset placeholder="{{ translate('Type email or name & Enter') }}">
                 </div>
             </div>
         </div>
-    
+
         <div class="card-body">
             <table class="table aiz-table mb-0">
                 <thead>
@@ -161,36 +161,46 @@
 
 @section('script')
     <script type="text/javascript">
-        
+
         $(document).on("change", ".check-all", function() {
             if(this.checked) {
                 // Iterate each checkbox
                 $('.check-one:checkbox').each(function() {
-                    this.checked = true;                        
+                    this.checked = true;
                 });
             } else {
                 $('.check-one:checkbox').each(function() {
-                    this.checked = false;                       
+                    this.checked = false;
                 });
             }
-          
+
         });
-        
+
         function sort_customers(el){
             $('#sort_customers').submit();
         }
         function confirm_ban(url)
         {
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                    AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                    return;
+                }
+
             $('#confirm-ban').modal('show', {backdrop: 'static'});
             document.getElementById('confirmation').setAttribute('href' , url);
         }
 
         function confirm_unban(url)
         {
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                    AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                    return;
+                }
+
             $('#confirm-unban').modal('show', {backdrop: 'static'});
             document.getElementById('confirmationunban').setAttribute('href' , url);
         }
-        
+
         function bulk_delete() {
             var data = new FormData($('#sort_customers')[0]);
             $.ajax({

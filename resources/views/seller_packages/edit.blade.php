@@ -8,10 +8,10 @@
 <div class="col-lg-10 mx-auto">
     <div class="card">
         <div class="card-body p-0">
-            <ul class="nav nav-tabs nav-fill border-light">
-                @foreach (\App\Models\Language::all() as $key => $language)
+            <ul class="nav nav-tabs nav-fill border-light language-bar">
+                @foreach (get_all_active_language() as $key => $language)
                     <li class="nav-item">
-                        <a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3" href="{{ route('seller_packages.edit', ['id'=>$seller_package->id, 'lang'=> $language->code] ) }}">
+                        <a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3" href="{{ route('seller_packages.edit', ['id'=>$seller_package->id, 'lang'=> $language->code] ) }}">
                             <img src="{{ static_asset('assets/img/flags/'.$language->code.'.png') }}" height="11" class="mr-1">
                             <span>{{ $language->name }}</span>
                         </a>

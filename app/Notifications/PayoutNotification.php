@@ -11,19 +11,17 @@ class PayoutNotification extends Notification
 {
     use Queueable;
 
-    protected $user;
-    protected $amount;
-    protected $status;
+    public $data;
+    public $className;
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($user, $amount, $status = '')
+    public function __construct($data)
     {
-        $this->user = $user;
-        $this->amount = $amount;
-        $this->status = $status;
+        $this->data = $data;
+        $this->className= PayoutNotification::class;
     }
 
     /**
@@ -34,7 +32,7 @@ class PayoutNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return [DbNotification::class];
     }
 
     /**
@@ -60,11 +58,14 @@ class PayoutNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'user_id'        => $this->user['id'],
-            'user_type'      => $this->user['user_type'],
-            'name'           => $this->user['name'],
-            'payment_amount' => $this->amount, 
-            'status'         => $this->status
+            'notification_type_id' => $this->data['notification_type_id'],
+            'data' => [
+                'user_id'        => $this->data['user']['id'],
+                'user_type'      => $this->data['user']['user_type'],
+                'name'           => $this->data['user']['name'],
+                'payment_amount' => $this->data['amount'], 
+                'status'         => $this->data['status']
+            ]
         ];
     }
 }

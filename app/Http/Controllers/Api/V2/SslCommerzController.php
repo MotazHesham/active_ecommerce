@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V2;
 use App\Models\BusinessSetting;
 use App\Http\Controllers\SSLCommerz;
 use App\Models\CombinedOrder;
+use App\Models\Order;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
@@ -43,41 +44,44 @@ class SslCommerzController extends Controller
 
     public function begin(Request $request)
     {
-
-        $payment_type = $request->payment_type;
+        $paymentType = $request->payment_type;
         $combined_order_id = $request->combined_order_id;
+        $orderID = 0;
         $amount = $request->amount;
         $user_id = $request->user_id;
 
         $post_data = array();
-        $post_data['total_amount'] = $request->amount; # You cant not pay less than 10
         $post_data['currency'] = "BDT";
+        $post_data['value_a'] = $user_id;
 
-        if ($request->payment_type == "cart_payment") {
-            $post_data['tran_id'] = 'AIZ-' . $request->combined_order_id . '-' . date('Ymd'); // tran_id must be unique
-
-        } else if (
-            $request->payment_type == "wallet_payment" ||
-            $request->payment_type ==  "seller_package_payment" ||
-            $request->payment_type ==  "customer_package_payment"
-
-        ) {
-            $post_data['tran_id'] = 'AIZ-' . $request->user_id . '-' . date('Ymd');
-        }
-
-        $post_data['value_a'] = $request->user_id;
-        $post_data['value_b'] = $request->combined_order_id;
-        $post_data['value_c'] = $request->payment_type;
-        $post_data['value_d'] = $request->amount;
-
-        if ($request->payment_type == "cart_payment") {
+        if ($paymentType == "cart_payment") {
             $combined_order = CombinedOrder::find($combined_order_id);
-            $post_data['value_d'] = $combined_order->grand_total;
-        } else if ($request->payment_type == "wallet_payment") {
-            $post_data['value_b'] = 'sslcommerz';
-        } else if ($request->payment_type == "seller_package_payment" || $request->payment_type == "customer_package_payment") {
-            $post_data['value_b'] = $request->package_id;
+            $amount = $combined_order->grand_total;
+            $combinedOrderID = $combined_order->id;
+
+            $post_data['value_b'] = $combinedOrderID;
+            $post_data['tran_id'] = 'AIZ-' . $combinedOrderID. '-' . date('Ymd'); // tran_id must be unique
         }
+        elseif ($paymentType == "order_re_payment") {
+            $order = Order::findOrFail($request->order_id);
+            $amount = $order->grand_total;
+            $orderID = $order->id;
+
+            $post_data['value_b'] = $orderID;
+            $post_data['tran_id'] = 'AIZ-' . $orderID . '-' . date('Ymd'); // tran_id must be unique
+        }
+        else if ($paymentType == "wallet_payment"){
+            $post_data['value_b'] = 'sslcommerz';
+            $post_data['tran_id'] = 'AIZ-' . $user_id . '-' . date('Ymd');
+        } 
+        else if ($paymentType ==  "seller_package_payment" || $paymentType ==  "customer_package_payment") {
+            $post_data['value_b'] = $request->package_id;
+            $post_data['tran_id'] = 'AIZ-' . $user_id . '-' . date('Ymd');
+        }
+
+        $post_data['total_amount'] = $amount; # You cant not pay less than 10
+        $post_data['value_c'] = $paymentType;
+        $post_data['value_d'] = $amount;
 
 
         # CUSTOMER INFORMATION
@@ -109,16 +113,19 @@ class SslCommerzController extends Controller
 
             try {
                 if ($request->value_c == 'cart_payment') {
-
                     checkout_done($request->value_b, $payment);
-                } elseif ($request->value_c == 'wallet_payment') {
-
+                }
+                elseif ($request->value_c == 'order_re_payment') {
+                    order_re_payment_done($request->value_b, 'SslCommerz', $payment);
+                }
+                elseif ($request->value_c == 'wallet_payment') {
                     wallet_payment_done($request->value_a, $request->value_d, 'SslCommerz', $payment);
-                } elseif ($request->value_c == 'seller_package_payment') {
-
-                    seller_purchase_payment_done($request->value_a, $request->value_b, $request->value_d, 'SslCommerz', $payment);
-                } else if ($request->value_c == 'customer_package_payment') {
-                    customer_purchase_payment_done($request->value_a, $request->value_b);
+                }
+                elseif ($request->value_c == 'seller_package_payment') {
+                    seller_purchase_payment_done($request->value_a, $request->value_b, 'SslCommerz', $payment);
+                }
+                else if ($request->value_c == 'customer_package_payment') {
+                    customer_purchase_payment_done($request->value_a, $request->value_b, 'SslCommerz', $payment);
                 }
 
                 return response()->json(['result' => true, 'message' => translate("Payment is successful")]);

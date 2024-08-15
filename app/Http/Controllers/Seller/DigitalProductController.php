@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Requests\ProductRequest;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductStock;
 use App\Models\ProductTax;
 use App\Models\ProductTranslation;
 use App\Models\Upload;
@@ -14,6 +13,7 @@ use App\Notifications\ShopProductNotification;
 use App\Services\ProductService;
 use App\Services\ProductStockService;
 use App\Services\ProductTaxService;
+use App\Services\FrequentlyBoughtProductService;
 use Artisan;
 use Auth;
 use Illuminate\Http\Request;
@@ -74,6 +74,9 @@ class DigitalProductController  extends Controller
 
         $request->merge(['product_id' => $product->id, 'current_stock' => 0]);
 
+        //Product categories
+        $product->categories()->attach($request->category_ids);
+
         //Product Stock
         (new ProductStockService)->store($request->only([
             'unit_price', 'current_stock', 'product_id'
@@ -86,24 +89,26 @@ class DigitalProductController  extends Controller
             ]));
         }
 
+        // Frequently Bought Products
+        (new FrequentlyBoughtProductService)->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+        ]));
+
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
-            'lang', 'name', 'unit', 'description', 'product_id'
+            'lang', 'name', 'description', 'product_id'
         ]));
 
-        //Product categories
-        $product->categories()->attach($request->category_ids);
-
-        // Product Translations
-        $product_translation                = ProductTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE'), 'product_id' => $product->id]);
-        $product_translation->name          = $request->name;
-        $product_translation->description   = $request->description;
-        $product_translation->save();
-
         if (get_setting('product_approve_by_admin') == 1) {
-            $users = User::findMany([auth()->user()->id, User::where('user_type', 'admin')->first()->id]);
-            Notification::send($users, new ShopProductNotification('digital', $product));
+            $users = User::findMany(User::where('user_type', 'admin')->first()->id);
+            $data = array();
+            $data['product_type']   = 'digital';
+            $data['status']         = 'pending';
+            $data['product']        = $product;
+            $data['notification_type_id'] = get_notification_type('seller_product_upload', 'type')->id;
+
+            Notification::send($users, new ShopProductNotification($data));
         }
 
         flash(translate('Digital Product has been inserted successfully'))->success();
@@ -162,6 +167,12 @@ class DigitalProductController  extends Controller
                 'tax_id', 'tax', 'tax_type', 'product_id'
             ]));
         }
+
+        // Frequently Bought Products
+        $product->frequently_bought_products()->delete();
+        (new FrequentlyBoughtProductService)->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+        ]));
 
         // Product Translations
         ProductTranslation::updateOrCreate(

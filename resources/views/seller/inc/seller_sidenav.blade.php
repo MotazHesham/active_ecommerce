@@ -43,6 +43,13 @@
                         </li>
 
                         <li class="aiz-side-nav-item">
+                            <a href="{{ route('seller.categories_wise_product_discount') }}"
+                                class="aiz-side-nav-link">
+                                <span class="aiz-side-nav-text">{{ translate('Category-Wise Discount') }}</span>
+                            </a>
+                        </li>
+
+                        <li class="aiz-side-nav-item">
                             <a href="{{ route('seller.product_bulk_upload.index') }}"
                                 class="aiz-side-nav-link {{ areActiveRoutes(['product_bulk_upload.index']) }}">
                                 <span class="aiz-side-nav-text">{{ translate('Product Bulk Upload') }}</span>

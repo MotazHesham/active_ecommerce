@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Upload extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes,PreventDemoModeChanges;
 
     /**
     * The attributes that are mass assignable.

@@ -15,6 +15,7 @@ use App\Http\Controllers\WalletController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\SellerPackageController;
 use App\Http\Controllers\CustomerPackageController;
+use App\Models\Order;
 
 class PaystackController extends Controller
 {
@@ -23,51 +24,68 @@ class PaystackController extends Controller
         $post_data = array();
         $post_data['payment_type'] = Session::get('payment_type');
 
+        $user = Auth::user();
+        $currency = env('PAYSTACK_CURRENCY_CODE', 'NGN');
+        $paymentData = Session::get('payment_data');
+
         if (Session::get('payment_type') == 'cart_payment') {
             $post_data['combined_order_id'] = Session::get('combined_order_id');
             $array = ['custom_fields' => $post_data];
 
             $combined_order = CombinedOrder::findOrFail(Session::get('combined_order_id'));
-            $user = Auth::user();
+            
             $request->email = $user->email;
             $request->amount = round($combined_order->grand_total * 100);
-            $request->currency = env('PAYSTACK_CURRENCY_CODE', 'NGN');
+            $request->currency = $currency;
+            $request->metadata = json_encode($array);
+            $request->reference = Paystack::genTranxRef();
+            return Paystack::getAuthorizationUrl()->redirectNow();
+        } elseif (Session::get('payment_type') == 'order_re_payment') {
+            $post_data['payment_method'] = $paymentData['payment_method'];
+            $post_data['order_id'] = $paymentData['order_id'];
+            $array = ['custom_fields' => $post_data];
+            
+            $order = Order::findOrFail($paymentData['order_id']);
+
+            $request->email = $user->email;
+            $request->amount = round($order->grand_total * 100);
+            $request->currency = $currency;
             $request->metadata = json_encode($array);
             $request->reference = Paystack::genTranxRef();
             return Paystack::getAuthorizationUrl()->redirectNow();
         } elseif (Session::get('payment_type') == 'wallet_payment') {
-            $post_data['payment_method'] = Session::get('payment_data')['payment_method'];
+            $post_data['payment_method'] = $paymentData['payment_method'];
             $array = ['custom_fields' => $post_data];
 
-            $user = Auth::user();
             $request->email = $user->email;
-            $request->amount = round(Session::get('payment_data')['amount'] * 100);
-            $request->currency = env('PAYSTACK_CURRENCY_CODE', 'NGN');
+            $request->amount = round($paymentData['amount'] * 100);
+            $request->currency = $currency;
             $request->metadata = json_encode($array);
             $request->reference = Paystack::genTranxRef();
             return Paystack::getAuthorizationUrl()->redirectNow();
         } elseif (Session::get('payment_type') == 'customer_package_payment') {
-            $post_data['customer_package_id'] = Session::get('payment_data')['customer_package_id'];
+            $post_data['customer_package_id'] = $paymentData['customer_package_id'];
+            $post_data['payment_method'] = $paymentData['payment_method'];
             $array = ['custom_fields' => $post_data];
 
-            $customer_package = CustomerPackage::findOrFail(Session::get('payment_data')['customer_package_id']);
-            $user = Auth::user();
+            $customer_package = CustomerPackage::findOrFail($paymentData['customer_package_id']);
+
             $request->email = $user->email;
             $request->amount = round($customer_package->amount * 100);
-            $request->currency = env('PAYSTACK_CURRENCY_CODE', 'NGN');
+            $request->currency = $currency;
             $request->metadata = json_encode($array);
             $request->reference = Paystack::genTranxRef();
             return Paystack::getAuthorizationUrl()->redirectNow();
         } elseif (Session::get('payment_type') == 'seller_package_payment') {
-            $post_data['seller_package_id'] = Session::get('payment_data')['seller_package_id'];
-            $post_data['payment_method'] = Session::get('payment_data')['payment_method'];
+            $post_data['seller_package_id'] = $paymentData['seller_package_id'];
+            $post_data['payment_method'] = $paymentData['payment_method'];
             $array = ['custom_fields' => $post_data];
 
-            $seller_package = SellerPackage::findOrFail(Session::get('payment_data')['seller_package_id']);
+            $seller_package = SellerPackage::findOrFail($paymentData['seller_package_id']);
             $user = Auth::user();
             $request->email = $user->email;
             $request->amount = round($seller_package->amount * 100);
-            $request->currency = env('PAYSTACK_CURRENCY_CODE', 'NGN');
+            $request->currency = $currency;
             $request->metadata = json_encode($array);
             $request->reference = Paystack::genTranxRef();
             return Paystack::getAuthorizationUrl()->redirectNow();
@@ -102,6 +120,17 @@ class PaystackController extends Controller
                 Session::forget('combined_order_id');
                 flash(translate('Payment cancelled'))->success();
                 return redirect()->route('home');
+            } elseif ($payment_type == 'order_re_payment') {
+                $payment_detalis = json_encode($payment);
+                if (!empty($payment['data']) && $payment['data']['status'] == 'success') {
+                    $payment_data['order_id'] = $payment['data']['metadata']['custom_fields']['order_id'];
+                    $payment_data['payment_method'] = $payment['data']['metadata']['custom_fields']['payment_method'];
+                    Auth::login(User::where('email', $payment['data']['customer']['email'])->first());
+                    return (new CheckoutController)->orderRePaymentDone($payment_data, $payment);
+                }
+                Session::forget('payment_data');
+                flash(translate('Payment cancelled'))->success();
+                return redirect()->route('home');
             } elseif ($payment_type == 'wallet_payment') {
                 $payment_detalis = json_encode($payment);
                 if (!empty($payment['data']) && $payment['data']['status'] == 'success') {
@@ -117,6 +146,7 @@ class PaystackController extends Controller
                 $payment_detalis = json_encode($payment);
                 if (!empty($payment['data']) && $payment['data']['status'] == 'success') {
                     $payment_data['customer_package_id'] = $payment['data']['metadata']['custom_fields']['customer_package_id'];
+                    $payment_data['payment_method'] = $payment['data']['metadata']['custom_fields']['payment_method'];
                     Auth::login(User::where('email', $payment['data']['customer']['email'])->first());
                     return (new CustomerPackageController)->purchase_payment_done($payment_data, $payment);
                 }

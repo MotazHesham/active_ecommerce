@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers\Api\V2;
 
-use App\Http\Controllers\OTPVerificationController;
 use App\Http\Resources\V2\PurchaseHistoryMiniCollection;
 use App\Http\Resources\V2\DeliveryBoyPurchaseHistoryMiniCollection;
 use Illuminate\Http\Request;
-use App\Http\Resources\V2\DeliveryBoyCollection;
 use App\Http\Resources\V2\DeliveryHistoryCollection;
 use App\Http\Resources\V2\PurchaseHistoryCollection;
 use App\Http\Resources\V2\PurchaseHistoryItemsCollection;
-use Auth;
 use App\Models\DeliveryBoy;
 use App\Models\DeliveryHistory;
 use App\Models\Order;
@@ -38,20 +35,6 @@ class DeliveryBoyController extends Controller
 
         $delivery_boy = DeliveryBoy::where('user_id', $id)->first();
 
-
-        //dummy
-        /*  return response()->json([
-              'completed_delivery' => 123,
-              'pending_delivery' => 0,
-              'total_collection' => format_price(154126.00),
-              'total_earning' => format_price(365.00),
-              'cancelled' => 5,
-              'on_the_way' => 123,
-              'picked' => 24,
-              'assigned' => 55,
-
-          ]);*/
-
         return response()->json([
             'completed_delivery' => Order::where('assign_delivery_boy', $id)->where('delivery_status', 'delivered')->count(),
             'pending_delivery' => Order::where('assign_delivery_boy', $id)->where('delivery_status', '!=', 'delivered')->where('delivery_status', '!=', 'cancelled')->where('cancel_request', '0')->count(),
@@ -67,9 +50,6 @@ class DeliveryBoyController extends Controller
 
     public function assigned_delivery($id)
     {
-//        $order_query = Order::query();
-//        $order_query->where('delivery_status', 'pending');
-//        $order_query->where('cancel_request', '0');
 
         $order_query = Order::query();
         $order_query->where('assign_delivery_boy', $id);
@@ -84,7 +64,6 @@ class DeliveryBoyController extends Controller
         });
 
         return new DeliveryBoyPurchaseHistoryMiniCollection($order_query->latest('delivery_history_date')->paginate(10));
-//        return new DeliveryBoyPurchaseHistoryMiniCollection($order_query->where('assign_delivery_boy', $id)->latest('delivery_history_date')->paginate(10));
     }
 
     /**
@@ -128,15 +107,12 @@ class DeliveryBoyController extends Controller
         $order_query = Order::query();
         $order_query->where('delivery_status', 'delivered');
 
-        //dd(request()->date_range);
-
         if (request()->has('date_range') && request()->date_range != null &&  request()->date_range != "") {
             $max_date = date('Y-m-d H:i:s');
             $min_date = date('Y-m-d 00:00:00');
             if (request()->date_range == "today") {
                 $min_date = date('Y-m-d 00:00:00');
             } else if (request()->date_range == "this_week") {
-                //dd("hello");
                 $min_date = date('Y-m-d 00:00:00', strtotime("-7 days"));
             } else if (request()->date_range == "this_month") {
                 $min_date = date('Y-m-d 00:00:00', strtotime("-30 days"));
@@ -192,7 +168,6 @@ class DeliveryBoyController extends Controller
             if (request()->date_range == "today") {
                 $min_date = date('Y-m-d 00:00:00');
             } else if (request()->date_range == "this_week") {
-                //dd("hello");
                 $min_date = date('Y-m-d 00:00:00', strtotime("-7 days"));
             } else if (request()->date_range == "this_month") {
                 $min_date = date('Y-m-d 00:00:00', strtotime("-30 days"));
@@ -277,8 +252,6 @@ class DeliveryBoyController extends Controller
     {
         $collection_query = DeliveryHistory::query();
         $collection_query->where('delivery_status', 'delivered');
-//        $collection_query->where('payment_type', 'cash_on_delivery');
-
 
         $today_date = date('Y-m-d');
         $yesterday_date = date('Y-m-d', strtotime("-1 day"));
@@ -403,9 +376,6 @@ class DeliveryBoyController extends Controller
     public function details($id)
     {
         $order_detail = Order::where('id', $id)->where('assign_delivery_boy', auth()->user()->id)->get();
-        // $order_query = auth()->user()->orders->where('id', $id);
-        
-        // return new PurchaseHistoryCollection($order_query->get());
         return new PurchaseHistoryCollection($order_detail);
     }
 

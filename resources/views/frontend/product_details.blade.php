@@ -107,8 +107,8 @@
                         <!-- Description, Video, Downloads -->
                         @include('frontend.product_details.description')
                         
-                        <!-- Related products -->
-                        @include('frontend.product_details.related_products')
+                        <!-- Frequently Bought products -->
+                        @include('frontend.product_details.frequently_bought_products')
 
                         <!-- Product Query -->
                         @include('frontend.product_details.product_queries')

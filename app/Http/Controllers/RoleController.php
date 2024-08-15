@@ -121,6 +121,11 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
+        if(env('DEMO_MODE') == 'On'){
+            flash(translate('Data can not change in demo mode.'))->info();
+            return back();
+        }
+
         RoleTranslation::where('role_id', $id)->delete();
         Role::destroy($id);
         flash(translate('Role has been deleted successfully'))->success();

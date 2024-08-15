@@ -36,13 +36,13 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $tax->name }}</td>
-                    
+
                     <td>
                         <label class="aiz-switch aiz-switch-success mb-0">
                             <input onchange="update_tax_status(this)" value="{{ $tax->id }}" type="checkbox" <?php if ($tax->tax_status == 1) echo "checked"; ?> >
                             <span class="slider round"></span>
                         </label>
-                        
+
                     </td>
                     <td class="text-right">
                         <a class="btn btn-soft-primary btn-icon btn-circle btn-sm" href="{{route('tax.edit', $tax->id )}}" title="{{ translate('Edit') }}">
@@ -56,7 +56,7 @@
                 @endforeach
             </tbody>
         </table>
-        
+
     </div>
 </div>
 
@@ -71,11 +71,11 @@
                     <h4 class="modal-title h6">{{translate('Add New Tax')}}</h4>
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
                 </div>
-                
+
                 <form class="form-horizontal"  action="{{ route('tax.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
-                        
+
                         <div class="form-group">
                             <div class=" row">
                                 <label class="col-sm-3 control-label" for="name">
@@ -86,7 +86,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-styled btn-base-3" data-dismiss="modal">
@@ -97,11 +97,11 @@
                         </button>
                     </div>
                 </form>
-                
+
             </div>
         </div>
     </div>
-    
+
     @include('modals.delete_modal')
 @endsection
 
@@ -110,8 +110,15 @@
         function sort_pickup_points(el){
             $('#sort_pickup_points').submit();
         }
-        
+
         function update_tax_status(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
+
             if(el.checked){
                 var status = 1;
             }

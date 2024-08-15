@@ -12,7 +12,7 @@
             <div class="row gutters-16">
                 <!-- Flash Deals Baner & Countdown -->
                 <div class="col-xxl-4 col-lg-5">
-                    <div class="z-3 sticky-top-flash-deal py-3 py-lg-0 h-400px h-md-570px h-lg-400px h-xl-475px">
+                    <div class="z-3 sticky-top-lg py-3 py-lg-0 h-400px h-md-570px h-lg-400px h-xl-475px">
                         <div class="h-100 w-100 w-xl-auto" style="background-image: url('{{ uploaded_asset($flash_deal->banner) }}'); background-size: cover; background-position: center center;">
                             <div class="py-5 px-2 px-lg-3 px-xl-5">
                                 <div class="bg-white">

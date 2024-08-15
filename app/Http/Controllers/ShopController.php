@@ -79,7 +79,14 @@ class ShopController extends Controller
                 $user->email_verified_at = date('Y-m-d H:m:s');
                 $user->save();
             } else {
-                $user->notify(new EmailVerificationNotification());
+                try {
+                    $user->notify(new EmailVerificationNotification());
+                } catch (\Throwable $th) {
+                    $shop->delete();
+                    $user->delete();
+                    flash(translate('Seller registration failed. Please try again later.'))->error();
+                    return back();
+                }
             }
 
             flash(translate('Your Shop has been created successfully!'))->success();

@@ -8,22 +8,21 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\ProductTranslation;
 use App\Models\Category;
-use App\Models\ProductTax;
 use App\Models\AttributeValue;
 use App\Models\Cart;
+use App\Models\ProductCategory;
 use App\Models\Wishlist;
 use App\Models\User;
 use App\Notifications\ShopProductNotification;
 use Carbon\Carbon;
-use Combinations;
 use CoreComponentRepository;
 use Artisan;
 use Cache;
-use Str;
 use App\Services\ProductService;
 use App\Services\ProductTaxService;
 use App\Services\ProductFlashDealService;
 use App\Services\ProductStockService;
+use App\Services\FrequentlyBoughtProductService;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
@@ -34,17 +33,20 @@ class ProductController extends Controller
     protected $productTaxService;
     protected $productFlashDealService;
     protected $productStockService;
+    protected $frequentlyBoughtProductService;
 
     public function __construct(
         ProductService $productService,
         ProductTaxService $productTaxService,
         ProductFlashDealService $productFlashDealService,
-        ProductStockService $productStockService
+        ProductStockService $productStockService,
+        FrequentlyBoughtProductService $frequentlyBoughtProductService
     ) {
         $this->productService = $productService;
         $this->productTaxService = $productTaxService;
         $this->productFlashDealService = $productFlashDealService;
         $this->productStockService = $productStockService;
+        $this->frequentlyBoughtProductService = $frequentlyBoughtProductService;
 
         // Staff Permission Check
         $this->middleware(['permission:add_new_product'])->only('create');
@@ -54,6 +56,7 @@ class ProductController extends Controller
         $this->middleware(['permission:product_edit'])->only('admin_product_edit', 'seller_product_edit');
         $this->middleware(['permission:product_duplicate'])->only('duplicate');
         $this->middleware(['permission:product_delete'])->only('destroy');
+        $this->middleware(['permission:set_category_wise_discount'])->only('categoriesWiseProductDiscount');
     }
     /**
      * Display a listing of the resource.
@@ -230,12 +233,17 @@ class ProductController extends Controller
             'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id'
         ]), $product);
 
+        // Frequently Bought Products
+        $this->frequentlyBoughtProductService->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+        ]));
+       
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
             'lang', 'name', 'unit', 'description', 'product_id'
         ]));
-
+        
         flash(translate('Product has been inserted successfully'))->success();
 
         Artisan::call('view:clear');
@@ -311,6 +319,7 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, Product $product)
     {
+
         //Product
         $product = $this->productService->update($request->except([
             '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type'
@@ -320,6 +329,7 @@ class ProductController extends Controller
 
         //Product categories
         $product->categories()->sync($request->category_ids);
+
 
         //Product Stock
         $product->stocks()->delete();
@@ -339,6 +349,12 @@ class ProductController extends Controller
                 'tax_id', 'tax', 'tax_type', 'product_id'
             ]));
         }
+
+        // Frequently Bought Products
+        $product->frequently_bought_products()->delete();
+        $this->frequentlyBoughtProductService->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+        ]));
 
         // Product Translations
         ProductTranslation::updateOrCreate(
@@ -374,6 +390,9 @@ class ProductController extends Controller
         $product->categories()->detach();
         $product->stocks()->delete();
         $product->taxes()->delete();
+        $product->frequently_bought_products()->delete();
+        $product->last_viewed_products()->delete();
+        $product->flash_deal_products()->delete();
 
         if (Product::destroy($id)) {
             Cart::where('product_id', $id)->delete();
@@ -420,6 +439,17 @@ class ProductController extends Controller
 
         //VAT & Tax
         $this->productTaxService->product_duplicate_store($product->taxes, $product_new);
+        
+        // Product Categories
+        foreach($product->product_categories as $product_category){
+            ProductCategory::insert([
+                'product_id' => $product_new->id,
+                'category_id' => $product_category->category_id,
+            ]);
+        }
+
+        // Frequently Bought Products
+        $this->frequentlyBoughtProductService->product_duplicate_store($product->frequently_bought_products, $product_new);
 
         flash(translate('Product has been duplicated successfully'))->success();
         if ($request->type == 'In House')
@@ -486,10 +516,13 @@ class ProductController extends Controller
 
         $product->save();
 
-        $product_type   = $product->digital ==  0 ? 'physical' : 'digital';
-        $status         = $request->approved == 1 ? 'approved' : 'rejected';
-        $users          = User::findMany([User::where('user_type', 'admin')->first()->id, $product->user_id]);
-        Notification::send($users, new ShopProductNotification($product_type, $product, $status));
+        $users                  = User::findMany($product->user_id);
+        $data = array();
+        $data['product_type']   = $product->digital ==  0 ? 'physical' : 'digital';
+        $data['status']         = $request->approved == 1 ? 'approved' : 'rejected';
+        $data['product']        = $product;
+        $data['notification_type_id'] = get_notification_type('seller_product_approved', 'type')->id;
+        Notification::send($users, new ShopProductNotification($data));
 
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
@@ -572,5 +605,21 @@ class ProductController extends Controller
 
         $combinations = (new CombinationService())->generate_combination($options);
         return view('backend.product.products.sku_combinations_edit', compact('combinations', 'unit_price', 'colors_active', 'product_name', 'product'));
+    }
+
+    public function product_search(Request $request)
+    {
+        $products = $this->productService->product_search($request->except(['_token']));
+        return view('partials.product.product_search', compact('products'));
+    }
+
+    public function get_selected_products(Request $request){
+        $products = product::whereIn('id', $request->product_ids)->get();
+        return  view('partials.product.frequently_bought_selected_product', compact('products'));
+    }
+
+    public function setProductDiscount(Request $request)
+    {
+        return $this->productService->setCategoryWiseDiscount($request->except(['_token']));
     }
 }

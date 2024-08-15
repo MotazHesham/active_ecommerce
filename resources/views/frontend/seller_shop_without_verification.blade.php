@@ -45,7 +45,7 @@
                     <div class="d-flex justify-content-center">
                         <!-- Shop Logo -->
                         <a href="{{ route('shop.visit', $shop->slug) }}" class="overflow-hidden size-64px rounded-content" style="border: 1px solid #e5e5e5;
-                            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.06);">
+                            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.06);min-width: fit-content;">
                             <img class="lazyload h-64px  mx-auto"
                                 src="{{ static_asset('assets/img/placeholder.jpg') }}"
                                 data-src="{{ uploaded_asset($shop->logo) }}"
@@ -65,7 +65,7 @@
                                 </span>
                             </a>
                             <!-- Ratting -->
-                            <div class="rating rating-mr-1 text-dark">
+                            <div class="rating rating-mr-2 text-dark">
                                 {{ renderStarRating($shop->rating) }}
                                 <span class="opacity-60 fs-12">({{ $shop->num_of_reviews }}
                                     {{ translate('Reviews') }})</span>

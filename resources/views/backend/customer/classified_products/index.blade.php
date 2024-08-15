@@ -35,9 +35,9 @@
                         </td>
                         <td>
                             <label class="aiz-switch aiz-switch-success mb-0">
-                                <input 
+                                <input
                                     @can('publish_classified_product') onchange="update_published(this)" @endcan
-                                    value="{{ $product->id }}" type="checkbox" <?php if($product->published == 1) echo "checked";?> 
+                                    value="{{ $product->id }}" type="checkbox" <?php if($product->published == 1) echo "checked";?>
                                     @if(!auth()->user()->can('publish_classified_product')) disabled @endif
                                 >
                                 <span class="slider round"></span>
@@ -72,6 +72,12 @@
     <script type="text/javascript">s
 
         function update_published(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var status = 1;
             }

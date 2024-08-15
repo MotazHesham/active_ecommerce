@@ -30,7 +30,7 @@
 					<div class="d-flex flex-wrap justify-content-between align-items-center">
 						<span class="fs-14 fw-500 text-dark">{{ translate('Authentication Layout 1 - Boxed') }}</span>
 						<span>
-							<a href="javascript:void(0);" class="btn btn-xs btn-danger rounded-0" 
+							<a href="javascript:void(0);" class="btn btn-xs btn-danger rounded-0"
 								onclick="imageShowOverlay('{{ static_asset('assets/img/authentication_pages/boxed.png') }}')">{{ translate('View') }}</a>
 						</span>
 					</div>
@@ -106,7 +106,7 @@
 	<div class="card-body">
 		<form action="{{ route('business_settings.update') }}" method="POST">
 			@csrf
-			
+
 			<div class="row">
 				<!-- Admin Login Page Image -->
 				<div class="form-group col-lg-6">
@@ -120,6 +120,7 @@
 						<input type="hidden" name="admin_login_page_image" value="{{ get_setting('admin_login_page_image') }}" class="selected-files">
 					</div>
 					<div class="file-preview box"></div>
+                    <small class="text-muted">{{ translate("Minimum dimensions required: 960px width X 911px height.") }}</small>
 				</div>
 
 				<!-- Customer Login page Image -->
@@ -134,6 +135,7 @@
 						<input type="hidden" name="customer_login_page_image" value="{{ get_setting('customer_login_page_image') }}" class="selected-files">
 					</div>
 					<div class="file-preview box"></div>
+                    <small class="text-muted">{{ translate("Minimum dimensions required: 945px width X 839px height.") }}</small>
 				</div>
 
 				<!-- Customer Register page Image -->
@@ -148,6 +150,7 @@
 						<input type="hidden" name="customer_register_page_image" value="{{ get_setting('customer_register_page_image') }}" class="selected-files">
 					</div>
 					<div class="file-preview box"></div>
+                    <small class="text-muted">{{ translate("Minimum dimensions required: 937px width X 965px height.") }}</small>
 				</div>
 
 				@if (get_setting('vendor_system_activation') == 1)
@@ -163,6 +166,7 @@
 							<input type="hidden" name="seller_login_page_image" value="{{ get_setting('seller_login_page_image') }}" class="selected-files">
 						</div>
 						<div class="file-preview box"></div>
+                    <small class="text-muted">{{ translate("Minimum dimensions required: 945px width X 839px height.") }}</small>
 					</div>
 
 					<!-- Seller Register page Image -->
@@ -177,10 +181,11 @@
 							<input type="hidden" name="seller_register_page_image" value="{{ get_setting('seller_register_page_image') }}" class="selected-files">
 						</div>
 						<div class="file-preview box"></div>
+                    <small class="text-muted">{{ translate("Minimum dimensions required: 945px width X 1036px height.") }}</small>
 					</div>
 				@endif
 
-				
+
 				@if (addon_is_activated('delivery_boy'))
 					<!-- Delivery Boy Login page Background -->
 					<div class="form-group col-lg-6">
@@ -194,6 +199,7 @@
 							<input type="hidden" name="delivery_boy_login_page_image" value="{{ get_setting('delivery_boy_login_page_image') }}" class="selected-files">
 						</div>
 						<div class="file-preview box"></div>
+                    <small class="text-muted">{{ translate("Minimum dimensions required: 945px width X 839px height.") }}</small>
 					</div>
 				@endif
 
@@ -209,6 +215,7 @@
 						<input type="hidden" name="forgot_password_page_image" value="{{ get_setting('forgot_password_page_image') }}" class="selected-files">
 					</div>
 					<div class="file-preview box"></div>
+                    <small class="text-muted">{{ translate("Minimum dimensions required: 945px width X 839px height.") }}</small>
 				</div>
 
 				<!-- Password Reset Page Image -->
@@ -223,6 +230,7 @@
 						<input type="hidden" name="password_reset_page_image" value="{{ get_setting('password_reset_page_image') }}" class="selected-files">
 					</div>
 					<div class="file-preview box"></div>
+                    <small class="text-muted">{{ translate("Minimum dimensions required: 945px width X 839px height.") }}</small>
 				</div>
 
 				@if (addon_is_activated('otp_system'))
@@ -237,6 +245,7 @@
 							<input type="hidden" name="phone_number_verify_page_image" value="{{ get_setting('phone_number_verify_page_image') }}" class="selected-files">
 						</div>
 						<div class="file-preview box"></div>
+                    <small class="text-muted">{{ translate("Minimum dimensions required: 945px width X 839px height.") }}</small>
 					</div>
 				@endif
 			</div>

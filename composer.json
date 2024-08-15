@@ -31,7 +31,7 @@
         "mehedi-iitdu/core-component-repository": "^2.2",
         "mercadopago/dx-php": "^2.5",
         "mpdf/mpdf": "^8.1",
-        "myfatoorah/laravel-package": "^2.1",
+        "myfatoorah/laravel-package": "^2.2",
         "niklasravnsborg/laravel-pdf": "^4.1",
         "paypal/paypal-checkout-sdk": "dev-master",
         "predis/predis": "^2.1",

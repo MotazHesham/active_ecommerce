@@ -3,10 +3,8 @@
 
 namespace App\Http\Controllers\Api\V2;
 
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\CustomerPackageController;
-use App\Http\Controllers\WalletController;
 use App\Models\CombinedOrder;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Paystack;
@@ -16,11 +14,18 @@ class PaystackController extends Controller
 
     public function init(Request $request)
     {
+        $paymentType = $request->payment_type;
+
         $amount = $request->amount;
-        if ($request->combined_order_id) {
+        if ($paymentType == 'cart_payment') {
             $combined_order = CombinedOrder::find($request->combined_order_id);
             $amount = $combined_order->grand_total;
         }
+        elseif($paymentType == 'order_re_payment') {
+            $order = Order::find($request->order_id);
+            $amount = $order->grand_total;
+        }
+
         $user_id = $request->user_id;
 
         $user = User::find($user_id);
@@ -43,17 +48,17 @@ class PaystackController extends Controller
             if ($payment_type == 'cart_payment') {
                 checkout_done($request->combined_order_id, $request->payment_details);
             }
-
-            if ($payment_type == 'wallet_payment') {
+            elseif ($request->payment_type == 'order_re_payment') {
+                order_re_payment_done($request->order_id, 'Paystack', $request->payment_details);
+            }
+            elseif ($payment_type == 'wallet_payment') {
                 wallet_payment_done($request->user_id, $request->amount, 'Paystack', $request->payment_details);
             }
-
-            if ($payment_type == 'seller_package_payment') {
-                seller_purchase_payment_done($request->user_id, $request->package_id, $request->amount, 'Paystack', $request->payment_details);
+            elseif ($payment_type == 'seller_package_payment') {
+                seller_purchase_payment_done($request->user_id, $request->package_id, 'Paystack', $request->payment_details);
             }
-
-            if ($payment_type == 'customer_package_payment') {
-                customer_purchase_payment_done($request->user_id, $request->package_id);
+            elseif ($payment_type == 'customer_package_payment') {
+                customer_purchase_payment_done($request->user_id, $request->package_id, 'Paystack', $request->payment_details);
             }
 
             return response()->json(['result' => true, 'message' => translate("Payment is successful")]);

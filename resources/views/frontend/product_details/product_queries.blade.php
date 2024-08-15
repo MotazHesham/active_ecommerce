@@ -32,7 +32,7 @@
                     <div class="form-group">
                         <textarea class="form-control rounded-0" rows="3" cols="40" name="question"
                             placeholder="{{ translate('Write your question here...') }}" style="resize: none;"></textarea>
-                        
+
                     </div>
                     <button type="submit" class="btn btn-sm w-150px btn-primary rounded-0">{{ translate('Submit') }}</button>
                 </form>
@@ -43,7 +43,7 @@
                 $own_product_queries = $detailedProduct->product_queries->where('customer_id', Auth::id());
             @endphp
             @if ($own_product_queries->count() > 0)
-            
+
                 <div class="question-area my-4 mb-0 px-3 px-sm-4">
 
                     <div class="py-3">
@@ -68,7 +68,10 @@
 
                                 <div class="ml-3">
                                     <div class="fs-14">{{ strip_tags($product_query->question) }}</div>
-                                    <span class="text-secondary">{{ $product_query->user->name }} </span>
+                                    <span class="text-secondary">
+                                        {{ $product_query->user->name }}
+                                        <span class="fs-10 ml-3">{{ date('d-m-Y H:ia', strtotime($product_query->created_at)) }}</span>
+                                    </span>
                                 </div>
                             </div>
                             <div class="answer d-flex my-2">
@@ -89,19 +92,21 @@
                                         {{ strip_tags($product_query->reply ? $product_query->reply : translate('Seller did not respond yet')) }}
                                     </div>
                                     <span class=" text-secondary">
-                                        {{ $product_query->product->user->name }} </span>
+                                        {{ $product_query->product->user->name }}
+                                        <span class="fs-10 ml-3">{{ date('d-m-Y H:ia', strtotime($product_query->created_at)) }}</span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
-            
+
             @endif
         @endauth
-                
+
         <!-- Others Queries -->
         <div class="queries-area my-4 mb-0 px-3 px-sm-4">
-            @include('frontend.'.get_setting('homepage_select').'.partials.product_query_pagination')
+            @include('frontend.partials.product_query_pagination')
         </div>
     </div>
 @endif

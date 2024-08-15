@@ -11,6 +11,7 @@ use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\SellerPackageController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\CheckoutController;
+use App\Models\Order;
 use Session;
 
 class NagadController
@@ -50,22 +51,30 @@ class NagadController
     public function pay()
     {
         if (Session::has('payment_type')) {
-            if (Session::get('payment_type') == 'cart_payment') {
+            $paymentType = Session::get('payment_type');
+            $paymentData = Session::get('payment_data');
+
+            if ($paymentType == 'cart_payment') {
                 $combined_order = CombinedOrder::findOrFail(Session::get('combined_order_id'));
                 $this->amount($combined_order->grand_total);
                 $this->tnx($combined_order->id);
             }
-            if (Session::get('payment_type') == 'wallet_payment') {
-                $this->amount(round(Session::get('payment_data')['amount']));
+            elseif ($paymentType == 'order_re_payment') {
+                $order = Order::findOrFail($paymentData['order_id']);
+                $this->amount($order->grand_total);
                 $this->tnx(rand(000000, 999999));
             }
-            if (Session::get('payment_type') == 'customer_package_payment') {
-                $customer_package = CustomerPackage::findOrFail(Session::get('payment_data')['customer_package_id']);
+            elseif ($paymentType == 'wallet_payment') {
+                $this->amount(round($paymentData['amount']));
+                $this->tnx(rand(000000, 999999));
+            }
+            elseif ($paymentType == 'customer_package_payment') {
+                $customer_package = CustomerPackage::findOrFail($paymentData['customer_package_id']);
                 $this->amount(round($customer_package->amount));
                 $this->tnx(rand(000000, 999999));
             }
-            if (Session::get('payment_type') == 'seller_package_payment') {
-                $seller_package = SellerPackage::findOrFail(Session::get('payment_data')['seller_package_id']);
+            elseif ($paymentType == 'seller_package_payment') {
+                $seller_package = SellerPackage::findOrFail($paymentData['seller_package_id']);
                 $this->amount(round($seller_package->amount));
                 $this->tnx(rand(000000, 999999));
             }
@@ -158,17 +167,18 @@ class NagadController
         $json = NagadUtility::HttpGet($url);
         if (json_decode($json)->status == 'Success') {
             $payment_type = Session::get('payment_type');
+            $paymentData = Session::get('payment_data');
+
             if ($payment_type == 'cart_payment') {
                 return (new CheckoutController)->checkout_done(Session::get('combined_order_id'), $json);
-            }
-            if ($payment_type == 'wallet_payment') {
-                return (new WalletController)->wallet_payment_done(Session::get('payment_data'), $json);
-            }
-            if ($payment_type == 'customer_package_payment') {
-                return (new CustomerPackageController)->purchase_payment_done(Session::get('payment_data'), $json);
-            }
-            if ($payment_type == 'seller_package_payment') {
-                return (new SellerPackageController)->purchase_payment_done(Session::get('payment_data'), $json);
+            } elseif ($payment_type == 'order_re_payment') {
+                return (new CheckoutController)->orderRePaymentDone($paymentData, $json);
+            } elseif ($payment_type == 'wallet_payment') {
+                return (new WalletController)->wallet_payment_done($paymentData, $json);
+            } elseif ($payment_type == 'customer_package_payment') {
+                return (new CustomerPackageController)->purchase_payment_done($paymentData, $json);
+            } elseif ($payment_type == 'seller_package_payment') {
+                return (new SellerPackageController)->purchase_payment_done($paymentData, $json);
             }
         }
         flash(translate('Payment Failed'))->error();

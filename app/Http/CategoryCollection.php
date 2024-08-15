@@ -10,9 +10,10 @@ class CategoryCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
                     'id' => $data->id,
+                    'slug' => $data->slug,
                     'name' => $data->getTranslation('name'),
                     'banner' => uploaded_asset($data->banner),
                     'icon' => uploaded_asset($data->icon),

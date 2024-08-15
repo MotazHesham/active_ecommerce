@@ -4,10 +4,12 @@ namespace App\Models;
 
 use App;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 
 class Product extends Model
 {
-
+    use PreventDemoModeChanges;
+    
     protected $guarded = ['choice_attributes'];
 
     protected $with = ['product_translations', 'taxes', 'thumbnail'];
@@ -32,6 +34,16 @@ class Product extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'product_categories');
+    }
+
+    public function frequently_bought_products()
+    {
+        return $this->hasMany(FrequentlyBoughtProduct::class);
+    }
+
+    public function product_categories()
+    {
+        return $this->hasMany(ProductCategory::class);
     }
 
     public function brand()
@@ -74,9 +86,9 @@ class Product extends Model
         return $this->hasMany(ProductTax::class);
     }
 
-    public function flash_deal_product()
+    public function flash_deal_products()
     {
-        return $this->hasOne(FlashDealProduct::class);
+        return $this->hasMany(FlashDealProduct::class);
     }
 
     public function bids()
@@ -107,5 +119,10 @@ class Product extends Model
     public function scopeIsApprovedPublished($query)
     {
         return $query->where('approved', '1')->where('published', 1);
+    }
+
+    public function last_viewed_products()
+    {
+        return $this->hasMany(LastViewedProduct::class);
     }
 }

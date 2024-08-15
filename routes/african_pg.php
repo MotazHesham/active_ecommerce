@@ -3,11 +3,9 @@
 use App\Http\Controllers\AfricanPaymentGatewayController;
 use App\Http\Controllers\Payment\FlutterwaveController;
 use App\Http\Controllers\Payment\MpesaController;
-use App\Http\Controllers\Payment\PayDunyaController;
 use App\Http\Controllers\Payment\PayfastController;
 
 Route::controller(AfricanPaymentGatewayController::class)->group(function () {
-  Route::get('/african/configuration', 'configuration')->name('african.configuration');
   Route::get('/african/credentials_index', 'credentials_index')->name('african_credentials.index');
 });
 //Mpesa
@@ -37,6 +35,10 @@ Route::controller(PayfastController::class)->group(function () {
   Route::any('/payfast/checkout/notify', 'checkout_notify')->name('payfast.checkout.notify');
   Route::any('/payfast/checkout/return', 'checkout_return')->name('payfast.checkout.return');
   Route::any('/payfast/checkout/cancel', 'checkout_cancel')->name('payfast.checkout.cancel');
+
+  Route::any('/payfast/order_re_payment/notify', 'order_re_payment_notify')->name('payfast.order_re_payment.notify');
+  Route::any('/payfast/order_re_payment/return', 'order_re_payment_return')->name('payfast.order_re_payment.return');
+  Route::any('/payfast/order_re_payment/cancel', 'order_re_payment_cancel')->name('payfast.order_re_payment.cancel');
 
   Route::any('/payfast/wallet/notify', 'wallet_notify')->name('payfast.wallet.notify');
   Route::any('/payfast/wallet/return', 'wallet_return')->name('payfast.wallet.return');

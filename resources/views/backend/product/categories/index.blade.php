@@ -88,7 +88,7 @@
                             @endif
                         </td>
                         <td>
-                            @if($category->icon != null)
+                            @if($category->cover_image != null)
                                 <img src="{{ uploaded_asset($category->cover_image) }}" alt="{{translate('Cover Image')}}" class="h-50px">
                             @else
                                 —
@@ -133,6 +133,12 @@
 @section('script')
     <script type="text/javascript">
         function update_featured(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var status = 1;
             }

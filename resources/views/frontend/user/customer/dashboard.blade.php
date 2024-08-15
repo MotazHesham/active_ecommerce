@@ -10,7 +10,7 @@
             @php
                 $discount = $welcomeCoupon->discount_type == 'amount' ? single_price($welcomeCoupon->discount) : $welcomeCoupon->discount.'%';
             @endphp
-            <div class="fw-400 fs-14" style="color: #3490F3 !important;">   
+            <div class="fw-400 fs-14" style="color: #3490F3 !important;">
                 {{ translate('Welcome Coupon') }} <strong>{{ $discount }}</strong> {{ translate('Discount on your Purchase Within') }} <strong>{{ $welcomeCoupon->validation_days }}</strong> {{ translate('days of Registration') }}
             </div>
             <button class="btn btn-sm mt-3 mt-lg-0 rounded-4" onclick="copyCouponCode('{{ $welcomeCoupon->coupon_code }}')" style="background-color: #3490F3; color: white;" >{{ translate('Copy coupon Code') }}</button>
@@ -175,7 +175,7 @@
                     $customer_package = get_single_customer_package(Auth::user()->customer_package_id);
                 @endphp
                 @if($customer_package != null)
-                    <img src="{{ uploaded_asset($customer_package->logo) }}" class="img-fluid mb-4 h-70px" 
+                    <img src="{{ uploaded_asset($customer_package->logo) }}" class="img-fluid mb-4 h-70px"
                         onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
                     <p class="fs-14 fw-700 mb-3 text-primary">{{ translate('Current Package') }}: {{ $customer_package->getTranslation('name') }}</p>
                     <p class="mb-2 d-flex justify-content-between">
@@ -193,7 +193,7 @@
             </div>
         </div>
         @endif
-        
+
         <!-- Default Shipping Address -->
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="p-4 border h-100">
@@ -250,7 +250,7 @@
                                 </a>
                             </div>
                             <!-- add to cart -->
-                            <a class="cart-btn absolute-bottom-left w-100 h-35px aiz-p-hov-icon text-white fs-13 fw-700 d-flex justify-content-center align-items-center" 
+                            <a class="cart-btn absolute-bottom-left w-100 h-35px aiz-p-hov-icon text-white fs-13 fw-700 d-flex justify-content-center align-items-center"
                                 href="javascript:void(0)" onclick="showAddToCartModal({{ $wishlist->product->id }})">{{ translate('Add to Cart') }}</a>
                         </div>
                         <!-- Product Name -->
@@ -283,19 +283,21 @@
 
 @section('modal')
     <!-- Wallet Recharge Modal -->
-    @include('frontend.'.get_setting('homepage_select').'.partials.wallet_modal')
+    @include('frontend.partials.wallet_modal')
     <script type="text/javascript">
         function show_wallet_modal() {
             $('#wallet_modal').modal('show');
         }
     </script>
-    
+
     <!-- Address modal Modal -->
-    @include('frontend.'.get_setting('homepage_select').'.partials.address_modal')
+    @include('frontend.partials.address.address_modal')
 @endsection
 
 @section('script')
+    @include('frontend.partials.address.address_js')
+
     @if (get_setting('google_map') == 1)
-        @include('frontend.'.get_setting('homepage_select').'.partials.google_map')
+        @include('frontend.partials.google_map')
     @endif
 @endsection

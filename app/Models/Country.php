@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 
 class Country extends Model
 {
+    use PreventDemoModeChanges;
+
     /**
      * Get the Zone that owns the Country
      *

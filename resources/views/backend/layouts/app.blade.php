@@ -37,28 +37,32 @@
             --blue: #3390f3;
             --hov-blue: #1f6dc2;
             --soft-blue: #f1fafd;
-            
-            /* --primary: #009ef7;
+
+            --primary: #009ef7;
             --hov-primary: #008cdd;
-            --soft-primary: rgb(0, 158, 247, 0.15);
+            --soft-primary: #f1fafd;
+            --secondary: #a1a5b3;
+            --soft-secondary: rgba(143, 151, 171, 0.15);
             --success: #19c553;
             --hov-success: #16a846;
-            --soft-success:  rgb(25, 197, 83, 0.15);
+            --soft-success:  #e6fff3;
             --info: #8f60ee;
             --hov-info: #714cbd;
-            --soft-info: rgb(143, 96, 238, 0.15);
+            --soft-info: #f4effe;
             --warning: #ffc700;
-            --soft-warning: rgb(255, 199, 0, 0.15);
+            --soft-warning: #fff9e3;
             --danger: #F0416C;
-            --soft-danger: rgb(240, 65, 108, 0.15);
-            
-            --secondary-base: #f1416c;  
+            --soft-danger: #fff4f8;
+            --dark: #232734;
+            --soft-dark: #1b2133;
+
+            --secondary-base: #f1416c;
             --hov-secondary-base: #c73459;
-            --soft-secondary-base: rgb(241, 65, 108, 0.15); */
+            --soft-secondary-base: rgb(241, 65, 108, 0.15);
         }
         body {
             font-size: 12px;
-            font-family: system-ui;
+            font-family: 'Public Sans', sans-serif;
         }
         /* .bootstrap-select .btn,
         .btn:not(.btn-circle),
@@ -120,13 +124,13 @@
 
     <div class="aiz-main-wrapper">
         @include('backend.inc.admin_sidenav')
-        <div class="aiz-content-wrapper">
+        <div class="aiz-content-wrapper bg-white">
             @include('backend.inc.admin_nav')
             <div class="aiz-main-content">
                 <div class="px-15px px-lg-25px">
                     @yield('content')
                 </div>
-                <div class="bg-white text-center py-3 px-15px px-lg-25px mt-auto">
+                <div class="bg-white text-center py-3 px-15px px-lg-25px mt-auto border-top">
                     <p class="mb-0">&copy; {{ get_setting('site_name') }} v{{ get_setting('current_version') }}</p>
                 </div>
             </div><!-- .aiz-main-content -->
@@ -144,6 +148,13 @@
     <script type="text/javascript">
         @foreach (session('flash_notification', collect())->toArray() as $message)
             AIZ.plugins.notify('{{ $message['level'] }}', '{{ $message['message'] }}');
+            @if ($message['message'] == translate('Product has been inserted successfully'))
+                var data_type = ['digital', 'physical', 'auction', 'wholesale'];
+                data_type.forEach(element => {
+                    localStorage.setItem('tempdataproduct_'+element, '{}');
+                    localStorage.setItem('tempload_'+element, 'no');
+                });
+            @endif
         @endforeach
 
         $('.dropdown-menu a[data-toggle="tab"]').click(function(e) {

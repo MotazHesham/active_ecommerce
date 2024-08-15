@@ -10,8 +10,6 @@ use App\Models\RefundRequest;
 
 class RefundController extends Controller
 {
-    //
-
     public function index(){
         $sellerId = auth()->user()->id;
 
@@ -19,8 +17,7 @@ class RefundController extends Controller
         return new RefundRequestCollection($refunds);
     }
     
-    
-        public function request_approval_vendor(Request $request)
+    public function request_approval_vendor(Request $request)
     {
         $refund = RefundRequest::findOrFail($request->refund_id);
 

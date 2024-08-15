@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Services\AuctionService;
 use Auth;
-use DB;
 
 class SellerAuctionProductController extends Controller
 {
@@ -69,22 +68,18 @@ class SellerAuctionProductController extends Controller
 
     public function bidDestroy($id)
     {
-
         AuctionProductBid::destroy($id);
         return $this->success(translate('Bid deleted successfully'));
     }
 
     public function getAuctionOrderList(Request $request)
     {
-
-
         $orders = Order::leftJoin('order_details', 'orders.id', '=', 'order_details.order_id')
             ->leftJoin('products', 'order_details.product_id', '=', 'products.id')
             ->where('orders.seller_id', auth()->user()->id)
             ->where('products.auction_product', '1')
             ->select("orders.*")
             ->orderBy('code', 'desc');
-
 
         if ($request->payment_status != null) {
             $orders = $orders->where('orders.payment_status', $request->payment_status);

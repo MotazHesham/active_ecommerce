@@ -66,6 +66,9 @@
                                     @if (get_setting('authorizenet') == 1)
                                         <option value="authorizenet">{{ translate('Authorize Net') }}</option>
                                     @endif
+                                    @if (get_setting('paymob_payment') == 1)
+                                        <option value="paymob">{{ translate('Paymob') }}</option>
+                                    @endif
                                     {{-- african payment gateways  --}}
                                     @if (addon_is_activated('african_pg'))
                                         @if (get_setting('mpesa') == 1)

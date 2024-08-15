@@ -45,10 +45,12 @@ class CouponController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(CouponRequest $request)
-    {   
+    {
         $user_id = User::where('user_type', 'admin')->first()->id;
+        $status = $request->type == 'welcome_base' ? 0 : 1;
         Coupon::create($request->validated() + [
             'user_id' => $user_id,
+            'status' => $status,
         ]);
         flash(translate('Coupon has been saved successfully'))->success();
         return redirect()->route('coupon.index');
@@ -139,6 +141,11 @@ class CouponController extends Controller
 
     public function updateStatus(Request $request)
     {
+        foreach (Coupon::where('type', 'welcome_base')->get() as $welcome_coupon) {
+            $welcome_coupon->status = 0;
+            $welcome_coupon->save();
+        }
+        
         $coupon = Coupon::findOrFail($request->id);
         $coupon->status = $request->status;
         if ($coupon->save()) {

@@ -34,14 +34,19 @@
                             <td>MySQL</td>
                             <td>
                                 @php
-                                $results = DB::select( DB::raw("select version()") );
-                                $mysql_version =  $results[0]->{'version()'};
+                                    $results = DB::select( DB::raw("select version()") );
+                                    $mysql_version =  $results[0]->{'version()'};
+                                    $version_explode = explode("-",$mysql_version);
+                                    $mysql_required_version = '8.0';
+                                    if (isset($version_explode[1]) && $version_explode[1]=='MariaDB') {
+                                        $mysql_required_version = '10.3';
+                                    }
                                 @endphp
                                 {{ $mysql_version }}
                             </td>
-                            <td>10.0+</td>
+                            <td>{{ $mysql_required_version }}+</td>
                             <td>
-                                @if (floatval(explode("-",$mysql_version)[0]) >= 10.0)
+                                @if (floatval($version_explode[0]) >= floatval($mysql_required_version))
                                 <i class="las la-check text-success"></i>
                                 @else
                                 <i class="las la-times text-danger"></i>
@@ -227,7 +232,7 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>				
+            </div>
         </div>
         <div class="card">
             <div class="card-header">

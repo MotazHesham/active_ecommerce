@@ -103,12 +103,18 @@ class RegisterController extends Controller
         }
         
         if(session('temp_user_id') != null){
-            Cart::where('temp_user_id', session('temp_user_id'))
-                    ->update([
-                        'user_id' => $user->id,
+            if(auth()->user()->user_type == 'customer'){
+                Cart::where('temp_user_id', session('temp_user_id'))
+                ->update(
+                    [
+                        'user_id' => auth()->user()->id,
                         'temp_user_id' => null
-            ]);
-
+                    ]
+                );
+            }
+            else {
+                Cart::where('temp_user_id', session('temp_user_id'))->delete();
+            }
             Session::forget('temp_user_id');
         }
 

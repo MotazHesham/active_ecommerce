@@ -4,6 +4,7 @@ namespace App\Services;
 
 use AizPackages\CombinationGenerate\Services\CombinationService;
 use App\Models\Cart;
+use App\Models\Category;
 use App\Models\Color;
 use App\Models\Product;
 use App\Models\User;
@@ -323,10 +324,80 @@ class ProductService
     {
         $product = Product::findOrFail($id);
         $product->product_translations()->delete();
+        $product->categories()->detach();
         $product->stocks()->delete();
         $product->taxes()->delete();
         $product->wishlists()->delete();
         $product->carts()->delete();
+        $product->frequently_bought_products()->delete();
+        $product->last_viewed_products()->delete();
+        $product->flash_deal_products()->delete();
         Product::destroy($id);
+    }
+
+    public function product_search(array $data)
+    {   
+        $collection     = collect($data);
+        $auth_user      = auth()->user();
+        $productType    = $collection['product_type'];
+        $products       = Product::query();
+    
+        if($collection['category'] != null ) {
+            $category = Category::with('childrenCategories')->find($collection['category']);
+            $products = $category->products();
+        }
+        
+        $products = in_array($auth_user->user_type, ['admin', 'staff']) ? $products->where('products.added_by', 'admin') : $products->where('products.user_id', $auth_user->id);
+        $products->where('published', '1')->where('auction_product', 0)->where('approved', '1');
+
+        if($productType == 'physical'){
+            $products->where('digital', 0)->where('wholesale_product', 0);
+        }
+        elseif($productType == 'digital'){
+            $products->where('digital', 1);
+        }
+        elseif($productType == 'wholesale'){
+            $products->where('wholesale_product', 1);
+        }
+
+        if($collection['product_id'] != null){
+            $products->where('id', '!=' , $collection['product_id']);
+        }
+        
+        if ($collection['search_key'] != null) {
+            $products->where('name','like', '%' . $collection['search_key'] . '%');
+        }    
+
+        return $products->limit(20)->get();
+    }
+
+    public function setCategoryWiseDiscount(array $data)
+    {
+        $auth_user      = auth()->user();
+        $discount_start_date = null;
+        $discount_end_date   = null;
+        if ($data['date_range'] != null) {
+            $date_var               = explode(" to ", $data['date_range']);
+            $discount_start_date = strtotime($date_var[0]);
+            $discount_end_date   = strtotime($date_var[1]);
+        }
+        $seller_product_discount =  isset($data['seller_product_discount']) ? $data['seller_product_discount'] : null ;
+        $admin_id = User::where('user_type', 'admin')->first()->id;
+
+        $products = Product::where('category_id', $data['category_id'])->where('auction_product', 0);
+        if(in_array($auth_user->user_type, ['admin', 'staff']) && $seller_product_discount == 0){
+            $products = $products->where('user_id', $admin_id);
+        }
+        elseif($auth_user->user_type == 'seller'){
+            $products = $products->where('user_id', $auth_user->id);
+        }
+
+        $products->update([
+            'discount' => $data['discount'],
+            'discount_type' => 'percent',
+            'discount_start_date' => $discount_start_date,
+            'discount_end_date' => $discount_end_date,
+        ]);
+        return 1;
     }
 }

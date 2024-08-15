@@ -1,7 +1,9 @@
 <div class="floating-buttons-section">
-    <a class="floating-buttons-section-control d-lg-none" onclick="showFloatingButtons()">
-        <i class="las la-2x la-angle-double-right"></i>
-    </a>
+    <div class="position-relative">
+        <a class="floating-buttons-section-control d-lg-none" onclick="showFloatingButtons()">
+            <i class="las la-2x la-angle-double-right"></i>
+        </a>
+    </div>
     <!-- All Categories -->
     <div class="aiz-floating-button">
         <a href="{{ route('categories.all') }}">

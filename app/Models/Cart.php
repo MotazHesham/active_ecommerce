@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
+
     protected $guarded = [];
     protected $fillable = ['address_id','price','tax','shipping_cost','discount','product_referral_code','coupon_code','coupon_applied','quantity','user_id','temp_user_id','owner_id','product_id','variation'];
 
@@ -24,5 +25,10 @@ class Cart extends Model
     public function address()
     {
         return $this->belongsTo(Address::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
     }
 }

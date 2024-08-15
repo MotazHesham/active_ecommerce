@@ -15,11 +15,12 @@ class FollowSellerResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'shop_id'=> $this->shop->id,
-            'shop_name'=> $this->shop->name,
-            'shop_url'=> $this->shop->slug,
-            'shop_rating'=> $this->shop->rating,
-            'shop_num_of_reviews'=> $this->shop->num_of_reviews,
+            'shop_id' => $this->shop->id,
+            'shop_slug' => $this->shop->slug,
+            'shop_name' => $this->shop->name,
+            'shop_url' => $this->shop->slug,
+            'shop_rating' => $this->shop->rating,
+            'shop_num_of_reviews' => $this->shop->num_of_reviews,
             'shop_logo' => uploaded_asset($this->shop->logo),
         ];
     }

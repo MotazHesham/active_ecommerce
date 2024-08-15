@@ -18,7 +18,7 @@
                     <a href="{{ route('auction_products.all') }}" class="hov-scale-img">
                         <img class="img-fit lazyload mx-auto h-400px h-lg-485px has-transition"
                             src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                            data-src="{{ uploaded_asset(get_setting('auction_banner_image', null, $lang)) }}"
+                            data-src="{{ uploaded_asset(get_setting('auction_banner_image', null, get_system_language()->code)) }}"
                             alt="{{ env('APP_NAME') }} promo"
                             onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                     </a>

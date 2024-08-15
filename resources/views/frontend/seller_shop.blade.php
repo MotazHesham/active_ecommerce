@@ -34,11 +34,11 @@
             <div class="d-flex flex-wrap justify-content-center justify-content-md-start">
                 <a class="fw-700 fs-11 fs-md-13 mr-3 mr-sm-4 mr-md-5 text-dark opacity-60 hov-opacity-100 @if(!isset($type)) opacity-100 @endif"
                         href="{{ route('shop.visit', $shop->slug) }}">{{ translate('Store Home')}}</a>
-                <a class="fw-700 fs-11 fs-md-13 mr-3 mr-sm-4 mr-md-5 text-dark opacity-60 hov-opacity-100 @if(isset($type) && $type == 'top-selling') opacity-100 @endif" 
+                <a class="fw-700 fs-11 fs-md-13 mr-3 mr-sm-4 mr-md-5 text-dark opacity-60 hov-opacity-100 @if(isset($type) && $type == 'top-selling') opacity-100 @endif"
                         href="{{ route('shop.visit.type', ['slug'=>$shop->slug, 'type'=>'top-selling']) }}">{{ translate('Top Selling')}}</a>
-                <a class="fw-700 fs-11 fs-md-13 mr-3 mr-sm-4 mr-md-5 text-dark opacity-60 hov-opacity-100 @if(isset($type) && $type == 'cupons') opacity-100 @endif" 
+                <a class="fw-700 fs-11 fs-md-13 mr-3 mr-sm-4 mr-md-5 text-dark opacity-60 hov-opacity-100 @if(isset($type) && $type == 'cupons') opacity-100 @endif"
                         href="{{ route('shop.visit.type', ['slug'=>$shop->slug, 'type'=>'cupons']) }}">{{ translate('Coupons')}}</a>
-                <a class="fw-700 fs-11 fs-md-13 text-dark opacity-60 hov-opacity-100 @if(isset($type) && $type == 'all-products') opacity-100 @endif" 
+                <a class="fw-700 fs-11 fs-md-13 text-dark opacity-60 hov-opacity-100 @if(isset($type) && $type == 'all-products') opacity-100 @endif"
                         href="{{ route('shop.visit.type', ['slug'=>$shop->slug, 'type'=>'all-products']) }}">{{ translate('All Products')}}</a>
             </div>
         </div>
@@ -55,8 +55,8 @@
         @if ($shop->top_banner)
             <!-- Top Banner -->
             <section class="h-160px h-md-200px h-lg-300px h-xl-100 w-100">
-                <img class="d-block lazyload h-100 img-fit" 
-                    src="{{ static_asset('assets/img/placeholder-rect.jpg') }}" 
+                <img class="d-block lazyload h-100 img-fit"
+                    src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
                     data-src="{{ uploaded_asset($shop->top_banner) }}" alt="{{ env('APP_NAME') }} offer">
             </section>
         @endif
@@ -71,7 +71,7 @@
                         <div class="d-flex align-items-center">
                             <!-- Shop Logo -->
                             <a href="{{ route('shop.visit', $shop->slug) }}" class="overflow-hidden size-64px rounded-content" style="border: 1px solid #e5e5e5;
-                                box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.06);">
+                                box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.06);min-width: fit-content;">
                                 <img class="lazyload h-64px  mx-auto"
                                     src="{{ static_asset('assets/img/placeholder.jpg') }}"
                                     data-src="{{ uploaded_asset($shop->logo) }}"
@@ -101,7 +101,7 @@
                                     @endif
                                 </a>
                                 <!-- Ratting -->
-                                <div class="rating rating-mr-1 text-dark">
+                                <div class="rating rating-mr-2 text-dark">
                                     {{ renderStarRating($shop->rating) }}
                                     <span class="opacity-60 fs-12">({{ $shop->num_of_reviews }}
                                         {{ translate('Reviews') }})</span>
@@ -172,14 +172,14 @@
                             <div class="d-flex justify-content-md-end pl-lg-3 pt-3 pt-lg-0">
                                 @if(in_array($shop->id, $followed_sellers))
                                     <a href="{{ route("followed_seller.remove", ['id'=>$shop->id]) }}"  data-toggle="tooltip" data-title="{{ translate('Unfollow Seller') }}" data-placement="top"
-                                        class="btn btn-success d-flex align-items-center justify-content-center fs-12 w-190px follow-btn followed" 
+                                        class="btn btn-success d-flex align-items-center justify-content-center fs-12 w-190px follow-btn followed"
                                         style="height: 40px; border-radius: 30px !important; justify-content: center;">
                                         <i class="las la-check fs-16 mr-2"></i>
                                         <span class="fw-700">{{ translate('Followed') }}</span> &nbsp; ({{ count($shop->followers) }})
                                     </a>
                                 @else
                                     <a href="{{ route("followed_seller.store", ['id'=>$shop->id]) }}"
-                                        class="btn btn-primary d-flex align-items-center justify-content-center fs-12 w-190px follow-btn" 
+                                        class="btn btn-primary d-flex align-items-center justify-content-center fs-12 w-190px follow-btn"
                                         style="height: 40px; border-radius: 30px !important; justify-content: center;">
                                         <i class="las la-plus fs-16 mr-2"></i>
                                         <span class="fw-700">{{ translate('Follow Seller') }}</span> &nbsp; ({{ count($shop->followers) }})
@@ -192,7 +192,7 @@
             </div>
         </div>
     </section>
-        
+
     @if (!isset($type))
         @php
             $feature_products = $shop->user->products->where('published', 1)->where('approved', 1)->where('seller_featured', 1);
@@ -226,7 +226,7 @@
                 </div>
             </section>
         @endif
-        
+
         <!-- Banner Slider -->
         <section class="mt-3 mb-3">
             <div class="container">
@@ -241,7 +241,7 @@
                 </div>
             </div>
         </section>
-        
+
         <!-- Coupons -->
         @php
             $coupons = get_coupons($shop->user->id);
@@ -266,7 +266,7 @@
                     <div class="aiz-carousel sm-gutters-16 arrow-none" data-items="3" data-lg-items="2" data-sm-items="1" data-arrows='true' data-infinite='false'>
                         @foreach ($coupons->take(10) as $key => $coupon)
                             <div class="carousel-box">
-                                @include('frontend.'.get_setting('homepage_select').'.partials.coupon_box',['coupon' => $coupon])
+                                @include('frontend.partials.coupon_box',['coupon' => $coupon])
                             </div>
                         @endforeach
                     </div>
@@ -279,8 +279,8 @@
             @foreach (explode(',',$shop->banner_full_width_1) as $key => $banner)
                 <section class="container mb-3 mt-3">
                     <div class="w-100">
-                        <img class="d-block lazyload h-100 img-fit" 
-                            src="{{ static_asset('assets/img/placeholder-rect.jpg') }}" 
+                        <img class="d-block lazyload h-100 img-fit"
+                            src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
                             data-src="{{ uploaded_asset($banner) }}" alt="{{ env('APP_NAME') }} offer">
                     </div>
                 </section>
@@ -294,8 +294,8 @@
                     @foreach (explode(',',$shop->banners_half_width) as $key => $banner)
                     <div class="col-md-6 mb-3 mb-md-0">
                         <div class="w-100">
-                            <img class="d-block lazyload h-100 img-fit" 
-                                src="{{ static_asset('assets/img/placeholder-rect.jpg') }}" 
+                            <img class="d-block lazyload h-100 img-fit"
+                                src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
                                 data-src="{{ uploaded_asset($banner) }}" alt="{{ env('APP_NAME') }} offer">
                         </div>
                     </div>
@@ -330,7 +330,7 @@
                     </div>
                 @endif
             </div>
-            
+
             @php
                 if (!isset($type)){
                     $products = get_seller_products($shop->user->id);
@@ -359,27 +359,27 @@
                     <!-- Banner full width 2 -->
                     @foreach (explode(',',$shop->banner_full_width_2) as $key => $banner)
                         <div class="mt-3 mb-3 w-100">
-                            <img class="d-block lazyload h-100 img-fit" 
-                                src="{{ static_asset('assets/img/placeholder-rect.jpg') }}" 
+                            <img class="d-block lazyload h-100 img-fit"
+                                src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
                                 data-src="{{ uploaded_asset($banner) }}" alt="{{ env('APP_NAME') }} offer">
                         </div>
                     @endforeach
                 @endif
-                
+
 
             @elseif ($type == 'cupons')
                 <!-- All Coupons Section -->
                 <div class="row gutters-16 row-cols-xl-3 row-cols-md-2 row-cols-1">
                     @foreach ($coupons as $key => $coupon)
                         <div class="col mb-4">
-                            @include('frontend.'.get_setting('homepage_select').'.partials.coupon_box',['coupon' => $coupon])
+                            @include('frontend.partials.coupon_box',['coupon' => $coupon])
                         </div>
                     @endforeach
                 </div>
                 <div class="aiz-pagination mt-4 mb-4">
                     {{ $coupons->links() }}
                 </div>
-            
+
             @elseif ($type == 'all-products')
                 <!-- All Products Section -->
                 <form class="" id="search-form" action="" method="GET">
@@ -484,7 +484,7 @@
                                                     onchange="filter()"
                                                 >
                                                 <span class="aiz-square-check"></span>
-                                                <span class="rating rating-mr-1">{{ renderStarRating(5) }}</span>
+                                                <span class="rating rating-mr-2">{{ renderStarRating(5) }}</span>
                                             </label>
                                             <br>
                                             <label class="aiz-checkbox mb-3">
@@ -495,7 +495,7 @@
                                                     onchange="filter()"
                                                 >
                                                 <span class="aiz-square-check"></span>
-                                                <span class="rating rating-mr-1">{{ renderStarRating(4) }}</span>
+                                                <span class="rating rating-mr-2">{{ renderStarRating(4) }}</span>
                                                 <span class="fs-14 fw-400 text-dark">{{ translate('And Up')}}</span>
                                             </label>
                                             <br>
@@ -507,7 +507,7 @@
                                                     onchange="filter()"
                                                 >
                                                 <span class="aiz-square-check"></span>
-                                                <span class="rating rating-mr-1">{{ renderStarRating(3) }}</span>
+                                                <span class="rating rating-mr-2">{{ renderStarRating(3) }}</span>
                                                 <span class="fs-14 fw-400 text-dark">{{ translate('And Up')}}</span>
                                             </label>
                                             <br>
@@ -519,7 +519,7 @@
                                                     onchange="filter()"
                                                 >
                                                 <span class="aiz-square-check"></span>
-                                                <span class="rating rating-mr-1">{{ renderStarRating(2) }}</span>
+                                                <span class="rating rating-mr-2">{{ renderStarRating(2) }}</span>
                                                 <span class="fs-14 fw-400 text-dark">{{ translate('And Up')}}</span>
                                             </label>
                                             <br>
@@ -531,7 +531,7 @@
                                                     onchange="filter()"
                                                 >
                                                 <span class="aiz-square-check"></span>
-                                                <span class="rating rating-mr-1">{{ renderStarRating(1) }}</span>
+                                                <span class="rating rating-mr-2">{{ renderStarRating(1) }}</span>
                                                 <span class="fs-14 fw-400 text-dark">{{ translate('And Up')}}</span>
                                             </label>
                                             <br>
@@ -570,7 +570,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Contents -->
                         <div class="col-xl-9">
                             <!-- Top Filters -->
@@ -597,7 +597,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Products -->
                             <div class="px-3">
                                 <div class="row gutters-16 row-cols-xxl-4 row-cols-xl-3 row-cols-lg-4 row-cols-md-3 row-cols-2 border-top border-left">
@@ -639,7 +639,7 @@
         function filter(){
             $('#search-form').submit();
         }
-        
+
         function rangefilter(arg){
             $('input[name=min_price]').val(arg[0]);
             $('input[name=max_price]').val(arg[1]);

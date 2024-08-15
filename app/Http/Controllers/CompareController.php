@@ -41,7 +41,7 @@ class CompareController extends Controller
             $request->session()->put('compare', $compare);
         }
 
-        return view('frontend.'.get_setting('homepage_select').'.partials.compare');
+        return view('frontend.partials.compare');
     }
 
     public function details($unique_identifier)
@@ -50,7 +50,7 @@ class CompareController extends Controller
         $data['unique_identifier'] = $unique_identifier;
         $data['main_item'] = get_setting('item_name') ?? 'eCommerce';
         $request_data_json = json_encode($data);
-        
+
         $gate = "https://activation.activeitzone.com/check_addon_activation";
 
         $header = array(
@@ -74,5 +74,5 @@ class CompareController extends Controller
             translation_tables($unique_identifier);
             return redirect()->route('home');
         }
-    } 
+    }
 }

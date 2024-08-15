@@ -36,7 +36,7 @@
         .install-card .install-card-body{
             padding: 3rem 4rem !important;
         }
-        .btn-install{
+        /* .btn-install{
             width: 280px;
             height: 40px;
             display: flex;
@@ -56,7 +56,7 @@
         .btn-install:hover{
             box-shadow: 0px 8px 40px rgb(255 88 0 / 30%);
             letter-spacing: 0.3px;
-        }
+        } */
         .back-btn-svg svg * {
             transition: fill .4s ease;
         }

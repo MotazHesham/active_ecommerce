@@ -5,7 +5,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-6 text-center text-lg-left">
-                    <h1 class="fw-600 h4">{{ translate('Affiliate Informations') }}</h1>
+                    <h3 class="fw-600 h4">{{ translate('Affiliate Informations') }}</h3>
                 </div>
                 <div class="col-lg-6">
                     <ul class="breadcrumb bg-transparent p-0 justify-content-center justify-content-lg-end">
@@ -88,7 +88,7 @@
                             </div>
                             <div class="card-body">
                                 @php
-                                    $verification_form = \App\Models\AffiliateConfig::where('type', 'verification_form')->first()->value;
+                                    $verification_form = get_Affiliate_onfig_value();
                                 @endphp
                                     @foreach (json_decode($verification_form) as $key => $element)
                                         @if ($element->type == 'text')

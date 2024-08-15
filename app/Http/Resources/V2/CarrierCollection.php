@@ -8,11 +8,16 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 class CarrierCollection extends ResourceCollection
 {
     protected $ownerId;
+    protected $carts;
+    protected $shipping_info;
 
-    public function extra($owner_id){
+    public function extra($owner_id, $carts, $shipping_info){
         $this->ownerId = $owner_id;
+        $this->carts = $carts;
+        $this->shipping_info = $shipping_info;
         return $this;
     }
+
     
     public function toArray($request)
     {
@@ -24,7 +29,7 @@ class CarrierCollection extends ResourceCollection
                     'logo'          => uploaded_asset($data->logo),
                     'transit_time'  => (integer) $data->transit_time,
                     'free_shipping' => $data->free_shipping == 1 ? true : false,
-                    'transit_price' => single_price(carrier_base_price(auth()->user()->carts, $data->id, $this->ownerId)),
+                    'transit_price' => single_price(carrier_base_price($this->carts, $data->id, $this->ownerId, $this->shipping_info)),
                 ];
             })
         ];

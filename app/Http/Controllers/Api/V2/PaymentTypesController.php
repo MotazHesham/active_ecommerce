@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers\Api\V2;
 
+use App\Models\Cart;
 use App\Models\ManualPaymentMethod;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,33 @@ class PaymentTypesController
         $payment_types = array();
 
         if ($list == "online" || $list == "both") {
-            if (get_setting('paypal_payment') == 1) {
+            $all_online_payment_methods = get_activate_payment_methods();
+            if (count($all_online_payment_methods) > 0) {
+                $available_online_payment_methods = [
+                    "paypal", "stripe", "instamojo", "razorpay", "paystack", "iyzico", "bkash", "nagad", "sslcommerz", "aamarpay", "flutterwave", "payfast", "paytm", "khalti", "myfatoorah", "phonepe"
+                ];
+                $online_payment_methods = $all_online_payment_methods->toQuery()->whereIn('name', $available_online_payment_methods)->get();
+
+                foreach ($online_payment_methods as $online_payment_method){
+                    if ($online_payment_method->active == 1) {
+                        $payment_type = array();
+                        $payment_type['payment_type'] = $online_payment_method->name;
+                        $payment_type['payment_type_key'] = $online_payment_method->name;
+                        $payment_type['image'] = static_asset('assets/img/cards/'.$online_payment_method->name.'.png');
+                        $payment_type['name'] = ucfirst($online_payment_method->name);
+                        $payment_type['title'] = translate("Checkout with ".$online_payment_method->name);
+                        $payment_type['offline_payment_id'] = 0;
+                        $payment_type['details'] = "";
+                        if ($mode == 'wallet') {
+                            $payment_type['title'] = translate("Recharge with ".$online_payment_method->name);
+                        }
+
+                        $payment_types[] = $payment_type;
+                    }
+                }
+            }
+
+            /* if (get_setting('paypal_payment') == 1) {
                 $payment_type = array();
                 $payment_type['payment_type'] = 'paypal_payment';
                 $payment_type['payment_type_key'] = 'paypal';
@@ -221,7 +248,7 @@ class PaymentTypesController
                     $payment_type = array();
                     $payment_type['payment_type'] = 'paytm';
                     $payment_type['payment_type_key'] = 'paytm';
-                    $payment_type['image'] = static_asset('assets/img/cards/paytm.jpg');
+                    $payment_type['image'] = static_asset('assets/img/cards/paytm.png');
                     $payment_type['name'] = "Paytm";
                     $payment_type['title'] = translate("Checkout with Paytm");
                     $payment_type['offline_payment_id'] = 0;
@@ -247,7 +274,37 @@ class PaymentTypesController
 
                     $payment_types[] = $payment_type;
                 }
-            }
+                if (get_setting('myfatoorah') == 1) {
+                    $payment_type = array();
+                    $payment_type['payment_type'] = 'myfatoorah';
+                    $payment_type['payment_type_key'] = 'myfatoorah';
+                    $payment_type['image'] = static_asset('assets/img/cards/myfatoorah.png');
+                    $payment_type['name'] = "myfatoorah";
+                    $payment_type['title'] = translate("Checkout with myfatoorah");
+                    $payment_type['offline_payment_id'] = 0;
+                    $payment_type['details'] = "";
+                    if ($mode == 'wallet') {
+                        $payment_type['title'] = translate("Recharge with myfatoorah");
+                    }
+
+                    $payment_types[] = $payment_type;
+                }
+                if (get_setting('phonepe_payment') == 1) {
+                    $payment_type = array();
+                    $payment_type['payment_type'] = 'phonepe';
+                    $payment_type['payment_type_key'] = 'phonepe';
+                    $payment_type['image'] = static_asset('assets/img/cards/phonepe.png');
+                    $payment_type['name'] = "phonepe";
+                    $payment_type['title'] = translate("Checkout with Phonepe");
+                    $payment_type['offline_payment_id'] = 0;
+                    $payment_type['details'] = "";
+                    if ($mode == 'wallet') {
+                        $payment_type['title'] = translate("Recharge with Phonepe");
+                    }
+
+                    $payment_types[] = $payment_type;
+                }
+            } */
         }
 
         // you cannot recharge wallet by wallet or cash payment
@@ -269,7 +326,10 @@ class PaymentTypesController
             $cash_on_delivery = false;
 
             if ($mode == "order") {
-                $carts = auth()->user()->carts;
+                $user   = auth()->user();
+                $carts = ($user != null) ?
+                        Cart::where('user_id', $user->id)->active()->get() :
+                        ($request->has('temp_user_id') ? Cart::where('temp_user_id', $request->temp_user_id)->active()->get() : [] );
 
                 foreach ($carts as $key => $cart) {
                     $haveDigitalProduct =  $cart->product->digital == 1;

@@ -65,11 +65,8 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
             Route::get('products/remaining-uploads', 'remainingUploads');
 
             Route::get('products/reviews', 'product_reviews');
-            Route::get('products/queries', 'product_queries');
-            Route::get('products/query-show/{id}', 'product_queries_show');
-            Route::post('products/query-reply/{id}', 'product_queries_reply');
+            Route::post('product/search', 'productSearch');
 
-            Route::get('products/search', 'search');
         });
 
 

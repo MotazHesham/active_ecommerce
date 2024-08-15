@@ -27,9 +27,7 @@
                                     @if (get_setting('mercadopago_payment') == 1)
                                         <option value="mercadopago">{{ translate('Mercadopago') }}</option>
                                     @endif
-                                    @if (get_setting('toyyibpay_payment') == 1)
-                                        <option value="toyyibpay">{{ translate('ToyyibPay') }}</option>
-                                    @endif
+                                    
                                     @if (get_setting('sslcommerz_payment') == 1)
                                         <option value="sslcommerz">{{ translate('SSLCommerz') }}</option>
                                     @endif
@@ -66,6 +64,10 @@
                                     @if (get_setting('authorizenet') == 1)
                                         <option value="authorizenet">{{ translate('Authorize Net') }}</option>
                                     @endif
+                                    @if (get_setting('paymob_payment') == 1)
+                                        <option value="paymob">{{ translate('Paymob') }}</option>
+                                    @endif
+
                                     {{-- african payment gateways  --}}
                                     @if (addon_is_activated('african_pg'))
                                         @if (get_setting('mpesa') == 1)
@@ -83,6 +85,9 @@
                                     @if (addon_is_activated('paytm'))
                                         @if (get_setting('paytm_payment'))
                                             <option value="paytm">{{ translate('Paytm') }}</option>
+                                        @endif
+                                        @if (get_setting('toyyibpay_payment') == 1)
+                                            <option value="toyyibpay">{{ translate('ToyyibPay') }}</option>
                                         @endif
                                         @if (get_setting('myfatoorah') == 1)
                                             <option value="myfatoorah">{{ translate('MyFatoorah') }}</option>

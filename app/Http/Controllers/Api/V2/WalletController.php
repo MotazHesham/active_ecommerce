@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Resources\V2\WalletCollection;
+use App\Models\CombinedOrder;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
@@ -31,13 +32,19 @@ class WalletController extends Controller
 
         if ($user->balance >= $request->amount) {
             
-            $response =  $order->store($request, true);            
+            $response =  $order->store($request, true);
             $decoded_response = $response->original;
             if ($decoded_response['result'] == true) { // only decrease user balance with a success
                 $user->balance -= $request->amount;
                 $user->save();            
             }
 
+            $combined_order = CombinedOrder::where('id', $decoded_response['combined_order_id'])->first();
+
+            foreach ($combined_order->orders as $key => $order) {
+                calculateCommissionAffilationClubPoint($order);
+            }
+            
             return $response;
 
         } else {
@@ -60,8 +67,6 @@ class WalletController extends Controller
         $wallet->offline_payment = 1;
         $wallet->reciept = $request->photo;
         $wallet->save();
-       // flash(translate('Offline Recharge has been done. Please wait for response.'))->success();
-        //return redirect()->route('wallet.index');
         return response()->json([
             'result' => true,
             'message' => translate('Offline Recharge has been done. Please wait for response.')

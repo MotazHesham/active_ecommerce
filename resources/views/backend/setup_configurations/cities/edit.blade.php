@@ -10,10 +10,10 @@
   <div class="col-lg-8 mx-auto">
       <div class="card">
           <div class="card-body p-0">
-              <ul class="nav nav-tabs nav-fill border-light">
+              <ul class="nav nav-tabs nav-fill language-bar">
     				@foreach (get_all_active_language() as $key => $language)
     					<li class="nav-item">
-    						<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3" href="{{ route('cities.edit', ['id'=>$city->id, 'lang'=> $language->code] ) }}">
+    						<a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3" href="{{ route('cities.edit', ['id'=>$city->id, 'lang'=> $language->code] ) }}">
     							<img src="{{ static_asset('assets/img/flags/'.$language->code.'.png') }}" height="11" class="mr-1">
     							<span>{{ $language->name }}</span>
     						</a>
@@ -31,7 +31,7 @@
 
                   <div class="form-group">
                       <label for="state_id">{{translate('State')}}</label>
-                      <select class="select2 form-control aiz-selectpicker" name="state_id" data-selected="{{ $city->state_id }}" data-toggle="select2" data-placeholder="Choose ..." data-live-search="true">
+                      <select class="select2 form-control aiz-selectpicker" name="state_id" data-selected="{{ $city->state_id }}" data-toggle="select2" data-placeholder="Choose ..." data-live-search="true" required>
                           @foreach ($states as $state)
                             <option value="{{ $state->id }}">{{ $state->name }}</option>
                           @endforeach

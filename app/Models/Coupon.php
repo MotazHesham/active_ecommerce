@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 
 class Coupon extends Model
 {
+    use PreventDemoModeChanges;
+
     protected $fillable = [
-        'user_id', 'type', 'code','details','discount', 'discount_type', 'start_date', 'end_date'
+        'user_id', 'type', 'code','details','discount', 'discount_type', 'start_date', 'end_date', 'status'
     ];
 
     public function user(){

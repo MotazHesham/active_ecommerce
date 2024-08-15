@@ -61,9 +61,9 @@
 						</td>
 						<td>
 							<label class="aiz-switch aiz-switch-success mb-0">
-								<input 
+								<input
                                     @can('publish_flash_deal') onchange="update_flash_deal_feature(this)" @endcan
-                                    value="{{ $flash_deal->id }}" type="checkbox" 
+                                    value="{{ $flash_deal->id }}" type="checkbox"
                                     <?php if($flash_deal->featured == 1) echo "checked";?>
                                     @cannot('publish_flash_deal') disabled @endcan
                                 >
@@ -104,6 +104,12 @@
 @section('script')
     <script type="text/javascript">
         function update_flash_deal_status(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var status = 1;
             }
@@ -120,6 +126,13 @@
             });
         }
         function update_flash_deal_feature(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
+
             if(el.checked){
                 var featured = 1;
             }

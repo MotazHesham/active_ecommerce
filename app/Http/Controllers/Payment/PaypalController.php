@@ -10,6 +10,7 @@ use App\Http\Controllers\WalletController;
 use Illuminate\Http\Request;
 use App\Models\CombinedOrder;
 use App\Models\CustomerPackage;
+use App\Models\Order;
 use App\Models\SellerPackage;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
@@ -36,16 +37,22 @@ class PaypalController extends Controller
         $client = new PayPalHttpClient($environment);
 
         if (Session::has('payment_type')) {
-            if (Session::get('payment_type') == 'cart_payment') {
+            $paymentType = Session::get('payment_type');
+            $paymentData = Session::get('payment_data');
+            
+            if ($paymentType == 'cart_payment') {
                 $combined_order = CombinedOrder::findOrFail(Session::get('combined_order_id'));
                 $amount = $combined_order->grand_total;
-            } elseif (Session::get('payment_type') == 'wallet_payment') {
-                $amount = Session::get('payment_data')['amount'];
-            } elseif (Session::get('payment_type') == 'customer_package_payment') {
-                $customer_package = CustomerPackage::findOrFail(Session::get('payment_data')['customer_package_id']);
+            } elseif ($paymentType == 'order_re_payment') {
+                $order = Order::findOrFail($paymentData['order_id']);
+                $amount = $order->grand_total;
+            } elseif ($paymentType == 'wallet_payment') {
+                $amount = $paymentData['amount'];
+            } elseif ($paymentType == 'customer_package_payment') {
+                $customer_package = CustomerPackage::findOrFail($paymentData['customer_package_id']);
                 $amount = $customer_package->amount;
-            } elseif (Session::get('payment_type') == 'seller_package_payment') {
-                $seller_package = SellerPackage::findOrFail(Session::get('payment_data')['seller_package_id']);
+            } elseif ($paymentType == 'seller_package_payment') {
+                $seller_package = SellerPackage::findOrFail($paymentData['seller_package_id']);
                 $amount = $seller_package->amount;
             }
         }
@@ -90,7 +97,6 @@ class PaypalController extends Controller
 
     public function getDone(Request $request)
     {
-        // dd($request->all());
         // Creating an environment
         $clientId = env('PAYPAL_CLIENT_ID');
         $clientSecret = env('PAYPAL_CLIENT_SECRET');
@@ -112,14 +118,18 @@ class PaypalController extends Controller
 
             // If call returns body in response, you can get the deserialized version from the result attribute of the response
             if ($request->session()->has('payment_type')) {
-                if ($request->session()->get('payment_type') == 'cart_payment') {
+                $paymentType = $request->session()->get('payment_type');
+                $paymentData = $request->session()->get('payment_data');
+                if ($paymentType == 'cart_payment') {
                     return (new CheckoutController)->checkout_done($request->session()->get('combined_order_id'), json_encode($response));
-                } elseif ($request->session()->get('payment_type') == 'wallet_payment') {
-                    return (new WalletController)->wallet_payment_done($request->session()->get('payment_data'), json_encode($response));
-                } elseif ($request->session()->get('payment_type') == 'customer_package_payment') {
-                    return (new CustomerPackageController)->purchase_payment_done($request->session()->get('payment_data'), json_encode($response));
-                } elseif ($request->session()->get('payment_type') == 'seller_package_payment') {
-                    return (new SellerPackageController)->purchase_payment_done($request->session()->get('payment_data'), json_encode($response));
+                } elseif ($paymentType == 'order_re_payment') {
+                    return (new CheckoutController)->orderRePaymentDone($paymentData, json_encode($response));
+                } elseif ($paymentType == 'wallet_payment') {
+                    return (new WalletController)->wallet_payment_done($paymentData, json_encode($response));
+                } elseif ($paymentType == 'customer_package_payment') {
+                    return (new CustomerPackageController)->purchase_payment_done($paymentData, json_encode($response));
+                } elseif ($paymentType == 'seller_package_payment') {
+                    return (new SellerPackageController)->purchase_payment_done($paymentData, json_encode($response));
                 }
             }
         } catch (\Exception $ex) {

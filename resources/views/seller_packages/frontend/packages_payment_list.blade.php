@@ -4,7 +4,7 @@
     <div class="aiz-titlebar mt-2 mb-4">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <h1 class="h3">{{ translate('Purchase Package List') }}</h1>
+                <h3 class="h3">{{ translate('Purchase Package List') }}</h3>
             </div>
         </div>
     </div>
@@ -31,7 +31,7 @@
                         <tr>
                             <td>{{ ($key+1) + ($seller_packages_payment->currentPage() - 1) * $seller_packages_payment->perPage() }}</td>
                             <td>{{ $payment->seller_package->name ?? translate('Package Unavailable') }}</td>
-                            <td>{{ $payment->seller_package->amount ?? translate('Package Unavailable') }}</td>
+                            <td>{{ single_price($payment->amount) }}</td>
                             <td>
                                 @if($payment->offline_payment == 1)
                                     {{ translate('Offline Payment') }}

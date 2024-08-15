@@ -171,10 +171,12 @@
 
 @section('modal')
     <!-- Address modal -->
-    @include('frontend.'.get_setting('homepage_select').'.partials.address_modal')
+    @include('frontend.partials.address.address_modal')
 @endsection
 
 @section('script')
+    @include('frontend.partials.address.address_js')
+
     <script type="text/javascript">
         $('.new-email-verification').on('click', function() {
             $(this).find('.loading').removeClass('d-none');
@@ -196,7 +198,7 @@
     </script>
 
     @if (get_setting('google_map') == 1)
-        @include('frontend.'.get_setting('homepage_select').'.partials.google_map')
+        @include('frontend.partials.google_map')
     @endif
 
 @endsection

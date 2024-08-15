@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 
 class RefundRequest extends Model
 {
+    use PreventDemoModeChanges;
+
     public function orderDetail()
     {
         return $this->belongsTo(OrderDetail::class);

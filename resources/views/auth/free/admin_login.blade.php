@@ -1,7 +1,7 @@
  <!-- aiz-main-wrapper -->
  <div class="aiz-main-wrapper d-flex flex-column justify-content-center bg-white">
     <section class="bg-white overflow-hidden" style="min-height:100vh;">
-        <div class="row no-gutters">
+        <div class="row no-gutters" style="min-height:100vh;">
             <!-- Left Side Image-->
             <div class="col-xxl-6 col-lg-7">
                 <div class="h-100">

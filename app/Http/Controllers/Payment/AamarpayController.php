@@ -11,6 +11,7 @@ use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\SellerPackageController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\CheckoutController;
+use App\Models\Order;
 use Session;
 use Auth;
 
@@ -37,16 +38,21 @@ class AamarpayController extends Controller
 
         $amount = 0;
         if (Session::has('payment_type')) {
-            if (Session::get('payment_type') == 'cart_payment') {
+            $paymentType = Session::get('payment_type');
+            $paymentData = Session::get('payment_data');
+            if ($paymentType == 'cart_payment') {
                 $combined_order = CombinedOrder::findOrFail(Session::get('combined_order_id'));
                 $amount = round($combined_order->grand_total);
-            } elseif (Session::get('payment_type') == 'wallet_payment') {
-                $amount = round(Session::get('payment_data')['amount']);
-            } elseif (Session::get('payment_type') == 'customer_package_payment') {
-                $customer_package = CustomerPackage::findOrFail(Session::get('payment_data')['customer_package_id']);
+            } elseif ($paymentType == 'order_re_payment') {
+                $order = Order::findOrFail($paymentData['order_id']);
+                $amount = round($order->grand_total);
+            } elseif ($paymentType == 'wallet_payment') {
+                $amount = round($paymentData['amount']);
+            } elseif ($paymentType == 'customer_package_payment') {
+                $customer_package = CustomerPackage::findOrFail($paymentData['customer_package_id']);
                 $amount = round($customer_package->amount);
-            } elseif (Session::get('payment_type') == 'seller_package_payment') {
-                $seller_package = SellerPackage::findOrFail(Session::get('payment_data')['seller_package_id']);
+            } elseif ($paymentType == 'seller_package_payment') {
+                $seller_package = SellerPackage::findOrFail($paymentData['seller_package_id']);
                 $amount = round($seller_package->amount);
             }
         }
@@ -137,16 +143,13 @@ class AamarpayController extends Controller
 
         if ($payment_type == 'cart_payment') {
             return (new CheckoutController)->checkout_done($request->opt_b, json_encode($request->all()));
-        }
-
-        if ($payment_type == 'wallet_payment') {
+        } elseif ($payment_type == 'order_re_payment') {
+            return (new CheckoutController)->orderRePaymentDone(json_decode($request->opt_c), json_encode($request->all()));
+        } elseif ($payment_type == 'wallet_payment') {
             return (new WalletController)->wallet_payment_done(json_decode($request->opt_c), json_encode($request->all()));
-        }
-
-        if ($payment_type == 'customer_package_payment') {
+        } elseif ($payment_type == 'customer_package_payment') {
             return (new CustomerPackageController)->purchase_payment_done(json_decode($request->opt_c), json_encode($request->all()));
-        }
-        if ($payment_type == 'seller_package_payment') {
+        } elseif ($payment_type == 'seller_package_payment') {
             return (new SellerPackageController)->purchase_payment_done(json_decode($request->opt_c), json_encode($request->all()));
         }
     }

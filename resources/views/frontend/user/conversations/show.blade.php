@@ -42,11 +42,11 @@
                         <div class="media mb-2">
                             @if (Auth::user()->id != $message->user_id && $message->user->shop != null)
                                 <a href="{{ route('shop.visit', $message->user->shop->slug) }}" class="">
-                                    <img  class="avatar avatar-sm mr-3" src="{{ uploaded_asset($message->user->shop->logo) }}" 
+                                    <img  class="avatar avatar-sm mr-3" src="{{ uploaded_asset($message->user->shop->logo) }}"
                                         onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
                                 </a>
                             @else
-                                <img class="avatar avatar-sm mr-3" @if($message->user != null) src="{{ uploaded_asset($message->user->avatar_original) }}" @endif 
+                                <img class="avatar avatar-sm mr-3" @if($message->user != null) src="{{ uploaded_asset($message->user->avatar_original) }}" @endif
                                     onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
                             @endif
                             <div class="media-body">
@@ -70,9 +70,9 @@
             </ul> --}}
             <!-- Conversations -->
             <div id="messages">
-                @include('frontend.'.get_setting('homepage_select').'.partials.messages', ['conversation', $conversation])
+                @include('frontend.partials.messages', ['conversation', $conversation])
             </div>
-            
+
             <!-- Send message -->
             <form class="pt-4" action="{{ route('messages.store') }}" method="POST">
                 @csrf

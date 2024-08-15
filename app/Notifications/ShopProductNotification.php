@@ -11,19 +11,17 @@ class ShopProductNotification extends Notification
 {
     use Queueable;
 
-    protected $type;
-    protected $product;
-    protected $status;
+    public $data;
+    public $className;
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($type, $product, $status='pending')
+    public function __construct($data)
     {
-        $this->type = $type;
-        $this->product = $product;
-        $this->status = $status;
+        $this->data  = $data;
+        $this->className= ShopProductNotification::class;
     }
 
     /**
@@ -34,7 +32,7 @@ class ShopProductNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return [DbNotification::class];
     }
 
     /**
@@ -60,10 +58,13 @@ class ShopProductNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'id'        => $this->product['id'],
-            'name'      => $this->product['name'],
-            'status'    => $this->status,
-            'type'      => $this->type
+            'notification_type_id' => $this->data['notification_type_id'],
+            'data' => [
+                'id'        => $this->data['product']['id'],
+                'name'      => $this->data['product']['name'],
+                'status'    => $this->data['status'],
+                'type'      => $this->data['product_type']
+            ]
         ];
     }
 }

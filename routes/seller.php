@@ -17,8 +17,8 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     Route::controller(DashboardController::class)->group(function () {
         Route::get('/dashboard', 'index')->name('dashboard');
     });
-    
-    // Product 
+
+    // Product
     Route::controller(ProductController::class)->group(function () {
         Route::get('/products', 'index')->name('products');
         Route::get('/product/create', 'create')->name('products.create');
@@ -33,6 +33,12 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::post('/products/published', 'updatePublished')->name('products.published');
         Route::get('/products/destroy/{id}', 'destroy')->name('products.destroy');
         Route::post('/products/bulk-delete', 'bulk_product_delete')->name('products.bulk-delete');
+        Route::post('/product-search', 'product_search')->name('product.search');
+        Route::post('/get-selected-products', 'get_selected_products')->name('get-selected-products');
+
+        // category-wise discount set
+        Route::get('/categories-wise-product-discount', 'categoriesWiseProductDiscount')->name('categories_wise_product_discount');
+        Route::post('/set-product-discount', 'setProductDiscount')->name('set_product_discount');
     });
 
     // Product Bulk Upload
@@ -69,6 +75,9 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     Route::controller(OrderController::class)->group(function () {
         Route::post('/orders/update_delivery_status', 'update_delivery_status')->name('orders.update_delivery_status');
         Route::post('/orders/update_payment_status', 'update_payment_status')->name('orders.update_payment_status');
+
+        // Order bulk export
+        Route::get('/order-bulk-export', 'orderBulkExport')->name('order-bulk-export');
     });
 
     Route::controller(InvoiceController::class)->group(function () {
@@ -119,7 +128,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::get('/commission-history', 'index')->name('commission-history.index');
     });
 
-    //Conversations 
+    //Conversations
     Route::controller(ConversationController::class)->group(function () {
         Route::get('/conversations', 'index')->name('conversations.index');
         Route::get('/conversations/show/{id}', 'show')->name('conversations.show');
@@ -145,6 +154,9 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     // Notifications
     Route::controller(NotificationController::class)->group(function () {
         Route::get('/all-notification', 'index')->name('all-notification');
+        Route::post('/notifications/bulk-delete', 'bulkDelete')->name('notifications.bulk_delete');
+        Route::get('/notification/read-and-redirect/{id}', 'readAndRedirect')->name('notification.read-and-redirect');
+
     });
 
 });

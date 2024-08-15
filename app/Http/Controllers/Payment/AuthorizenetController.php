@@ -13,6 +13,7 @@ use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\SellerPackageController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\CheckoutController;
+use App\Models\Order;
 use Auth;
 use Session;
 
@@ -45,7 +46,9 @@ class AuthorizenetController extends Controller
         $zip = '';
         $country = '';
 
-        if (Session::get('payment_type') == 'cart_payment') {
+        $paymentType = Session::get('payment_type');
+        $paymentData = Session::get('payment_data');
+        if ($paymentType == 'cart_payment') {
             $database_order = CombinedOrder::findOrFail(Session::get('combined_order_id'));
             $first_order = $database_order->orders->first();
 
@@ -56,18 +59,27 @@ class AuthorizenetController extends Controller
             $city = json_decode($first_order->shipping_address)->city;
             $zip = json_decode($first_order->shipping_address)->postal_code;
             $country = json_decode($first_order->shipping_address)->country;
-        } elseif (Session::get('payment_type') == 'wallet_payment') {
-            $invoiceNumber = rand(10000, 99999);
-            $amount = Session::get('payment_data')['amount'];
+        }
+        elseif ($paymentType == 'order_re_payment') {
+            $order = Order::findOrFail($paymentData['order_id']);
+            $amount = $order->grand_total;
             $lastName = $user->name;
-        } elseif (Session::get('payment_type') == 'customer_package_payment') {
+            $invoiceNumber = time() . $order->id;
+        }
+        elseif ($paymentType == 'wallet_payment') {
             $invoiceNumber = rand(10000, 99999);
-            $customer_package = CustomerPackage::findOrFail(Session::get('payment_data')['customer_package_id']);
+            $amount = $paymentData['amount'];
+            $lastName = $user->name;
+        }
+        elseif ($paymentType == 'customer_package_payment') {
+            $invoiceNumber = rand(10000, 99999);
+            $customer_package = CustomerPackage::findOrFail($paymentData['customer_package_id']);
             $amount = $customer_package->amount;
             $lastName = $user->name;
-        } elseif (Session::get('payment_type') == 'seller_package_payment') {
+        }
+        elseif ($paymentType == 'seller_package_payment') {
             $invoiceNumber = rand(10000, 99999);
-            $seller_package = SellerPackage::findOrFail(Session::get('payment_data')['seller_package_id']);
+            $seller_package = SellerPackage::findOrFail($paymentData['seller_package_id']);
             $amount = $seller_package->amount;
             $lastName = $user->name;
         }
@@ -161,14 +173,16 @@ class AuthorizenetController extends Controller
                     $message_text = $tresponse->getMessages()[0]->getDescription() . ", Transaction ID: " . $tresponse->getTransId();
                     $msg_type = "success_msg";
 
-                    if (Session::get('payment_type') == 'cart_payment') {
+                    if ($paymentType == 'cart_payment') {
                         return (new CheckoutController)->checkout_done(Session::get('combined_order_id'), $payment_detalis);
-                    } elseif (Session::get('payment_type') == 'wallet_payment') {
-                        return (new WalletController)->wallet_payment_done(Session::get('payment_data'), $payment_detalis);
-                    } elseif (Session::get('payment_type') == 'customer_package_payment') {
-                        return (new CustomerPackageController)->purchase_payment_done(Session::get('payment_data'), $payment_detalis);
-                    } elseif (Session::get('payment_type') == 'seller_package_payment') {
-                        return (new SellerPackageController)->purchase_payment_done(Session::get('payment_data'), $payment_detalis);
+                    } elseif ($paymentType == 'order_re_payment') {
+                        return (new CheckoutController)->orderRePaymentDone($paymentData, $payment_detalis);
+                    } elseif ($paymentType == 'wallet_payment') {
+                        return (new WalletController)->wallet_payment_done($paymentData, $payment_detalis);
+                    } elseif ($paymentType == 'customer_package_payment') {
+                        return (new CustomerPackageController)->purchase_payment_done($paymentData, $payment_detalis);
+                    } elseif ($paymentType == 'seller_package_payment') {
+                        return (new SellerPackageController)->purchase_payment_done($paymentData, $payment_detalis);
                     }
                 } else {
                     $message_text = 'There were some issue with the payment. Please try again later.';

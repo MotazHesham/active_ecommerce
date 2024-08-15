@@ -12,38 +12,36 @@
     @if (count($wishlists) > 0)
         <div class="row row-cols-xxl-5 row-cols-xl-4 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-2 gutters-16 border-top border-left mx-1 mx-md-0 mb-4">
             @foreach($wishlists as $key => $wishlist)
-                @if ($wishlist->product != null)
-                    <div class="aiz-card-box col py-3 text-center border-right border-bottom has-transition hov-shadow-out z-1" id="wishlist_{{ $wishlist->id }}">
-                        <div class="position-relative h-140px h-md-200px img-fit overflow-hidden mb-3">
-                            <!-- Image -->
-                            <a href="{{ route('product', $wishlist->product->slug) }}" class="d-block h-100">
-                                <img src="{{ uploaded_asset($wishlist->product->thumbnail_img) }}" class="lazyload mx-auto img-fit"
-                                    title="{{ $wishlist->product->getTranslation('name') }}">
+                <div class="aiz-card-box col py-3 text-center border-right border-bottom has-transition hov-shadow-out z-1" id="wishlist_{{ $wishlist->id }}">
+                    <div class="position-relative h-140px h-md-200px img-fit overflow-hidden mb-3">
+                        <!-- Image -->
+                        <a href="{{ route('product', $wishlist->product->slug) }}" class="d-block h-100">
+                            <img src="{{ uploaded_asset($wishlist->product->thumbnail_img) }}" class="lazyload mx-auto img-fit"
+                                title="{{ $wishlist->product->getTranslation('name') }}">
+                        </a>
+                        <!-- Remove from wishlisht -->
+                        <div class="absolute-top-right aiz-p-hov-icon">
+                            <a href="javascript:void(0)" onclick="removeFromWishlist({{ $wishlist->id }})" data-toggle="tooltip" data-title="{{ translate('Remove from wishlist') }}" data-placement="left">
+                                <i class="la la-trash"></i>
                             </a>
-                            <!-- Remove from wishlisht -->
-                            <div class="absolute-top-right aiz-p-hov-icon">
-                                <a href="javascript:void(0)" onclick="removeFromWishlist({{ $wishlist->id }})" data-toggle="tooltip" data-title="{{ translate('Remove from wishlist') }}" data-placement="left">
-                                    <i class="la la-trash"></i>
-                                </a>
-                            </div>
-                            <!-- add to cart -->
-                            <a class="cart-btn absolute-bottom-left w-100 h-35px aiz-p-hov-icon text-white fs-13 fw-700 d-flex justify-content-center align-items-center" 
-                                href="javascript:void(0)" onclick="showAddToCartModal({{ $wishlist->product->id }})">{{ translate('Add to Cart') }}</a>
                         </div>
-                        <!-- Product Name -->
-                        <h5 class="fs-14 mb-0 lh-1-5 fw-400 text-truncate-2 mb-3">
-                            <a href="{{ route('product', $wishlist->product->slug) }}" class="text-reset hov-text-primary"
-                                title="{{ $wishlist->product->getTranslation('name') }}">{{ $wishlist->product->getTranslation('name') }}</a>
-                        </h5>
-                        <!-- Price -->
-                        <div class="fs-14">
-                            <span class="fw-600 text-primary">{{ home_discounted_base_price($wishlist->product) }}</span>
-                            @if(home_base_price($wishlist->product) != home_discounted_base_price($wishlist->product))
-                                <del class="opacity-60 ml-1">{{ home_base_price($wishlist->product) }}</del>
-                            @endif
-                        </div>
+                        <!-- add to cart -->
+                        <a class="cart-btn absolute-bottom-left w-100 h-35px aiz-p-hov-icon text-white fs-13 fw-700 d-flex justify-content-center align-items-center" 
+                            href="javascript:void(0)" onclick="showAddToCartModal({{ $wishlist->product->id }})">{{ translate('Add to Cart') }}</a>
                     </div>
-                @endif
+                    <!-- Product Name -->
+                    <h5 class="fs-14 mb-0 lh-1-5 fw-400 text-truncate-2 mb-3">
+                        <a href="{{ route('product', $wishlist->product->slug) }}" class="text-reset hov-text-primary"
+                            title="{{ $wishlist->product->getTranslation('name') }}">{{ $wishlist->product->getTranslation('name') }}</a>
+                    </h5>
+                    <!-- Price -->
+                    <div class="fs-14">
+                        <span class="fw-600 text-primary">{{ home_discounted_base_price($wishlist->product) }}</span>
+                        @if(home_base_price($wishlist->product) != home_discounted_base_price($wishlist->product))
+                            <del class="opacity-60 ml-1">{{ home_base_price($wishlist->product) }}</del>
+                        @endif
+                    </div>
+                </div>
             @endforeach
         </div>
     @else

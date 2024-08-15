@@ -8,11 +8,15 @@ class Sparrow implements SendSms {
     public function send($to, $from, $text, $template_id)
     {
         $url = "http://api.sparrowsms.com/v2/sms/";
+        
+        if (strpos($to, '+977') !== false) {
+            $to = substr($to, 4);
+        }
 
         $args = http_build_query(array(
             "token" => env('SPARROW_TOKEN'),
             "from" => env('MESSGAE_FROM'),
-            "to" => $to,
+            "to" => str_replace([' ','-'], "", $to),
             "text" => $text
         ));
         # Make the call using API.

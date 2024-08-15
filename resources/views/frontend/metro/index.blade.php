@@ -5,14 +5,8 @@
         #section_featured .slick-slider .slick-list{
             background: #fff;
         }
-        #flash_deal .slick-slider .slick-list .slick-slide,
         #section_featured .slick-slider .slick-list .slick-slide {
             margin-bottom: -5px;
-        }
-        @media (max-width: 991px){
-            #flash_deal .slick-slider .slick-list .slick-slide{
-                margin-bottom: 0px;
-            }
         }
         @media (max-width: 575px){
             #section_featured .slick-slider .slick-list .slick-slide {
@@ -28,15 +22,16 @@
         <div class="p-0">
             <!-- Sliders -->
             <div class="home-slider slider-full">
-                @if (get_setting('home_slider_images') != null)
+                @if (get_setting('home_slider_images', null, $lang) != null)
                     <div class="aiz-carousel dots-inside-bottom mobile-img-auto-height" data-autoplay="true" data-infinite="true">
                         @php
                             $decoded_slider_images = json_decode(get_setting('home_slider_images', null, $lang), true);
                             $sliders = get_slider_images($decoded_slider_images);
+                            $home_slider_links = get_setting('home_slider_links', null, $lang);
                         @endphp
                         @foreach ($sliders as $key => $slider)
                             <div class="carousel-box">
-                                <a href="{{ json_decode(get_setting('home_slider_links'), true)[$key] }}">
+                                <a href="{{ isset(json_decode($home_slider_links, true)[$key]) ? json_decode($home_slider_links, true)[$key] : '' }}">
                                     <!-- Image -->
                                     <div class="d-block mw-100 img-fit overflow-hidden h-180px h-md-320px h-lg-460px h-xl-553px overflow-hidden">
                                         <img class="img-fit h-100 m-auto has-transition ls-is-cached lazyloaded"
@@ -59,7 +54,7 @@
         $flash_deal_bg = get_setting('flash_deal_bg_color');
         $flash_deal_bg_full_width = (get_setting('flash_deal_bg_full_width') == 1) ? true : false;
         $flash_deal_banner_menu_text = ((get_setting('flash_deal_banner_menu_text') == 'dark') ||  (get_setting('flash_deal_banner_menu_text') == null)) ? 'text-dark' : 'text-white';
-        
+
     @endphp
     @if ($flash_deal != null)
         <section class="mb-2 mb-md-3 mt-2 mt-md-3" style="background: {{ ($flash_deal_bg_full_width && $flash_deal_bg != null) ? $flash_deal_bg : '' }};" id="flash_deal">
@@ -107,7 +102,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-xxl-8 col-lg-7 col-6">
                         <div class="pl-3 pr-lg-3 pl-xl-2rem pr-xl-2rem">
                             <!-- Top Section from lg device -->
@@ -141,56 +136,42 @@
                                 $flash_deal_products = get_flash_deal_products($flash_deal->id);
                             @endphp
                             <div class="aiz-carousel border-top @if (count($flash_deal_products) > 8) border-right @endif arrow-inactive-none arrow-x-0"
-                                data-items="5" data-xxl-items="5" data-xl-items="3.5" data-lg-items="3" data-md-items="2"
-                                data-sm-items="2.5" data-xs-items="2" data-arrows="true" data-dots="false">
-                                @php
-                                    $init = 0;
-                                    $end = 1;
-                                @endphp
-                                @for ($i = 0; $i < 5; $i++)
-                                    <div class="carousel-box bg-white @if ($i == 0) border-left @endif">
-                                        @foreach ($flash_deal_products as $key => $flash_deal_product)
-                                            @if ($key >= $init && $key <= $end)
-                                                
-                                                @if ($flash_deal_product->product != null && $flash_deal_product->product->published != 0)
-                                                    @php
-                                                        $product_url = route('product', $flash_deal_product->product->slug);
-                                                        if ($flash_deal_product->product->auction_product == 1) {
-                                                            $product_url = route('auction-product', $flash_deal_product->product->slug);
-                                                        }
-                                                    @endphp
+                                data-rows="2" data-items="5" data-xxl-items="5" data-xl-items="3.5" data-lg-items="3" data-md-items="2"
+                                data-sm-items="2.5" data-xs-items="1.7" data-arrows="true" data-dots="false">
+                                @foreach ($flash_deal_products as $key => $flash_deal_product)
+                                    <div class="carousel-box bg-white border-left border-bottom">
+                                        @if ($flash_deal_product->product != null && $flash_deal_product->product->published != 0)
+                                            @php
+                                                $product_url = route('product', $flash_deal_product->product->slug);
+                                                if ($flash_deal_product->product->auction_product == 1) {
+                                                    $product_url = route('auction-product', $flash_deal_product->product->slug);
+                                                }
+                                            @endphp
+                                            <div
+                                                class="h-100px h-md-200px h-lg-auto flash-deal-item position-relative text-center has-transition hov-shadow-out z-1">
+                                                <a href="{{ $product_url }}"
+                                                    class="d-block py-md-2 overflow-hidden hov-scale-img"
+                                                    title="{{ $flash_deal_product->product->getTranslation('name') }}">
+                                                    <!-- Image -->
+                                                    <img src="{{ get_image($flash_deal_product->product->thumbnail) }}"
+                                                        class="lazyload h-60px h-md-100px h-lg-120px mw-100 mx-auto has-transition"
+                                                        alt="{{ $flash_deal_product->product->getTranslation('name') }}"
+                                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                                    <!-- Price -->
                                                     <div
-                                                        class="h-100px h-md-200px h-lg-auto flash-deal-item position-relative text-center border-bottom @if ($i != 4) border-right @endif has-transition hov-shadow-out z-1">
-                                                        <a href="{{ $product_url }}"
-                                                            class="d-block py-md-2 overflow-hidden hov-scale-img"
-                                                            title="{{ $flash_deal_product->product->getTranslation('name') }}">
-                                                            <!-- Image -->
-                                                            <img src="{{ get_image($flash_deal_product->product->thumbnail) }}"
-                                                                class="lazyload h-60px h-md-100px h-lg-120px mw-100 mx-auto has-transition"
-                                                                alt="{{ $flash_deal_product->product->getTranslation('name') }}"
-                                                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
-                                                            <!-- Price -->
-                                                            <div
-                                                                class="fs-10 fs-md-14 mt-md-2 text-center h-md-48px has-transition overflow-hidden pt-md-4 flash-deal-price">
-                                                                <span
-                                                                    class="d-block text-primary fw-700">{{ home_discounted_base_price($flash_deal_product->product) }}</span>
-                                                                @if (home_base_price($flash_deal_product->product) != home_discounted_base_price($flash_deal_product->product))
-                                                                    <del
-                                                                        class="d-block fw-400 text-secondary">{{ home_base_price($flash_deal_product->product) }}</del>
-                                                                @endif
-                                                            </div>
-                                                        </a>
+                                                        class="fs-10 fs-md-14 mt-md-2 text-center h-md-48px has-transition overflow-hidden pt-md-4 flash-deal-price lh-1-5">
+                                                        <span
+                                                            class="d-block text-primary fw-700">{{ home_discounted_base_price($flash_deal_product->product) }}</span>
+                                                        @if (home_base_price($flash_deal_product->product) != home_discounted_base_price($flash_deal_product->product))
+                                                            <del
+                                                                class="d-block fw-400 text-secondary">{{ home_base_price($flash_deal_product->product) }}</del>
+                                                        @endif
                                                     </div>
-                                                @endif
-                                            @endif
-                                        @endforeach
-
-                                        @php
-                                            $init += 2;
-                                            $end += 2;
-                                        @endphp
+                                                </a>
+                                            </div>
+                                        @endif
                                     </div>
-                                @endfor
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -267,12 +248,14 @@
     @endif
 
     <!-- Banner section 1 -->
-    @if (get_setting('home_banner1_images') != null)
+    @php $homeBanner1Images = get_setting('home_banner1_images', null, $lang);   @endphp
+    @if ($homeBanner1Images != null)
         <div class="pb-2 pb-md-3 pt-2 pt-md-3" style="background: #f5f5fa;">
             <div class="container mb-2 mb-md-3">
                 @php
-                    $banner_1_imags = json_decode(get_setting('home_banner1_images', null, $lang));
+                    $banner_1_imags = json_decode($homeBanner1Images);
                     $data_md = count($banner_1_imags) >= 2 ? 2 : 1;
+                    $home_banner1_links = get_setting('home_banner1_links', null, $lang);
                 @endphp
                 <div class="w-100">
                     <div class="aiz-carousel gutters-16 overflow-hidden arrow-inactive-none arrow-dark arrow-x-15"
@@ -282,7 +265,7 @@
                         data-dots="false">
                         @foreach ($banner_1_imags as $key => $value)
                             <div class="carousel-box overflow-hidden hov-scale-img">
-                                <a href="{{ json_decode(get_setting('home_banner1_links'), true)[$key] }}"
+                                <a href="{{ isset(json_decode($home_banner1_links, true)[$key]) ? json_decode($home_banner1_links, true)[$key] : '' }}"
                                     class="d-block text-reset overflow-hidden">
                                     <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
                                         data-src="{{ uploaded_asset($value) }}" alt="{{ env('APP_NAME') }} promo"
@@ -303,12 +286,14 @@
     </div>
 
     <!-- Banner Section 2 -->
-    @if (get_setting('home_banner2_images') != null)
+    @php $homeBanner2Images = get_setting('home_banner2_images', null, $lang);   @endphp
+    @if ($homeBanner2Images != null)
         <div class="mb-2 mb-md-3 mt-2 mt-md-3">
             <div class="container">
                 @php
-                    $banner_2_imags = json_decode(get_setting('home_banner2_images', null, $lang));
+                    $banner_2_imags = json_decode($homeBanner2Images);
                     $data_md = count($banner_2_imags) >= 2 ? 2 : 1;
+                    $home_banner2_links = get_setting('home_banner2_links', null, $lang);
                 @endphp
                 <div class="aiz-carousel gutters-16 overflow-hidden arrow-inactive-none arrow-dark arrow-x-15"
                     data-items="{{ count($banner_2_imags) }}" data-xxl-items="{{ count($banner_2_imags) }}"
@@ -317,7 +302,7 @@
                     data-dots="false">
                     @foreach ($banner_2_imags as $key => $value)
                         <div class="carousel-box overflow-hidden hov-scale-img">
-                            <a href="{{ json_decode(get_setting('home_banner2_links'), true)[$key] }}"
+                            <a href="{{ isset(json_decode($home_banner2_links, true)[$key]) ? json_decode($home_banner2_links, true)[$key] : '' }}"
                                 class="d-block text-reset overflow-hidden">
                                 <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
                                     data-src="{{ uploaded_asset($value) }}" alt="{{ env('APP_NAME') }} promo"
@@ -342,12 +327,14 @@
     </div>
 
     <!-- Banner Section 3 -->
-    @if (get_setting('home_banner3_images') != null)
+    @php $homeBanner3Images = get_setting('home_banner3_images', null, $lang);   @endphp
+    @if ($homeBanner3Images != null)
         <div class="mb-2 mb-md-3 mt-2 mt-md-3">
             <div class="container">
                 @php
-                    $banner_3_imags = json_decode(get_setting('home_banner3_images', null, $lang));
+                    $banner_3_imags = json_decode($homeBanner3Images);
                     $data_md = count($banner_3_imags) >= 2 ? 2 : 1;
+                    $home_banner3_links = get_setting('home_banner3_links', null, $lang);
                 @endphp
                 <div class="aiz-carousel gutters-16 overflow-hidden arrow-inactive-none arrow-dark arrow-x-15"
                     data-items="{{ count($banner_3_imags) }}" data-xxl-items="{{ count($banner_3_imags) }}"
@@ -356,7 +343,7 @@
                     data-dots="false">
                     @foreach ($banner_3_imags as $key => $value)
                         <div class="carousel-box overflow-hidden hov-scale-img">
-                            <a href="{{ json_decode(get_setting('home_banner3_links'), true)[$key] }}"
+                            <a href="{{ isset(json_decode($home_banner3_links, true)[$key]) ? json_decode($home_banner3_links, true)[$key] : '' }}"
                                 class="d-block text-reset overflow-hidden">
                                 <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
                                     data-src="{{ uploaded_asset($value) }}" alt="{{ env('APP_NAME') }} promo"
@@ -450,7 +437,7 @@
                         </div>
                     </div>
                     <div class="position-absolute right-0 bottom-0 h-100">
-                        <img class="h-100" src="{{ uploaded_asset(get_setting('coupon_background_image', null, $lang)) }}"
+                        <img class="img-fit h-100" src="{{ uploaded_asset(get_setting('coupon_background_image', null, $lang)) }}"
                             onerror="this.onerror=null;this.src='{{ static_asset('assets/img/coupon.svg') }}';"
                             alt="{{ env('APP_NAME') }} promo">
                     </div>
@@ -557,7 +544,7 @@
     <!-- Top Sellers -->
     @if (get_setting('vendor_system_activation') == 1)
         @php
-            $best_selers = get_best_sellers(5);
+            $best_selers = get_best_sellers(10);
         @endphp
         @if (count($best_selers) > 0)
         <section class="mb-2 mb-md-3 mt-2 mt-md-3">
@@ -601,7 +588,7 @@
                                             class="text-reset hov-text-primary" tabindex="0">{{ $seller->name }}</a>
                                     </h2>
                                     <!-- Shop Rating -->
-                                    <div class="rating rating-mr-1 text-dark mb-3">
+                                    <div class="rating rating-mr-2 text-dark mb-3">
                                         {{ renderStarRating($seller->rating) }}
                                         <span class="opacity-60 fs-14">({{ $seller->num_of_reviews }}
                                             {{ translate('Reviews') }})</span>
@@ -660,7 +647,7 @@
                                 class="col text-center border-right border-bottom hov-scale-img has-transition hov-shadow-out z-1">
                                 <a href="{{ route('products.brand', $brand->slug) }}" class="d-block p-sm-3">
                                     <img src="{{ isset($brand->brandLogo->file_name) ? my_asset($brand->brandLogo->file_name) : static_asset('assets/img/placeholder.jpg') }}"
-                                        class="lazyload h-md-100px mx-auto has-transition p-2 p-sm-4 mw-100"
+                                        class="lazyload h-100 h-md-100px mx-auto has-transition p-2 p-sm-4 mw-100"
                                         alt="{{ $brand->getTranslation('name') }}"
                                         onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                     <p class="text-center text-dark fs-12 fs-md-14 fw-700 mt-2">

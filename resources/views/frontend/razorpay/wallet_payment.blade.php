@@ -17,6 +17,7 @@
                     data-key="{{ env('RAZOR_KEY') }}"
                     data-amount={{$amount * 100}}
                     data-order_id="{{ $res->id }}"
+                    data-callback_url="{{ route('api.razorpay.success') }}"
                     data-buttontext=""
                     data-name="{{ env('APP_NAME') }}"
                     data-description="Wallet Payment"

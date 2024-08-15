@@ -24,6 +24,7 @@ class VerifyCsrfToken extends Middleware
         '/paytm*',
         '/payhere*',
         '/stripe*',
+        '/api/v2/stripe*',
         '/iyzico*',
         '/payfast*',
         'api/v2/payfast*',
@@ -35,5 +36,6 @@ class VerifyCsrfToken extends Middleware
         '/lnmo*',
         '/rozer*',
         '/phonepe*',
+        '/import-data',
     ];
 }

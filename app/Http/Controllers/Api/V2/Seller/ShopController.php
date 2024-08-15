@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Api\V2\Seller;
 use App\Http\Controllers\Api\V2\AuthController;
 use App\Http\Requests\SellerRegistrationRequest;
 use App\Http\Resources\V2\Seller\ProductCollection;
-use App\Http\Resources\V2\Seller\ProductMiniCollection;
 use App\Http\Resources\V2\Seller\CommissionHistoryResource;
-use App\Http\Resources\V2\Seller\SellerPackageResource;
 use App\Http\Resources\V2\Seller\SellerPaymentResource;
 use App\Http\Resources\V2\ShopCollection;
 use App\Http\Resources\V2\ShopDetailsCollection;
@@ -15,21 +13,16 @@ use App\Models\BusinessSetting;
 use App\Models\Category;
 use App\Models\CommissionHistory;
 use App\Models\Order;
-use App\Models\OrderDetail;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Shop;
 use App\Models\User;
 use App\Notifications\AppEmailVerificationNotification;
-use App\Notifications\EmailVerificationNotification;
 use Illuminate\Http\Request;
 use App\Utility\SearchUtility;
-use Cache;
 use Carbon\Carbon;
 use DB;
 use Hash;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Response;
 
 class ShopController extends Controller
 {
@@ -41,11 +34,7 @@ class ShopController extends Controller
             $shop_query->where("name", 'like', "%{$request->name}%");
             SearchUtility::store($request->name);
         }
-
         return new ShopCollection($shop_query->whereIn('user_id', verified_sellers_id())->paginate(10));
-
-        //remove this , this is for testing
-        //return new ShopCollection($shop_query->paginate(10));
     }
 
 
@@ -123,11 +112,9 @@ class ShopController extends Controller
             ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d')"))
             ->get()->toArray();
 
-        //$array_date = [];
         $sales_array = [];
         for ($i = 1; $i < 8; $i++) {
             $new_date = date("M-d", strtotime(($i - 1) . " days ago"));
-            //$array_date[] = date("M-d", strtotime($i." days ago"));
 
             $sales_array[$i]['date'] = $new_date;
             $sales_array[$i]['total'] = 0;
@@ -244,13 +231,16 @@ class ShopController extends Controller
                 try {
                     $user->notify(new AppEmailVerificationNotification());
                 } catch (\Exception $e) {
+                    $shop->delete();
+                    $user->delete();
+                    return $this->failed(translate('Something Went Wrong!'));
                 }
             }
             $authController = new AuthController();
             return $authController->loginSuccess($user);
         }
 
-        return $this->failed(translate('Something Wenr Wrong!'));
+        return $this->failed(translate('Something Went Wrong!'));
     }
 
 
@@ -293,6 +283,6 @@ class ShopController extends Controller
             return $this->success(translate('Your shop verification request has been submitted successfully!'));
         }
 
-        return $this->failed(translate('Something Wenr Wrong!'));
+        return $this->failed(translate('Something Went Wrong!'));
     }
 }

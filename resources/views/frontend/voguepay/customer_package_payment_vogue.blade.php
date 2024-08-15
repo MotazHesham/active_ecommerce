@@ -20,6 +20,7 @@
 @endif
 @php
     $customer_package = get_single_customer_package(Session::get('payment_data')['customer_package_id']);
+    $user = Auth::user();
 @endphp
 
 <script>
@@ -36,10 +37,10 @@
              merchant_ref: 'ref123',
              loadText:'Custom load text',
              customer: {
-                name: '{{ Auth::user()->name }}',
+                name: '{{ $user->name }}',
 
-                email: '{{ Auth::user()->email }}',
-                phone: '{{ Auth::user()->phone }}'
+                email: '{{ $user->email }}',
+                phone: '{{ $user->phone }}'
             },
              closed:closedFunction,
              success:successFunction,

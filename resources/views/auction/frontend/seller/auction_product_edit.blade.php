@@ -24,10 +24,10 @@
             <div class="col-lg-8">
 
                 <div class="card">
-                    <ul class="nav nav-tabs nav-fill border-light">
+                    <ul class="nav nav-tabs nav-fill border-light language-bar">
                         @foreach (\App\Models\Language::all() as $key => $language)
                         <li class="nav-item">
-                            <a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3" href="{{ route('auction_product_edit.seller', ['id'=>$product->id, 'lang'=> $language->code] ) }}">
+                            <a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3" href="{{ route('auction_product_edit.seller', ['id'=>$product->id, 'lang'=> $language->code] ) }}">
                                 <img src="{{ static_asset('assets/img/flags/'.$language->code.'.png') }}" height="11" class="mr-1">
                                 <span>{{$language->name}}</span>
                             </a>
@@ -418,6 +418,7 @@
 <script type="text/javascript">
     $(document).ready(function (){
         show_hide_shipping_div();
+        AIZ.plugins.tagify();
 
         $("#treeview").hummingbird();
         var main_id = '{{ $product->category_id != null ? $product->category_id : 0 }}';

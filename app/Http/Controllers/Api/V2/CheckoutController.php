@@ -14,16 +14,21 @@ class CheckoutController
 {
     public function apply_coupon_code(Request $request)
     {
-        
-        $coupon = Coupon::where('code', $request->coupon_code)->first(); 
+        $coupon = Coupon::where('code', $request->coupon_code)->first();
         if ($coupon == null) {
             return response()->json([
                 'result' => false,
                 'message' => translate('Invalid coupon code!')
             ]);
         }
-        $cart_items = Cart::where('user_id', auth()->user()->id)->where('owner_id', $coupon->user_id)->get();
+
+        $user_id        = $request->user_id;
+        $temp_user_id   = $request->temp_user_id;
         
+        $cart_items     = ($user_id != null) ?
+                            Cart::where('user_id', $user_id)->where('owner_id', $coupon->user_id)->active()->get():
+                            Cart::where('temp_user_id', $temp_user_id)->where('owner_id', $coupon->user_id)->active()->get();
+
         $coupon_discount = 0;
         if ($cart_items->isEmpty()) {
             return response()->json([
@@ -41,24 +46,25 @@ class CheckoutController
             ]);
         }
 
-        $is_used = CouponUsage::where('user_id', auth()->user()->id)->where('coupon_id', $coupon->id)->first() != null;
-
-        if ($is_used) {
-            return response()->json([
-                'result' => false,
-                'message' => translate('You already used this coupon!')
-            ]);
+        // check if user already used this coupon
+        if($user_id != null){
+            $is_used = CouponUsage::where('user_id', $user_id)->where('coupon_id', $coupon->id)->first() != null;
+            if ($is_used) {
+                return response()->json([
+                    'result' => false,
+                    'message' => translate('You already used this coupon!')
+                ]);
+            }
         }
-
-
-        $coupon_details = json_decode($coupon->details);
         
+        $coupon_details = json_decode($coupon->details);
+
 
         if ($coupon->type == 'cart_base') {
             $subtotal = 0;
             $tax = 0;
             $shipping = 0;
-            foreach ($cart_items as $key => $cartItem) { 
+            foreach ($cart_items as $key => $cartItem) {
                 $product = Product::find($cartItem['product_id']);
                 $subtotal += cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
                 $tax += cart_product_tax($cartItem, $product,false) * $cartItem['quantity'];
@@ -77,8 +83,8 @@ class CheckoutController
                 }
             }
         } elseif ($coupon->type == 'product_base') {
-            
-            foreach ($cart_items as $key => $cartItem) { 
+
+            foreach ($cart_items as $key => $cartItem) {
                 $product = Product::find($cartItem['product_id']);
                 foreach ($coupon_details as $key => $coupon_detail) {
                     if ($coupon_detail->product_id == $cartItem['product_id']) {
@@ -90,15 +96,17 @@ class CheckoutController
                     }
                 }
             }
-            
-        } 
+
+        }
 
         if($coupon_discount>0){
-            Cart::where('user_id', auth()->user()->id)->where('owner_id', $coupon->user_id)->update([
+            $cart_query = $user_id != null ? Cart::where('user_id', $user_id) : Cart::where('temp_user_id', $temp_user_id);
+            $cart_query->where('owner_id', $coupon->user_id)->active()->update([
                 'discount' => $coupon_discount / count($cart_items),
                 'coupon_code' => $request->coupon_code,
                 'coupon_applied' => 1
             ]);
+            
 
             return response()->json([
                 'result' => true,
@@ -116,7 +124,10 @@ class CheckoutController
 
     public function remove_coupon_code(Request $request)
     {
-        Cart::where('user_id', auth()->user()->id)->update([
+        $user_id        = $request->user_id;
+        $temp_user_id   = $request->temp_user_id;
+        $cart_query = $user_id != null ? Cart::where('user_id', $user_id) : Cart::where('temp_user_id', $temp_user_id);
+        $cart_query->update([
             'discount' => 0.00,
             'coupon_code' => "",
             'coupon_applied' => 0

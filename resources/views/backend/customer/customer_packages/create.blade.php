@@ -8,28 +8,50 @@
                 <h5 class="mb-0 h6">{{translate('Create New Package')}}</h5>
             </div>
             <div class="card-body">
+                <!-- Error Meassages -->
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <form action="{{ route('customer_packages.store') }}" method="POST" >
                   	@csrf
                     <div class="form-group row">
-                        <label class="col-sm-3 col-from-label" for="name">{{translate('Package Name')}}</label>
+                        <label class="col-sm-3 col-from-label" for="name">
+                            {{translate('Package Name')}}
+                            <span class="text-danger">*</span>
+                        </label>
                         <div class="col-sm-9">
                             <input type="text" placeholder="{{translate('Name')}}" id="name" name="name" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-3 col-from-label" for="name">{{translate('Amount')}}</label>
+                        <label class="col-sm-3 col-from-label" for="name">
+                            {{translate('Amount')}}
+                            <span class="text-danger">*</span>
+                        </label>
                         <div class="col-sm-9">
                             <input type="number" lang="en" min="0" step="0.01" placeholder="{{translate('Amount')}}" id="amount" name="amount" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-3 col-from-label" for="name">{{translate('Product Upload')}}</label>
+                        <label class="col-sm-3 col-from-label" for="name">
+                            {{translate('Product Upload')}}
+                            <span class="text-danger">*</span>
+                        </label>
                         <div class="col-sm-9">
                             <input type="number" lang="en" min="0" step="1" placeholder="{{translate('Product Upload')}}" id="product_upload" name="product_upload" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Package logo')}}</label>
+                        <label class="col-md-3 col-form-label" for="signinSrEmail">
+                            {{translate('Package logo')}}
+                            <span class="text-danger">*</span>
+                        </label>
                         <div class="col-md-9">
                             <div class="input-group" data-toggle="aizuploader" data-type="image">
                                 <div class="input-group-prepend">

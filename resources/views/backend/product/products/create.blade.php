@@ -13,8 +13,13 @@
             <div class="col">
                 <h1 class="h3">{{ translate('Add New Product') }}</h1>
             </div>
+            <div class="col text-right">
+                <a class="btn btn-xs btn-soft-primary" href="javascript:void(0);" onclick="clearTempdata()">
+                    {{ translate('Clear Tempdata') }}
+                </a>
+            </div>
             {{-- <div class="col text-right">
-                <a class="btn has-transition btn-xs p-0 hov-svg-danger" href="{{ route('home') }}" 
+                <a class="btn has-transition btn-xs p-0 hov-svg-danger" href="{{ route('home') }}"
                     target="_blank" data-toggle="tooltip" data-placement="top" data-title="{{ translate('View Tutorial Video') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="19.887" height="16" viewBox="0 0 19.887 16">
                         <path id="_42fbab5a39cb8436403668a76e5a774b" data-name="42fbab5a39cb8436403668a76e5a774b" d="M18.723,8H5.5A3.333,3.333,0,0,0,2.17,11.333v9.333A3.333,3.333,0,0,0,5.5,24h13.22a3.333,3.333,0,0,0,3.333-3.333V11.333A3.333,3.333,0,0,0,18.723,8Zm-3.04,8.88-5.47,2.933a1,1,0,0,1-1.473-.88V13.067a1,1,0,0,1,1.473-.88l5.47,2.933a1,1,0,0,1,0,1.76Zm-5.61-3.257L14.5,16l-4.43,2.377Z" transform="translate(-2.17 -8)" fill="#9da3ae"/>
@@ -63,6 +68,14 @@
                         {{ translate('Shipping') }}
                     </a>
                 </li>
+
+                <!-- Frequently Bought Product -->
+                <li class="nav-item">
+                    <a class="nav-link" id="frequenty-bought-product-tab" href="#frequenty-bought-product"
+                        data-toggle="tab" data-target="#frequenty-bought-product" type="button" role="tab" aria-controls="frequenty-bought-product" aria-selected="false">
+                        {{ translate('Frequently Bought') }}
+                    </a>
+                </li>
             </ul>
         </div>
 
@@ -71,14 +84,17 @@
             <!-- Error Meassages -->
             @if ($errors->any())
                 <div class="alert alert-danger">
-                    <ul>
+                    <ul class="mb-0">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
             @endif
-            
+
+            <!-- Data type -->
+            <input type="hidden" id="data_type" value="physical">
+
             <form action="{{route('products.store')}}" method="POST" enctype="multipart/form-data" enctype="multipart/form-data" id="choice_form">
                 @csrf
                 <div class="tab-content">
@@ -94,7 +110,7 @@
                                         <div class="form-group row">
                                             <label class="col-xxl-3 col-from-label fs-13">{{translate('Product Name')}} <span class="text-danger">*</span></label>
                                             <div class="col-xxl-9">
-                                                <input type="text" class="form-control" name="name" value="{{ old('name') }}" placeholder="{{ translate('Product Name') }}" onchange="update_sku()">
+                                                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" placeholder="{{ translate('Product Name') }}" onchange="update_sku()" required>
                                             </div>
                                         </div>
                                         <!-- Brand -->
@@ -114,33 +130,33 @@
                                         <div class="form-group row">
                                             <label class="col-xxl-3 col-from-label fs-13">{{translate('Unit')}} <span class="text-danger">*</span></label>
                                             <div class="col-xxl-9">
-                                                <input type="text" class="form-control" name="unit" value="{{ old('unit') }}" placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}">
+                                                <input type="text" class="form-control @error('unit') is-invalid @enderror" name="unit" value="{{ old('unit') }}" placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}" required>
                                             </div>
                                         </div>
                                         <!-- Weight -->
                                         <div class="form-group row">
                                             <label class="col-xxl-3 col-from-label fs-13">{{translate('Weight')}} <small>({{ translate('In Kg') }})</small></label>
                                             <div class="col-xxl-9">
-                                                <input type="number" class="form-control" name="weight" step="0.01" value="0.00" placeholder="0.00">
+                                                <input type="number" class="form-control" name="weight" value="{{ old('weight') ?? 0.00 }}"  step="0.01" placeholder="0.00">
                                             </div>
                                         </div>
-                                        <!-- Quantity -->
+                                        <!-- Minimum Purchase Qty -->
                                         <div class="form-group row">
                                             <label class="col-xxl-3 col-from-label fs-13">{{translate('Minimum Purchase Qty')}} <span class="text-danger">*</span></label>
                                             <div class="col-xxl-9">
-                                                <input type="number" lang="en" class="form-control" name="min_qty" value="1" min="1">
+                                                <input type="number" lang="en" class="form-control @error('min_qty') is-invalid @enderror" name="min_qty" value="{{ old('min_qty') ?? 1 }}" placeholder="1" min="1" required>
                                                 <small class="text-muted">{{translate("The minimum quantity needs to be purchased by your customer.")}}</small>
                                             </div>
                                         </div>
                                         <!-- Tags -->
                                         <div class="form-group row">
-                                            <label class="col-xxl-3 col-from-label fs-13">{{translate('Tags')}} <span class="text-danger">*</span></label>
+                                            <label class="col-xxl-3 col-from-label fs-13">{{translate('Tags')}}</label>
                                             <div class="col-xxl-9">
                                                 <input type="text" class="form-control aiz-tag-input" name="tags[]" placeholder="{{ translate('Type and hit enter to add a tag') }}">
                                                 <small class="text-muted">{{translate('This is used for search. Input those words by which cutomer can find this product.')}}</small>
                                             </div>
                                         </div>
-                
+
                                         @if (addon_is_activated('pos_system'))
                                         <!-- Barcode -->
                                         <div class="form-group row">
@@ -150,7 +166,7 @@
                                             </div>
                                         </div>
                                         @endif
-                
+
                                         @if (addon_is_activated('refund_request'))
                                         <!-- refund_request -->
                                         <div class="form-group row mt-4 mb-4">
@@ -167,7 +183,7 @@
 
                                     <!-- Product Category -->
                                     <div class="col-xxl-5 col-xl-6">
-                                        <div class="card">
+                                        <div class="card @if($errors->has('category_ids') || $errors->has('category_id')) border border-danger @endif">
                                             <div class="card-header">
                                                 <h5 class="mb-0 h6">{{ translate('Product Category') }}</h5>
                                                 <h6 class="float-right fs-13 mb-0">
@@ -303,7 +319,7 @@
                             <div class="w-100">
                                 <!-- Gallery Images -->
                                 <div class="form-group row">
-                                    <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Gallery Images')}} <small>(600x600)</small></label>
+                                    <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Gallery Images')}}</label>
                                     <div class="col-md-9">
                                         <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
                                             <div class="input-group-prepend">
@@ -314,12 +330,12 @@
                                         </div>
                                         <div class="file-preview box sm">
                                         </div>
-                                        <small class="text-muted">{{translate('These images are visible in product details page gallery. Use 600x600 sizes images.')}}</small>
+                                        <small class="text-muted">{{translate('These images are visible in product details page gallery. Minimum dimensions required: 900px width X 900px height.')}}</small>
                                     </div>
                                 </div>
                                 <!-- Thumbnail Image -->
                                 <div class="form-group row">
-                                    <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Thumbnail Image')}} <small>(300x300)</small></label>
+                                    <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Thumbnail Image')}}</label>
                                     <div class="col-md-9">
                                         <div class="input-group" data-toggle="aizuploader" data-type="image">
                                             <div class="input-group-prepend">
@@ -330,7 +346,7 @@
                                         </div>
                                         <div class="file-preview box sm">
                                         </div>
-                                        <small class="text-muted">{{translate('This image is visible in all product box. Use 300x300 sizes image. Keep some blank space around main object of your image as we had to crop some edge in different devices to make it responsive.')}}</small>
+                                        <small class="text-muted">{{translate("This image is visible in all product box. Minimum dimensions required: 195px width X 195px height. Keep some blank space around main object of your image as we had to crop some edge in different devices to make it responsive.")}}</small>
                                     </div>
                                 </div>
                             </div>
@@ -413,17 +429,17 @@
                                     <p>{{ translate('Choose the attributes of this product and then input values of each attribute') }}</p>
                                     <br>
                                 </div>
-        
+
                                 <!-- choice options -->
                                 <div class="customer_choice_options mb-4" id="customer_choice_options">
-        
+
                                 </div>
 
                                 <!-- Unit price -->
                                 <div class="form-group row">
                                     <label class="col-md-3 col-from-label">{{translate('Unit price')}} <span class="text-danger">*</span></label>
                                     <div class="col-md-6">
-                                        <input type="number" lang="en" min="0" value="0" step="0.01" placeholder="{{ translate('Unit price') }}" name="unit_price" class="form-control">
+                                        <input type="number" lang="en" min="0" value="0" step="0.01" placeholder="{{ translate('Unit price') }}" name="unit_price" class="form-control @error('unit_price') is-invalid @enderror">
                                     </div>
                                 </div>
                                 <!-- Discount Date Range -->
@@ -437,7 +453,7 @@
                                 <div class="form-group row">
                                     <label class="col-md-3 col-from-label">{{translate('Discount')}} <span class="text-danger">*</span></label>
                                     <div class="col-md-6">
-                                        <input type="number" lang="en" min="0" value="0" step="0.01" placeholder="{{ translate('Discount') }}" name="discount" class="form-control">
+                                        <input type="number" lang="en" min="0" value="0" step="0.01" placeholder="{{ translate('Discount') }}" name="discount" class="form-control @error('discount') is-invalid @enderror">
                                     </div>
                                     <div class="col-md-3">
                                         <select class="form-control aiz-selectpicker" name="discount_type">
@@ -446,7 +462,7 @@
                                         </select>
                                     </div>
                                 </div>
-        
+
                                 @if(addon_is_activated('club_point'))
                                     <!-- club point -->
                                     <div class="form-group row">
@@ -458,7 +474,7 @@
                                         </div>
                                     </div>
                                 @endif
-                                    
+
                                 <div id="show-hide-div">
                                     <!-- Quantity -->
                                     <div class="form-group row">
@@ -500,7 +516,7 @@
                                 <br>
                                 <!-- sku combination -->
                                 <div class="sku_combination" id="sku_combination">
-        
+
                                 </div>
                             </div>
 
@@ -592,7 +608,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Shipping -->
                     <div class="tab-pane fade" id="shipping" role="tabpanel" aria-labelledby="shipping-tab">
                         <div class="bg-white p-3 p-sm-2rem">
@@ -668,7 +684,7 @@
                                 </p>
                                 @endif
                             </div>
-                            
+
                             <!-- Estimate Shipping Time -->
                             <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Estimate Shipping Time')}}</h5>
                             <div class="w-100">
@@ -676,11 +692,68 @@
                                     <label class="col-md-3 col-from-label">{{translate('Shipping Days')}}</label>
                                     <div class="col-md-9">
                                         <div class="input-group">
-                                            <input type="number" class="form-control" name="est_shipping_days" min="1" step="1" placeholder="{{translate('Shipping Days')}}">
+                                            <input type="number" class="form-control" name="est_shipping_days" value="{{ old('est_shipping_days') }}" min="1" step="1" placeholder="{{translate('Shipping Days')}}">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="inputGroupPrepend">{{translate('Days')}}</span>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Frequently Bought Product -->
+                    <div class="tab-pane fade" id="frequenty-bought-product" role="tabpanel" aria-labelledby="frequenty-bought-product-tab">
+                        <div class="bg-white p-3 p-sm-2rem">
+                            <!-- tab Title -->
+                            <h5 class="mb-3 pb-3 fs-17 fw-700">{{translate('Frequently Bought')}}</h5>
+                            <div class="w-100">
+                                <div class="d-flex mb-4">
+                                    <div class="radio mar-btm mr-5 d-flex align-items-center">
+                                        <input id="fq_bought_select_products" type="radio" name="frequently_bought_selection_type" value="product" onchange="fq_bought_product_selection_type()" checked >
+                                        <label for="fq_bought_select_products" class="fs-14 fw-700 mb-0 ml-2">{{translate('Select Product')}}</label>
+                                    </div>
+                                    <div class="radio mar-btm mr-3 d-flex align-items-center">
+                                        <input id="fq_bought_select_category" type="radio" name="frequently_bought_selection_type" value="category" onchange="fq_bought_product_selection_type()">
+                                        <label for="fq_bought_select_category" class="fs-14 fw-700 mb-0 ml-2">{{translate('Select Category')}}</label>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="fq_bought_select_product_div">
+
+                                            <div id="selected-fq-bought-products">
+
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center"
+                                                onclick="showFqBoughtProductModal()">
+                                                <i class="las la-plus"></i>
+                                                <span class="ml-2">{{ translate('Add More') }}</span>
+                                            </button>
+                                        </div>
+
+                                        {{-- Select Category for Frequently Bought Product --}}
+                                        <div class="fq_bought_select_category_div d-none">
+                                            <div class="form-group row">
+                                                <label class="col-md-2 col-from-label">{{translate('Category')}}</label>
+                                                <div class="col-md-10">
+                                                    <select class="form-control aiz-selectpicker" data-placeholder="{{ translate('Select a Category')}}" name="fq_bought_product_category_id" data-live-search="true" required>
+                                                        @foreach ($categories as $category)
+                                                            <option value="{{ $category->id }}">{{ $category->getTranslation('name') }}</option>
+                                                            @foreach ($category->childrenCategories as $childCategory)
+                                                                @include('categories.child_category', ['child_category' => $childCategory])
+                                                            @endforeach
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -699,6 +772,11 @@
     </div>
 </div>
 
+@endsection
+
+@section('modal')
+	<!-- Frequently Bought Product Select Modal -->
+    @include('modals.product_select_modal')
 @endsection
 
 @section('script')
@@ -722,9 +800,18 @@
             $('#treeview input:checkbox#'+element).parents( "ul" ).css( "display", "block" );
             $('#treeview input:checkbox#'+element).parents( "li" ).children('.las').removeClass( "la-plus" ).addClass('la-minus');
         }
+
         if(main_id){
             $('#treeview input:radio[value='+main_id+']').prop('checked',true);
         }
+
+        $('#treeview input:checkbox').on("click", function (){
+            let $this = $(this);
+            if ($this.prop('checked') && ($('#treeview input:radio:checked').length == 0)) {
+                let val = $this.val();
+                $('#treeview input:radio[value='+val+']').prop('checked',true);
+            }
+        });
     });
 
     $('form').bind('submit', function (e) {
@@ -735,19 +822,8 @@
 		else {
 			$(".action-btn").attr("attempted", 'true');
 		}
-        // Disable the submit button while evaluating if the form should be submitted
-        // $("button[type='submit']").prop('disabled', true);
-        
-        // var valid = true;
-
-        // if (!valid) {
-            // e.preventDefault();
-            
-            ////Reactivate the button if the form was not submitted
-            // $("button[type='submit']").button.prop('disabled', false);
-        // }
     });
-    
+
     $("[name=shipping_type]").on("change", function (){
         $(".flat_rate_shipping_div").hide();
 
@@ -776,7 +852,7 @@
                         <input type="text" class="form-control" name="choice[]" value="'+name+'" placeholder="{{ translate('Choice Title') }}" readonly>\
                     </div>\
                     <div class="col-md-8">\
-                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i +'[]" multiple>\
+                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i +'[]" data-selected-text-format="count" multiple>\
                             '+obj+'\
                         </select>\
                     </div>\
@@ -833,7 +909,7 @@
            success: function(data) {
                 $('#sku_combination').html(data);
                 AIZ.uploader.previewGenerate();
-                AIZ.plugins.fooTable();
+                AIZ.plugins.sectionFooTable('#sku_combination');
                 if (data.trim().length > 1) {
                    $('#show-hide-div').hide();
                 }
@@ -853,6 +929,51 @@
         update_sku();
     });
 
+    function fq_bought_product_selection_type(){
+        var productSelectionType = $("input[name='frequently_bought_selection_type']:checked").val();
+        if(productSelectionType == 'product'){
+            $('.fq_bought_select_product_div').removeClass('d-none');
+            $('.fq_bought_select_category_div').addClass('d-none');
+        }
+        else if(productSelectionType == 'category'){
+            $('.fq_bought_select_category_div').removeClass('d-none');
+            $('.fq_bought_select_product_div').addClass('d-none');
+        }
+    }
+
+    function showFqBoughtProductModal() {
+        $('#fq-bought-product-select-modal').modal('show', {backdrop: 'static'});
+    }
+
+    function filterFqBoughtProduct() {
+        var searchKey = $('input[name=search_keyword]').val();
+        var fqBroughCategory = $('select[name=fq_brough_category]').val();
+        $.post('{{ route('product.search') }}', { _token: AIZ.data.csrf, product_id: null, search_key:searchKey, category:fqBroughCategory, product_type:"physical" }, function(data){
+            $('#product-list').html(data);
+            AIZ.plugins.sectionFooTable('#product-list');
+        });
+    }
+
+    function addFqBoughtProduct() {
+        var selectedProducts = [];
+        $("input:checkbox[name=fq_bought_product_id]:checked").each(function() {
+            selectedProducts.push($(this).val());
+        });
+
+        var fqBoughtProductIds = [];
+        $("input[name='fq_bought_product_ids[]']").each(function() {
+            fqBoughtProductIds.push($(this).val());
+        });
+
+        var productIds = selectedProducts.concat(fqBoughtProductIds.filter((item) => selectedProducts.indexOf(item) < 0))
+
+        $.post('{{ route('get-selected-products') }}', { _token: AIZ.data.csrf, product_ids:productIds}, function(data){
+            $('#fq-bought-product-select-modal').modal('hide');
+            $('#selected-fq-bought-products').html(data);
+            AIZ.plugins.sectionFooTable('#selected-fq-bought-products');
+        });
+    }
+
 </script>
 <script>
     $(document).ready(function(){
@@ -862,11 +983,15 @@
         }else{
             $('.nav-tabs a[href="#general"]').tab('show');
         }
-        
+
         // Change hash for page-reload
         $('.nav-tabs a').on('shown.bs.tab', function (e) {
             window.location.hash = e.target.hash;
         });
     });
+
 </script>
+
+@include('partials.product.product_temp_data')
+
 @endsection

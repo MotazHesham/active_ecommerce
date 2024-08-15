@@ -100,6 +100,7 @@
                 else{
                     AIZ.plugins.notify('danger', '{{ translate('Something went wrong') }}');
                 }
+                location.reload();
             });
         }
     </script>

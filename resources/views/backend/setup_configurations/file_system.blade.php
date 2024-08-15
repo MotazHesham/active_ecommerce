@@ -87,7 +87,7 @@
                                 <label class="control-label">{{translate('BACKBLAZE_SECRET_ACCESS_KEY')}}</label>
                             </div>
                             <div class="col-lg-8">
-                                <input type="text" class="form-control" name="BACKBLAZE_SECRET_ACCESS_KEY" value="{{  env('BACKBLAZE_SECRET_ACCESS_KEY') }}" placeholder="{{ translate('AWS_SECRET_ACCESS_KEY') }}" required>
+                                <input type="text" class="form-control" name="BACKBLAZE_SECRET_ACCESS_KEY" value="{{  env('BACKBLAZE_SECRET_ACCESS_KEY') }}" placeholder="{{ translate('BACKBLAZE_SECRET_ACCESS_KEY') }}" required>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -269,13 +269,18 @@
 @section('script')
     <script type="text/javascript">
         function updateSettings(el, type, value_type){
-            
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             $.post('{{ route('business_settings.update.activation') }}', {
-                _token:'{{ csrf_token() }}', 
-                type:type, 
+                _token:'{{ csrf_token() }}',
+                type:type,
                 value:value_type
             }, function(data){
-                if(data == '1'){
+                if(data == 1){
                     AIZ.plugins.notify('success', '{{ translate('Settings updated successfully') }}');
                 }
                 else{

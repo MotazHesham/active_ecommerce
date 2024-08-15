@@ -41,11 +41,7 @@
                             @if($seller != null)
                                 <tr>
                                     <td>{{ $seller->user->name }}</td>
-                                    @if($seller->shop != null)
-                                        <td>{{ $seller->name }}</td>
-                                    @else
-                                        <td>--</td>
-                                    @endif
+                                    <td>{{ $seller->shop != null ? $seller->name : '--' }}</td>
                                     <td>
                                         @php
                                             $num_of_sale = 0;
@@ -56,7 +52,7 @@
                                         {{ $num_of_sale }}
                                     </td>
                                     <td>
-                                        {{ single_price(\App\Models\OrderDetail::where('seller_id', $seller->user->id)->sum('price')) }}
+                                        {{ single_price(\App\Models\OrderDetail::where('seller_id', $seller->user->id)->where('delivery_status', '!=', 'cancelled')->sum('price')) }}
                                     </td>
                                 </tr>
                             @endif

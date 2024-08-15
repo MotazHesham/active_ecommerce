@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Controllers\Controller;
 use App\Models\CombinedOrder;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -15,21 +16,20 @@ class AamarpayController extends Controller
         $combined_order_id = $request->combined_order_id;
         $amount = round($request->amount);
         $user_id = $request->user_id;
-        $package_id = 0;
-
-        if (isset($request->package_id)) {
-            $package_id = $request->package_id;
+        $paymentData = 0;
+        if(isset($request->package_id)){
+            $paymentData = $request->package_id;
         }
+        if(isset($request->order_id)){
+            $paymentData = $request->order_id;
+        }
+
         $user = User::find($user_id);
         if ($user->phone == null) {
             return response()->json(['result' => false, 'message' => translate("Please add phone number to your profile")]);
         }
-        if ($user->email == null) {
-            $email = 'customer@exmaple.com';
-        } else {
-            $email = $user->email;
-        }
-
+        $email = $user->email != null ? $user->email : 'customer@exmaple.com';
+ 
         if (get_setting('aamarpay_sandbox') == 1) {
             $url = 'https://sandbox.aamarpay.com/request.php'; // live url https://secure.aamarpay.com/request.php
         } else {
@@ -40,6 +40,10 @@ class AamarpayController extends Controller
             if ($payment_type == 'cart_payment') {
                 $combined_order = CombinedOrder::find($combined_order_id);
                 $amount = round($combined_order->grand_total);
+            }
+            elseif ($payment_type == 'order_re_payment') {
+                $order = Order::find($request->order_id);
+                $amount = round($order->grand_total);
             }
         }
 
@@ -72,7 +76,7 @@ class AamarpayController extends Controller
             'cancel_url' => route('cart'), //your cancel url
             'opt_a' => $payment_type,  //optional paramter
             'opt_b' => $combined_order_id,
-            'opt_c' => $package_id,
+            'opt_c' => $paymentData,
             'opt_d' => $user_id,
             'signature_key' => env('AAMARPAY_SIGNATURE_KEY') //signature key will provided aamarpay, contact integration@aamarpay.com for test/live signature key
         );
@@ -130,14 +134,17 @@ class AamarpayController extends Controller
         if ($payment_type == 'cart_payment') {
             checkout_done($request->opt_b, json_encode($request->all()));
         }
-        if ($payment_type == 'wallet_payment') {
+        elseif ($payment_type == 'order_re_payment') {
+            order_re_payment_done($request->opt_c, 'AmarPay', json_encode($request->all()));
+        }
+        elseif ($payment_type == 'wallet_payment') {
             wallet_payment_done($request->opt_d, $request->amount, 'AmarPay', json_encode($request->all()));
         }
-        if ($payment_type == 'customer_package_payment') {
-            customer_purchase_payment_done($request->opt_d, $request->package_id);
+        elseif ($payment_type == 'customer_package_payment') {
+            customer_purchase_payment_done($request->opt_d, $request->opt_c, 'AmarPay', json_encode($request->all()));
         }
-        if ($payment_type == 'seller_package_payment') {
-            seller_purchase_payment_done($request->opt_d, $request->opt_c, $request->amount, 'AmarPay', json_encode($request->all()));
+        elseif ($payment_type == 'seller_package_payment') {
+            seller_purchase_payment_done($request->opt_d, $request->opt_c, 'AmarPay', json_encode($request->all()));
         }
         return response()->json(['result' => true, 'message' => translate("Payment is successful")]);
     }

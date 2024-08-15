@@ -13,7 +13,7 @@
                 <img src="{{ $topbar_banner_asset }}" class="d-none d-xl-block img-fit h-100" alt="{{ translate('topbar_banner') }}">
                 <!-- For Medium device -->
                 <img src="{{ $topbar_banner_medium != null ? uploaded_asset($topbar_banner_medium) : $topbar_banner_asset }}"
-                    class="d-none d-md-block d-xl-none img-fit h-100" alt="{{ translate('topbar_banner') }}"> 
+                    class="d-none d-md-block d-xl-none img-fit h-100" alt="{{ translate('topbar_banner') }}">
                 <!-- For Small device -->
                 <img src="{{ $topbar_banner_small != null ? uploaded_asset($topbar_banner_small) : $topbar_banner_asset }}"
                     class="d-md-none img-fit h-100" alt="{{ translate('topbar_banner') }}">
@@ -34,7 +34,7 @@
                         <!-- Language switcher -->
                         @if (get_setting('show_language_switcher') == 'on')
                             <li class="list-inline-item dropdown mr-4" id="lang-change">
-                                
+
                                 <a href="javascript:void(0)" class="dropdown-toggle text-secondary fs-12 py-2"
                                     data-toggle="dropdown" data-display="static">
                                     <span class="">{{ $system_language->name }}</span>
@@ -210,70 +210,94 @@
                             </a>
                         </div>
                     </div>
-                    <!-- Compare -->
-                    <div class="d-none d-lg-block ml-3 mr-0">
-                        <div class="" id="compare">
-                            @include('frontend.'.get_setting('homepage_select').'.partials.compare')
+
+                    @if (Auth::check() && auth()->user()->user_type == 'customer')
+                        <!-- Compare -->
+                        <div class="d-none d-lg-block ml-3 mr-0">
+                            <div class="" id="compare">
+                                @include('frontend.partials.compare')
+                            </div>
                         </div>
-                    </div>
-                    <!-- Wishlist -->
-                    <div class="d-none d-lg-block mr-3" style="margin-left: 36px;">
-                        <div class="" id="wishlist">
-                            @include('frontend.'.get_setting('homepage_select').'.partials.wishlist')
+                        <!-- Wishlist -->
+                        <div class="d-none d-lg-block mr-3" style="margin-left: 36px;">
+                            <div class="" id="wishlist">
+                                @include('frontend.partials.wishlist')
+                            </div>
                         </div>
-                    </div>
-                    @if (!isAdmin())
                         <!-- Notifications -->
                         <ul class="list-inline mb-0 h-100 d-none d-xl-flex justify-content-end align-items-center">
                             <li class="list-inline-item ml-3 mr-3 pr-3 pl-0 dropdown">
                                 <a class="dropdown-toggle no-arrow text-secondary fs-12" data-toggle="dropdown"
                                     href="javascript:void(0);" role="button" aria-haspopup="false"
-                                    aria-expanded="false">
-                                    <span class="">
-                                        <span class="position-relative d-inline-block">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14.668" height="16"
-                                                viewBox="0 0 14.668 16">
-                                                <path id="_26._Notification" data-name="26. Notification"
-                                                    d="M8.333,16A3.34,3.34,0,0,0,11,14.667H5.666A3.34,3.34,0,0,0,8.333,16ZM15.06,9.78a2.457,2.457,0,0,1-.727-1.747V6a6,6,0,1,0-12,0V8.033A2.457,2.457,0,0,1,1.606,9.78,2.083,2.083,0,0,0,3.08,13.333H13.586A2.083,2.083,0,0,0,15.06,9.78Z"
-                                                    transform="translate(-0.999)" fill="#91919b" />
-                                            </svg>
-                                            @if (Auth::check() && count($user->unreadNotifications) > 0)
-                                                <span
-                                                    class="badge badge-primary badge-inline badge-pill absolute-top-right--10px">{{ count($user->unreadNotifications) }}</span>
-                                            @endif
-                                        </span>
+                                    aria-expanded="false"
+                                    onclick="nonLinkableNotificationRead()">
+                                    <span class="position-relative d-inline-block">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14.668" height="16"
+                                            viewBox="0 0 14.668 16">
+                                            <path id="_26._Notification" data-name="26. Notification"
+                                                d="M8.333,16A3.34,3.34,0,0,0,11,14.667H5.666A3.34,3.34,0,0,0,8.333,16ZM15.06,9.78a2.457,2.457,0,0,1-.727-1.747V6a6,6,0,1,0-12,0V8.033A2.457,2.457,0,0,1,1.606,9.78,2.083,2.083,0,0,0,3.08,13.333H13.586A2.083,2.083,0,0,0,15.06,9.78Z"
+                                                transform="translate(-0.999)" fill="#91919b" />
+                                        </svg>
+                                        @if (Auth::check() && count($user->unreadNotifications) > 0)
+                                            <span class="badge badge-primary badge-inline badge-pill absolute-top-right--10px unread-notification-count">{{ count($user->unreadNotifications) }}</span>
+                                        @endif
+                                    </span>
                                 </a>
-
                                 @auth
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg py-0 rounded-0">
                                         <div class="p-3 bg-light border-bottom">
                                             <h6 class="mb-0">{{ translate('Notifications') }}</h6>
                                         </div>
-                                        <div class="px-3 c-scrollbar-light overflow-auto " style="max-height:300px;">
+                                        <div class="c-scrollbar-light overflow-auto" style="max-height:300px;">
                                             <ul class="list-group list-group-flush">
                                                 @forelse($user->unreadNotifications as $notification)
+                                                    @php
+                                                        $isLinkable = true;
+                                                        $notificationType = get_notification_type($notification->notification_type_id, 'id');
+                                                        $notifyContent = $notificationType->getTranslation('default_text');
+                                                        $notificationShowDesign = get_setting('notification_show_type');
+                                                        if($notification->type == 'App\Notifications\customNotification' && $notification->data['link'] == null){
+                                                            $isLinkable = false;
+                                                        }
+                                                    @endphp
                                                     <li class="list-group-item">
-                                                        @if ($notification->type == 'App\Notifications\OrderNotification')
-                                                            @if ($user->user_type == 'customer')
-                                                                <a href="{{ route('purchase_history.details', encrypt($notification->data['order_id'])) }}"
-                                                                    class="text-secondary fs-12">
-                                                                    <span class="ml-2">
-                                                                        {{ translate('Order code: ') }}
-                                                                        {{ $notification->data['order_code'] }}
-                                                                        {{ translate('has been ' . ucfirst(str_replace('_', ' ', $notification->data['status']))) }}
-                                                                    </span>
-                                                                </a>
-                                                            @elseif ($user->user_type == 'seller')
-                                                                <a href="{{ route('seller.orders.show', encrypt($notification->data['order_id'])) }}"
-                                                                    class="text-secondary fs-12">
-                                                                    <span class="ml-2">
-                                                                        {{ translate('Order code: ') }}
-                                                                        {{ $notification->data['order_code'] }}
-                                                                        {{ translate('has been ' . ucfirst(str_replace('_', ' ', $notification->data['status']))) }}
-                                                                    </span>
-                                                                </a>
+                                                        <div class="d-flex">
+                                                            @if($notificationShowDesign != 'only_text')
+                                                                <div class="size-35px mr-2">
+                                                                    @php
+                                                                        $notifyImageDesign = '';
+                                                                        if($notificationShowDesign == 'design_2'){
+                                                                            $notifyImageDesign = 'rounded-1';
+                                                                        }
+                                                                        elseif($notificationShowDesign == 'design_3'){
+                                                                            $notifyImageDesign = 'rounded-circle';
+                                                                        }
+                                                                    @endphp
+                                                                    <img
+                                                                        src="{{ uploaded_asset($notificationType->image) }}"
+                                                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/notification.png') }}';"
+                                                                        class="img-fit h-100 {{ $notifyImageDesign }}" >
+                                                                </div>
                                                             @endif
-                                                        @endif
+                                                            <div>
+                                                                @if ($notification->type == 'App\Notifications\OrderNotification')
+                                                                    @php
+                                                                        $orderCode  = $notification->data['order_code'];
+                                                                        $route = route('purchase_history.details', encrypt($notification->data['order_id']));
+                                                                            $orderCode = "<span class='text-blue'>".$orderCode."</span>";
+                                                                        $notifyContent = str_replace('[[order_code]]', $orderCode, $notifyContent);
+                                                                    @endphp
+                                                                @endif
+
+                                                                @if($isLinkable = true)
+                                                                    <a href="{{ route('notification.read-and-redirect', encrypt($notification->id)) }}">
+                                                                @endif
+                                                                    <span class="fs-12 text-dark text-truncate-2">{!! $notifyContent !!}</span>
+                                                                @if($isLinkable = true)
+                                                                    </a>
+                                                                @endif
+                                                            </div>
+                                                        </div>
                                                     </li>
                                                 @empty
                                                     <li class="list-group-item">
@@ -285,7 +309,7 @@
                                             </ul>
                                         </div>
                                         <div class="text-center border-top">
-                                            <a href="{{ route('all-notifications') }}"
+                                            <a href="{{ route('customer.all-notifications') }}"
                                                 class="text-secondary fs-12 d-block py-2">
                                                 {{ translate('View All Notifications') }}
                                             </a>
@@ -545,9 +569,9 @@
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <span class="fw-700 fs-16 text-white mr-3">{{ translate('Categories') }}</span>
-                                    <a href="{{ route('categories.all') }}" class="text-reset">
+                                    <a href="{{ route('categories.all') }}" class="text-reset categoriesAll">
                                         <span
-                                            class="d-none d-lg-inline-block text-white hov-opacity-80">({{ translate('See All') }})</span>
+                                            class="d-none d-lg-inline-block text-white animate-underline-white">({{ translate('See All') }})</span>
                                     </a>
                                 </div>
                                 <i class="las la-angle-down text-white has-transition" id="category-menu-bar-icon"
@@ -580,7 +604,7 @@
                     <div class="d-none d-xl-block align-self-stretch ml-5 mr-0 has-transition bg-black-10"
                         data-hover="dropdown">
                         <div class="nav-cart-box dropdown h-100" id="cart_items" style="width: max-content;">
-                            @include('frontend.'.get_setting('homepage_select').'.partials.cart')
+                            @include('frontend.partials.cart.cart')
                         </div>
                     </div>
                 </div>
@@ -676,9 +700,9 @@
                     @endif
                     @if (isCustomer())
                         <li class="mr-0">
-                            <a href="{{ route('all-notifications') }}"
+                            <a href="{{ route('customer.all-notifications') }}"
                                 class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
-                                {{ areActiveRoutes(['all-notifications'], ' active') }}">
+                                {{ areActiveRoutes(['customer.all-notifications'], ' active') }}">
                                 {{ translate('Notifications') }}
                             </a>
                         </li>

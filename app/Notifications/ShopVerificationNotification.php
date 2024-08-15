@@ -11,17 +11,17 @@ class ShopVerificationNotification extends Notification
 {
     use Queueable;
 
-    protected $shop;
-    protected $status;
+    public $data;
+    public $className;
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($shop, $status='submitted')
+    public function __construct($data)
     {
-        $this->shop = $shop;
-        $this->status = $status;
+        $this->data = $data;
+        $this->className= ShopVerificationNotification::class;
     }
 
     /**
@@ -32,7 +32,7 @@ class ShopVerificationNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return [DbNotification::class];
     }
 
     /**
@@ -58,9 +58,12 @@ class ShopVerificationNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'name'  => $this->shop['name'],
-            'id'    => $this->shop['id'],
-            'status'=> $this->status
+            'notification_type_id' => $this->data['notification_type_id'],
+            'data' => [
+                'name'  => $this->data['shop']['name'],
+                'id'    => $this->data['shop']['id'],
+                'status'=> $this->data['status']
+            ]
         ];
     }
 }

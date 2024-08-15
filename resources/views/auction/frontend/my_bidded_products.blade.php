@@ -51,7 +51,7 @@
                             <td class="text-right pr-0" style="vertical-align: middle;">
                                 @php
                                     $order = null;
-                                    $order_detail = get_order_details($bid->product_id);
+                                    $order_detail = get_order_details_by_product($bid->product_id);
                                     if($order_detail != null ){
                                         $order = get_user_order_by_id($order_detail->order_id);
                                     }

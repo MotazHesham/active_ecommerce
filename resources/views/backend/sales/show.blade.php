@@ -15,10 +15,9 @@
                     $payment_status = $order->payment_status;
                     $admin_user_id = App\Models\User::where('user_type', 'admin')->first()->id;
                 @endphp
-
-                <!--Assign Delivery Boy-->
                 @if ($order->seller_id == $admin_user_id || get_setting('product_manage_by_admin') == 1)
-                    
+
+                    <!--Assign Delivery Boy-->
                     @if (addon_is_activated('delivery_boy'))
                         <div class="col-md-3 ml-auto">
                             <label for="assign_deliver_boy">{{ translate('Assign Deliver Boy') }}</label>
@@ -42,9 +41,9 @@
 
                     <div class="col-md-3 ml-auto">
                         <label for="update_payment_status">{{ translate('Payment Status') }}</label>
-                        @if (auth()->user()->can('update_order_payment_status'))
-                            <select class="form-control aiz-selectpicker" data-minimum-results-for-search="Infinity"
-                                id="update_payment_status">
+                        @if (auth()->user()->can('update_order_payment_status') && $payment_status == 'unpaid')
+                            {{-- <select class="form-control aiz-selectpicker" data-minimum-results-for-search="Infinity" id="update_payment_status"> --}}
+                            <select class="form-control aiz-selectpicker" data-minimum-results-for-search="Infinity" id="update_payment_status" onchange="confirm_payment_status()">
                                 <option value="unpaid" @if ($payment_status == 'unpaid') selected @endif>
                                     {{ translate('Unpaid') }}
                                 </option>
@@ -53,7 +52,7 @@
                                 </option>
                             </select>
                         @else
-                            <input type="text" class="form-control" value="{{ $payment_status }}" disabled>
+                            <input type="text" class="form-control" value="{{ ucfirst($payment_status) }}" disabled>
                         @endif
                     </div>
                     <div class="col-md-3 ml-auto">
@@ -84,13 +83,13 @@
                             <input type="text" class="form-control" value="{{ $delivery_status }}" disabled>
                         @endif
                     </div>
-                    {{-- <div class="col-md-3 ml-auto">
+                    <div class="col-md-3 ml-auto">
                         <label for="update_tracking_code">
                             {{ translate('Tracking Code (optional)') }}
                         </label>
                         <input type="text" class="form-control" id="update_tracking_code"
                             value="{{ $order->tracking_code }}">
-                    </div> --}}
+                    </div>
                 @endif
             </div>
             <div class="mb-3">
@@ -134,8 +133,8 @@
                         </a>
                     @endif
                 </div>
-                <div class="col-md-4 ml-auto">
-                    <table>
+                <div class="col-md-4">
+                    <table class="ml-auto">
                         <tbody>
                             <tr>
                                 <td class="text-main text-bold">{{ translate('Order #') }}</td>
@@ -230,7 +229,7 @@
                                             <br>
                                             <small>
                                                 @php
-                                                    $product_stock = json_decode($orderDetail->product->stocks->first(), true);
+                                                    $product_stock = $orderDetail->product->stocks->where('variant', $orderDetail->variation)->first();
                                                 @endphp
                                                 {{translate('SKU')}}: {{ $product_stock['sku'] }}
                                             </small>
@@ -335,6 +334,30 @@
     </div>
 @endsection
 
+@section('modal')
+
+    <!-- confirm payment Status Modal -->
+    <div id="confirm-payment-status" class="modal fade">
+        <div class="modal-dialog modal-md modal-dialog-centered" style="max-width: 540px;">
+            <div class="modal-content p-2rem">
+                <div class="modal-body text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="72" height="64" viewBox="0 0 72 64">
+                        <g id="Octicons" transform="translate(-0.14 -1.02)">
+                          <g id="alert" transform="translate(0.14 1.02)">
+                            <path id="Shape" d="M40.159,3.309a4.623,4.623,0,0,0-7.981,0L.759,58.153a4.54,4.54,0,0,0,0,4.578A4.718,4.718,0,0,0,4.75,65.02H67.587a4.476,4.476,0,0,0,3.945-2.289,4.773,4.773,0,0,0,.046-4.578Zm.6,52.555H31.582V46.708h9.173Zm0-13.734H31.582V23.818h9.173Z" transform="translate(-0.14 -1.02)" fill="#ffc700" fill-rule="evenodd"/>
+                          </g>
+                        </g>
+                    </svg>
+                    <p class="mt-3 mb-3 fs-16 fw-700">{{translate('Are you sure you want to change the payment status?')}}</p>
+                    <button type="button" class="btn btn-light rounded-2 mt-2 fs-13 fw-700 w-150px" data-dismiss="modal">{{ translate('Cancel') }}</button>
+                    <button type="button" onclick="update_payment_status()" class="btn btn-success rounded-2 mt-2 fs-13 fw-700 w-150px">{{translate('Confirm')}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+
 @section('script')
     <script type="text/javascript">
         $('#assign_deliver_boy').on('change', function() {
@@ -359,17 +382,26 @@
                 AIZ.plugins.notify('success', '{{ translate('Delivery status has been updated') }}');
             });
         });
-        $('#update_payment_status').on('change', function() {
+
+        // Payment Status Update
+        function confirm_payment_status(value){
+            $('#confirm-payment-status').modal('show');
+        }
+
+        function update_payment_status(){
+            $('#confirm-payment-status').modal('hide');
             var order_id = {{ $order->id }};
-            var status = $('#update_payment_status').val();
             $.post('{{ route('orders.update_payment_status') }}', {
                 _token: '{{ @csrf_token() }}',
                 order_id: order_id,
-                status: status
+                status: 'paid'
             }, function(data) {
+                $('#update_payment_status').prop('disabled', true);
+                AIZ.plugins.bootstrapSelect('refresh');
                 AIZ.plugins.notify('success', '{{ translate('Payment status has been updated') }}');
             });
-        });
+        }
+
         $('#update_tracking_code').on('change', function() {
             var order_id = {{ $order->id }};
             var tracking_code = $('#update_tracking_code').val();

@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 
 class Order extends Model
 {
+    use PreventDemoModeChanges;
     public function orderDetails()
     {
         return $this->hasMany(OrderDetail::class);
@@ -54,5 +56,10 @@ class Order extends Model
     public function proxy_cart_reference_id()
     {
         return $this->hasMany(ProxyPayment::class)->select('reference_id');
+    }
+
+    public function commissionHistory()
+    {
+        return $this->hasOne(CommissionHistory::class);
     }
 }

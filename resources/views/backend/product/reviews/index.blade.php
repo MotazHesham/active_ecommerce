@@ -13,7 +13,7 @@
         <div class="row flex-grow-1">
             <div class="col">
                 <h5 class="mb-0 h6">{{translate('Product Reviews')}}</h5>
-                
+
             </div>
             <div class="col-md-6 col-xl-4 ml-auto mr-0">
                 <form class="" id="sort_by_rating" action="{{ route('reviews.index') }}" method="GET">
@@ -55,9 +55,9 @@
                             <td>{{ $review->comment }}</td>
                             <td>
                                 <label class="aiz-switch aiz-switch-success mb-0">
-                                    <input 
-                                        @can('publish_product_review') onchange="update_published(this)" @endcan 
-                                        value="{{ $review->id }}" type="checkbox" 
+                                    <input
+                                        @can('publish_product_review') onchange="update_published(this)" @endcan
+                                        value="{{ $review->id }}" type="checkbox"
                                         @if($review->status == 1) checked @endif
                                         @cannot('publish_product_review') disabled @endcan
                                     >
@@ -80,6 +80,12 @@
 @section('script')
     <script type="text/javascript">
         function update_published(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var status = 1;
             }

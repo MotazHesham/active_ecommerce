@@ -9,6 +9,7 @@ use Auth;
 use Storage;
 use Image;
 use enshrined\svgSanitize\Sanitizer;
+use Str;
 
 class AizUploadController extends Controller
 {
@@ -53,6 +54,11 @@ class AizUploadController extends Controller
 
     public function create()
     {
+        if(env('DEMO_MODE') == 'On'){
+            flash(translate('Data can not change in demo mode.'))->info();
+            return back();
+        }
+
         return (auth()->user()->user_type == 'seller')
             ? view('seller.uploads.create')
             : view('backend.uploaded_files.create');
@@ -137,39 +143,108 @@ class AizUploadController extends Controller
                     file_put_contents($request->file('aiz_file'), $cleanSVG);
                 }
 
-                $path = $request->file('aiz_file')->store('uploads/all', 'local');
                 $size = $request->file('aiz_file')->getSize();
 
-                // Return MIME type ala mimetype extension
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-
-                // Get the MIME type of the file
-                $file_mime = finfo_file($finfo, base_path('public/') . $path);
-
-
-                if ($type[$extension] == 'image' && get_setting('disable_image_optimization') != 1) {
+                if ($type[$extension] == 'image' && $extension != 'svg') {
+                    if (get_setting('uploaded_image_format') != "default") {
+                        $extension = get_setting('uploaded_image_format');
+                    }
                     try {
-                        $img = Image::make($request->file('aiz_file')->getRealPath())->encode();
+                        $path = 'uploads/all/'. Str::random(40) . '.' .$extension;
+                        $img = Image::make($request->file('aiz_file')->getRealPath())->encode($extension, 75);
                         $height = $img->height();
                         $width = $img->width();
-                        if ($width > $height && $width > 1500) {
-                            $img->resize(1500, null, function ($constraint) {
-                                $constraint->aspectRatio();
-                            });
-                        } elseif ($height > 1500) {
-                            $img->resize(null, 800, function ($constraint) {
-                                $constraint->aspectRatio();
-                            });
+
+                        // watermark
+                        if (get_setting('use_image_watermark') == 'on') {
+                            $watermark_position = get_setting('watermark_position', 'top-left');
+                            // watermark Image
+                            if (get_setting('image_watermark_type') == "image") {
+                                $watermarkImg = Image::make( uploaded_asset(get_setting('watermark_image')) );
+                                if ($width > $height ) {
+                                    $wmarkHeight = $height/2;
+                                    $watermarkImg->resize(null, $wmarkHeight, function ($constraint) {
+                                        $constraint->aspectRatio();
+                                    });
+                                } else {
+                                    $wmarkWidth = $width/2;
+                                    $watermarkImg->resize(null, $wmarkWidth, function ($constraint) {
+                                        $constraint->aspectRatio();
+                                    });
+                                }
+                                $img->insert($watermarkImg, $watermark_position, 10, 10);
+
+                                // // --------watermark Image multiple times------
+                                // if ($width > 1999) {
+                                //     $watermark = 'watermark-2x.png';
+                                // } else {
+                                //     $watermark = 'watermark-1x.png';
+                                // }
+                                // $watermarkImg = Image::make('public/assets/img/'.$watermark);
+                                // $wmarkWidth=$watermarkImg->width();
+                                // $wmarkHeight=$watermarkImg->height();
+                                // $x=10;
+                                // $y=10;
+                                // while($y<=$height){
+                                //     $img->insert($watermarkImg,'top-left',$x,$y);
+                                //     $x+=$wmarkWidth+40;
+                                //     if($x>=$width){
+                                //         $x=0;
+                                //         $y+=$wmarkHeight+30;
+                                //     }
+                                // }
+
+                            // watermark Text
+                            } elseif (get_setting('image_watermark_type') == "text") {
+                                if ($watermark_position == 'center') {
+                                    $valign = 'middle';
+                                    $align = 'center';
+                                    $x = round($width/2);
+                                    $y =  round($height/2);
+                                } else {
+                                    $valign = explode('-', $watermark_position)[0];
+                                    $align = explode('-', $watermark_position)[1];
+                                    $x = ($align == 'right') ? ($width - 20) : 20;
+                                    $y =  ($valign == 'bottom') ? ($height - 20) : 20;
+                                }
+                                $img->text(get_setting('watermark_text', 'Watermark Text Here'), $x, $y, function($font) use ($valign, $align) {
+                                    $font->file(base_path('public/assets/fonts/robotoMedium.ttf'));
+                                    $font->size(get_setting('watermark_text_size', 20));
+                                    $font->color(get_setting('watermark_text_color', '#e1e1e1'));
+                                    $font->align($align);
+                                    $font->valign($valign);
+                                });
+                            }
                         }
+
+                        // Image optimization
+                        if (get_setting('disable_image_optimization') != 1) {
+                            if ($width > $height && $width > 1500) {
+                                $img->resize(1500, null, function ($constraint) {
+                                    $constraint->aspectRatio();
+                                });
+                            } elseif ($height > 1500) {
+                                $img->resize(null, 800, function ($constraint) {
+                                    $constraint->aspectRatio();
+                                });
+                            }
+                        }
+
                         $img->save(base_path('public/') . $path);
                         clearstatcache();
                         $size = $img->filesize();
                     } catch (\Exception $e) {
                         //dd($e);
                     }
+                }else{
+                    $path = $request->file('aiz_file')->store('uploads/all', 'local');
                 }
 
                 if (env('FILESYSTEM_DRIVER') != 'local') {
+                    // Return MIME type ala mimetype extension
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    // Get the MIME type of the file
+                    $file_mime = finfo_file($finfo, base_path('public/') . $path);
 
                     Storage::disk(env('FILESYSTEM_DRIVER'))->put(
                         $path,
@@ -179,7 +254,7 @@ class AizUploadController extends Controller
                             'ContentType' =>  $extension == 'svg' ? 'image/svg+xml' : $file_mime
                         ]
                     );
-                    // dd($storage);
+
                     if ($arr[0] != 'updates') {
                         unlink(base_path('public/') . $path);
                     }

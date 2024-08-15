@@ -1,10 +1,15 @@
-@if ($key == 0 || ($key+1 > 3 && (($key+1)%3) == 1))
+@php
+    $couponUserType = $coupon->user->user_type;
+@endphp
+
+@if ($couponUserType == 'admin' && $coupon->type != 'welcome_base')
     @php $bg = "linear-gradient(to right, #e2583e 0%, #bf1931 100%);"; @endphp
-@elseif ($key == 1 || ($key+1 > 3 && (($key+1)%3) == 2))
+@elseif ($couponUserType == 'seller')
     @php $bg = "linear-gradient(to right, #7cc4c3 0%, #479493 100%);"; @endphp
-@elseif ($key == 2 || ($key+1 > 3 && (($key+1)%3) == 0))
+@elseif ($coupon->type == 'welcome_base')
     @php $bg = "linear-gradient(to right, #98b3d1 0%, #5f4a8b 100%);"; @endphp
 @endif
+
 
 @if($coupon->type == 'product_base')
     @php 
@@ -16,7 +21,7 @@
     @endphp
 @else                 
     @php 
-        $order_discount = json_decode($coupon->details); 
+        $coupon_discount = json_decode($coupon->details); 
     @endphp             
 @endif
 @php 
@@ -80,13 +85,21 @@
                         </a>
                     @endforeach      
                 </div>       
-            @else
+            @elseif($coupon->type == 'cart_base')
                 <!-- Coupon Discount range -->
                 <span class="fs-12 text-white pb-lg-3 d-block m-auto ">
                     @if($coupon->discount_type == 'amount')
-                        {{ translate('Min Spend ') }} <strong>{{ single_price($order_discount->min_buy) }}</strong> {{ translate('from') }} <strong>{{ $name }}</strong> {{ translate('to get') }} <strong>{{ single_price($coupon->discount) }}</strong> {{ translate('OFF on total orders') }}
+                        {{ translate('Min Spend ') }} <strong>{{ single_price($coupon_discount->min_buy) }}</strong> {{ translate('from') }} <strong>{{ $name }}</strong> {{ translate('to get') }} <strong>{{ single_price($coupon->discount) }}</strong> {{ translate('OFF on total orders') }}
                     @else 
-                        {{ translate('Min Spend ') }} <strong>{{ single_price($order_discount->min_buy) }}</strong> {{ translate('from') }} <strong>{{ $name }}</strong> {{ translate('to get') }} <strong>{{ $coupon->discount }}%</strong> {{ translate('OFF on total orders') }}                                   
+                        {{ translate('Min Spend ') }} <strong>{{ single_price($coupon_discount->min_buy) }}</strong> {{ translate('from') }} <strong>{{ $name }}</strong> {{ translate('to get') }} <strong>{{ $coupon->discount }}%</strong> {{ translate('OFF on total orders') }}                                   
+                    @endif
+                </span>
+            @else
+                <span class="fs-12 text-white pb-lg-3 d-block m-auto ">
+                    @if($coupon->discount_type == 'amount')
+                        <strong>{{ single_price($coupon->discount) }}</strong> {{ translate('OFF on total orders within').' '.$coupon_discount->validation_days.' '.translate('days of registration') }}
+                    @else 
+                        <strong>{{ $coupon->discount }}%</strong> {{ translate('OFF on total orders within').' '.$coupon_discount->validation_days.' '.translate('days of registration') }}                                   
                     @endif
                 </span>
             @endif

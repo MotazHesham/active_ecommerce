@@ -31,10 +31,10 @@
                                     <td>
                                         @foreach ($attribute->attribute_values as $key => $value)
                                             <span
-                                                class="badge badge-inline badge-md bg-soft-dark">{{ $value->value }}</span>
+                                                class="badge badge-inline badge-md bg-light">{{ $value->value }}</span>
                                         @endforeach
                                     </td>
-                                    <td class="text-right">
+                                    <td class="text-right w-140px">
                                         @can('view_product_attribute_values')
                                             <a class="btn btn-soft-info btn-icon btn-circle btn-sm"
                                                 href="{{ route('attributes.show', $attribute->id) }}"
@@ -69,7 +69,7 @@
             </div>
         </div>
         @can('add_product_attribute')
-            <div class="col-md-5">
+            <div class="col-lg-5">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0 h6">{{ translate('Add New Attribute') }}</h5>

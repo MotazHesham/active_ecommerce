@@ -40,7 +40,7 @@
             </div>
             <!-- Ratting -->
             <div class="mt-3">
-                <div class="rating rating-mr-1">
+                <div class="rating rating-mr-2">
                     {{ renderStarRating($detailedProduct->user->shop->rating) }}
                 </div>
                 <div class="opacity-60 fs-12">

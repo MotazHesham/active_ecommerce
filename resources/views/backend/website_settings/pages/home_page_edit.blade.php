@@ -15,10 +15,10 @@
 				<h6 class="mb-0">{{ translate('Home Slider') }}</h6>
 			</div>
 			<div class="card-body">
-				<ul class="nav nav-tabs nav-fill border-light mb-2">
+				<ul class="nav nav-tabs nav-fill language-bar mb-2">
 					@foreach ($activeLanguages as $key => $language)
 						<li class="nav-item">
-							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+							<a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3"
 								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
 								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
 									height="11" class="mr-1">
@@ -124,10 +124,10 @@
 				<h6 class="mb-0">{{ translate("Today's deal") }}</h6>
 			</div>
 			<div class="card-body">
-				<ul class="nav nav-tabs nav-fill border-light mb-2">
+				<ul class="nav nav-tabs nav-fill language-bar mb-2">
 					@foreach ($activeLanguages as $key => $language)
 						<li class="nav-item">
-							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+							<a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3"
 								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
 								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
 									height="11" class="mr-1">
@@ -180,10 +180,10 @@
 				<h6 class="mb-0">{{ translate('Home Banner 1 (Max 3)') }}</h6>
 			</div>
 			<div class="card-body">
-				<ul class="nav nav-tabs nav-fill border-light mb-2">
+				<ul class="nav nav-tabs nav-fill language-bar mb-2">
 					@foreach ($activeLanguages as $key => $language)
 						<li class="nav-item">
-							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+							<a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3"
 								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
 								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
 									height="11" class="mr-1">
@@ -286,10 +286,10 @@
 				<h6 class="mb-0">{{ translate('Home Banner 2 (Max 3)') }}</h6>
 			</div>
 			<div class="card-body">
-				<ul class="nav nav-tabs nav-fill border-light mb-2">
+				<ul class="nav nav-tabs nav-fill language-bar mb-2">
 					@foreach ($activeLanguages as $key => $language)
 						<li class="nav-item">
-							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+							<a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3"
 								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
 								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
 									height="11" class="mr-1">
@@ -394,10 +394,10 @@
 				<h6 class="mb-0">{{ translate('Home Banner 3 (Max 3)') }}</h6>
 			</div>
 			<div class="card-body">
-				<ul class="nav nav-tabs nav-fill border-light mb-2">
+				<ul class="nav nav-tabs nav-fill language-bar mb-2">
 					@foreach ($activeLanguages as $key => $language)
 						<li class="nav-item">
-							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+							<a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3"
 								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
 								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
 									height="11" class="mr-1">
@@ -503,10 +503,10 @@
 				<h6 class="mb-0">{{ translate('Auction Banner') }}</h6>
 			</div>
 			<div class="card-body">
-				<ul class="nav nav-tabs nav-fill border-light mb-2">
+				<ul class="nav nav-tabs nav-fill language-bar mb-2">
 					@foreach ($activeLanguages as $key => $language)
 						<li class="nav-item">
-							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+							<a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3"
 								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
 								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
 									height="11" class="mr-1">
@@ -643,10 +643,10 @@
 				<h6 class="mb-0">{{ translate('Classified Ads Banner') }}</h6>
 			</div>
 			<div class="card-body">
-				<ul class="nav nav-tabs nav-fill border-light mb-2">
+				<ul class="nav nav-tabs nav-fill language-bar mb-2">
 					@foreach ($activeLanguages as $key => $language)
 						<li class="nav-item">
-							<a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3"
+							<a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3"
 								href="{{route('custom-pages.edit', ['id'=>$page->slug, 'lang'=>$language->code, 'page'=>'home'] )}}">
 								<img src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
 									height="11" class="mr-1">

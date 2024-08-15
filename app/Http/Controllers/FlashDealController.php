@@ -44,7 +44,8 @@ class FlashDealController extends Controller
      */
     public function create()
     {
-        return view('backend.marketing.flash_deals.create');
+        $products = Product::isApprovedPublished()->where('auction_product', 0)->orderBy('created_at', 'desc')->get();
+        return view('backend.marketing.flash_deals.create', compact('products'));
     }
 
     /**
@@ -115,7 +116,8 @@ class FlashDealController extends Controller
     {
         $lang           = $request->lang;
         $flash_deal = FlashDeal::findOrFail($id);
-        return view('backend.marketing.flash_deals.edit', compact('flash_deal','lang'));
+        $products = Product::isApprovedPublished()->where('auction_product', 0)->orderBy('created_at', 'desc')->get();
+        return view('backend.marketing.flash_deals.edit', compact('flash_deal','lang', 'products'));
     }
 
     /**
@@ -146,6 +148,13 @@ class FlashDealController extends Controller
 
         $flash_deal->banner = $request->banner;
         foreach ($flash_deal->flash_deal_products as $key => $flash_deal_product) {
+            $prev_product = Product::findOrFail($flash_deal_product->product_id);
+            $prev_product->discount = 0.00;
+            $prev_product->discount_type = 'amount';
+            $prev_product->discount_start_date = null;
+            $prev_product->discount_end_date   = null;
+            $prev_product->save();
+
             $flash_deal_product->delete();
         }
         if($flash_deal->save()){
@@ -185,7 +194,18 @@ class FlashDealController extends Controller
     public function destroy($id)
     {
         $flash_deal = FlashDeal::findOrFail($id);
-        $flash_deal->flash_deal_products()->delete();
+
+        foreach ($flash_deal->flash_deal_products as $key => $flash_deal_product) {
+            $root_product = Product::findOrFail($flash_deal_product->product_id);
+            $root_product->discount = 0.00;
+            $root_product->discount_type = 'amount';
+            $root_product->discount_start_date = null;
+            $root_product->discount_end_date   = null;
+            $root_product->save();
+
+            $flash_deal_product->delete();
+        }
+
         $flash_deal->flash_deal_translations()->delete();
 
         FlashDeal::destroy($id);

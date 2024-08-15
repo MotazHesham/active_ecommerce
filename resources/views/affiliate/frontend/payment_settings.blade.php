@@ -10,7 +10,7 @@
                     <div class="aiz-titlebar mb-4">
                         <div class="row align-items-center">
                             <div class="col-md-6">
-                                <h1 class="fs-20 fw-700 text-dark">{{ translate('Affiliate') }}</h1>
+                                <h3 class="fs-20 fw-700 text-dark">{{ translate('Affiliate') }}</h3>
                             </div>
                         </div>
                     </div>

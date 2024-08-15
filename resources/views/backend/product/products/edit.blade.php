@@ -8,7 +8,7 @@
                 <h1 class="h3">{{ translate('Edit Product') }}</h1>
             </div>
             {{-- <div class="col text-right">
-                <a class="btn has-transition btn-xs p-0 hov-svg-danger" href="{{ route('home') }}" 
+                <a class="btn has-transition btn-xs p-0 hov-svg-danger" href="{{ route('home') }}"
                     target="_blank" data-toggle="tooltip" data-placement="top" data-title="{{ translate('View Tutorial Video') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="19.887" height="16" viewBox="0 0 19.887 16">
                         <path id="_42fbab5a39cb8436403668a76e5a774b" data-name="42fbab5a39cb8436403668a76e5a774b" d="M18.723,8H5.5A3.333,3.333,0,0,0,2.17,11.333v9.333A3.333,3.333,0,0,0,5.5,24h13.22a3.333,3.333,0,0,0,3.333-3.333V11.333A3.333,3.333,0,0,0,18.723,8Zm-3.04,8.88-5.47,2.933a1,1,0,0,1-1.473-.88V13.067a1,1,0,0,1,1.473-.88l5.47,2.933a1,1,0,0,1,0,1.76Zm-5.61-3.257L14.5,16l-4.43,2.377Z" transform="translate(-2.17 -8)" fill="#9da3ae"/>
@@ -57,6 +57,14 @@
                         {{ translate('Shipping') }}
                     </a>
                 </li>
+
+                <!-- Frequently Bought Product -->
+                <li class="nav-item">
+                    <a class="nav-link" id="frequenty-bought-product-tab" href="#frequenty-bought-product"
+                        data-toggle="tab" data-target="#frequenty-bought-product" type="button" role="tab" aria-controls="frequenty-bought-product" aria-selected="false">
+                        {{ translate('Frequently Bought') }}
+                    </a>
+                </li>
             </ul>
         </div>
 
@@ -72,7 +80,7 @@
                     </ul>
                 </div>
             @endif
-            
+
             <form action="{{route('products.update', $product->id)}}" method="POST" enctype="multipart/form-data" enctype="multipart/form-data" id="choice_form">
                 @csrf
                 <input name="_method" type="hidden" value="POST">
@@ -80,10 +88,10 @@
                 <input type="hidden" name="lang" value="{{ $lang }}">
                 <input type="hidden" name="tab" id="tab">
 
-                <ul class="nav nav-tabs nav-fill border-light language-bar">
+                <ul class="nav nav-tabs nav-fill language-bar">
                     @foreach (get_all_active_language() as $key => $language)
                     <li class="nav-item">
-                        <a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3" href="{{ route('products.admin.edit', ['id'=>$product->id, 'lang'=> $language->code] ) }}">
+                        <a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3" href="{{ route('products.admin.edit', ['id'=>$product->id, 'lang'=> $language->code] ) }}">
                             <img src="{{ static_asset('assets/img/flags/'.$language->code.'.png') }}" height="11" class="mr-1">
                             <span>{{$language->name}}</span>
                         </a>
@@ -104,7 +112,7 @@
                                         <div class="form-group row">
                                             <label class="col-xxl-3 col-from-label fs-13">{{translate('Product Name')}} <span class="text-danger">*</span></label>
                                             <div class="col-xxl-9">
-                                                <input type="text" class="form-control" name="name" placeholder="{{translate('Product Name')}}" value="{{ $product->getTranslation('name', $lang) }}">
+                                                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="{{translate('Product Name')}}" value="{{ $product->getTranslation('name', $lang) }}">
                                             </div>
                                         </div>
                                         <!-- Brand -->
@@ -124,7 +132,7 @@
                                         <div class="form-group row">
                                             <label class="col-xxl-3 col-from-label fs-13">{{translate('Unit')}} <span class="text-danger">*</span></label>
                                             <div class="col-xxl-9">
-                                                <input type="text" class="form-control" name="unit" placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}" value="{{$product->getTranslation('unit', $lang)}}">
+                                                <input type="text" class="form-control @error('unit') is-invalid @enderror" name="unit" placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}" value="{{$product->getTranslation('unit', $lang)}}">
                                             </div>
                                         </div>
                                         <!-- Weight -->
@@ -138,19 +146,19 @@
                                         <div class="form-group row">
                                             <label class="col-xxl-3 col-from-label fs-13">{{translate('Minimum Purchase Qty')}} <span class="text-danger">*</span></label>
                                             <div class="col-xxl-9">
-                                                <input type="number" lang="en" class="form-control" name="min_qty" value="@if($product->min_qty <= 1){{1}}@else{{$product->min_qty}}@endif" min="1">
+                                                <input type="number" lang="en" class="form-control @error('min_qty') is-invalid @enderror" name="min_qty" value="@if($product->min_qty <= 1){{1}}@else{{$product->min_qty}}@endif" min="1">
                                                 <small class="text-muted">{{translate("The minimum quantity needs to be purchased by your customer.")}}</small>
                                             </div>
                                         </div>
                                         <!-- Tags -->
                                         <div class="form-group row">
-                                            <label class="col-xxl-3 col-from-label fs-13">{{translate('Tags')}} <span class="text-danger">*</span></label>
+                                            <label class="col-xxl-3 col-from-label fs-13">{{translate('Tags')}}</label>
                                             <div class="col-xxl-9">
                                                 <input type="text" class="form-control aiz-tag-input" name="tags[]" id="tags" value="{{ $product->tags }}" placeholder="{{ translate('Type to add a tag') }}" data-role="tagsinput">
                                                 <small class="text-muted">{{translate('This is used for search. Input those words by which cutomer can find this product.')}}</small>
                                             </div>
                                         </div>
-                
+
                                         @if (addon_is_activated('pos_system'))
                                         <!-- Barcode -->
                                         <div class="form-group row">
@@ -160,7 +168,7 @@
                                             </div>
                                         </div>
                                         @endif
-                
+
                                         @if (addon_is_activated('refund_request'))
                                         <!-- refund_request -->
                                         <div class="form-group row mt-4 mb-4">
@@ -177,7 +185,7 @@
 
                                     <!-- Product Category -->
                                     <div class="col-xxl-5 col-xl-6">
-                                        <div class="card">
+                                        <div class="card @if($errors->has('category_ids') || $errors->has('category_id')) border border-danger @endif">
                                             <div class="card-header">
                                                 <h5 class="mb-0 h6">{{ translate('Product Category') }}</h5>
                                                 <h6 class="float-right fs-13 mb-0">
@@ -253,10 +261,13 @@
                                 <div class="form-group row">
                                     <label class="col-md-3 col-from-label">{{translate('Add To Flash')}}</label>
                                     <div class="col-xxl-9">
+                                        @php
+                                            $productFlashDealId = $product->flash_deal_products->last()->flash_deal_id ?? null;
+                                        @endphp
                                         <select class="form-control aiz-selectpicker" name="flash_deal_id" id="video_provider">
                                             <option value="">{{ translate('Choose Flash Title') }}</option>
                                             @foreach(\App\Models\FlashDeal::where("status", 1)->get() as $flash_deal)
-                                                <option value="{{ $flash_deal->id }}" @if($product->flash_deal_product && $product->flash_deal_product->flash_deal_id == $flash_deal->id) selected @endif>
+                                                <option value="{{ $flash_deal->id }}" @if($productFlashDealId == $flash_deal->id) selected @endif>
                                                     {{ $flash_deal->title }}
                                                 </option>
                                             @endforeach
@@ -335,7 +346,7 @@
                             <div class="w-100">
                                 <!-- Gallery Images -->
                                 <div class="form-group row">
-                                    <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Gallery Images')}} <small>(600x600)</small></label>
+                                    <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Gallery Images')}}</label>
                                     <div class="col-md-9">
                                         <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
                                             <div class="input-group-prepend">
@@ -346,12 +357,12 @@
                                         </div>
                                         <div class="file-preview box sm">
                                         </div>
-                                        <small class="text-muted">{{translate('These images are visible in product details page gallery. Use 600x600 sizes images.')}}</small>
+                                        <small class="text-muted">{{translate('These images are visible in product details page gallery. Minimum dimensions required: 900px width X 900px height.')}}</small>
                                     </div>
                                 </div>
                                 <!-- Thumbnail Image -->
                                 <div class="form-group row">
-                                    <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Thumbnail Image')}} <small>(300x300)</small></label>
+                                    <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Thumbnail Image')}}</label>
                                     <div class="col-md-9">
                                         <div class="input-group" data-toggle="aizuploader" data-type="image">
                                             <div class="input-group-prepend">
@@ -362,7 +373,7 @@
                                         </div>
                                         <div class="file-preview box sm">
                                         </div>
-                                        <small class="text-muted">{{translate('This image is visible in all product box. Use 300x300 sizes image. Keep some blank space around main object of your image as we had to crop some edge in different devices to make it responsive.')}}</small>
+                                        <small class="text-muted">{{translate("This image is visible in all product box. Minimum dimensions required: 195px width X 195px height. Keep some blank space around main object of your image as we had to crop some edge in different devices to make it responsive.")}}</small>
                                     </div>
                                 </div>
                             </div>
@@ -449,7 +460,7 @@
                                     <p>{{ translate('Choose the attributes of this product and then input values of each attribute') }}</p>
                                     <br>
                                 </div>
-        
+
                                 <!-- choice options -->
                                 <div class="customer_choice_options" id="customer_choice_options">
                                     @foreach (json_decode($product->choice_options) as $key => $choice_option)
@@ -459,7 +470,7 @@
                                             <input type="text" class="form-control" name="choice[]" value="{{ optional(\App\Models\Attribute::find($choice_option->attribute_id))->getTranslation('name') }}" placeholder="{{ translate('Choice Title') }}" disabled>
                                         </div>
                                         <div class="col-lg-8">
-                                            <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_{{ $choice_option->attribute_id }}[]" multiple>
+                                            <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_{{ $choice_option->attribute_id }}[]" data-selected-text-format="count" multiple>
                                                 @foreach (\App\Models\AttributeValue::where('attribute_id', $choice_option->attribute_id)->get() as $row)
                                                 <option value="{{ $row->value }}" @if( in_array($row->value, $choice_option->values)) selected @endif>
                                                     {{ $row->value }}
@@ -475,7 +486,7 @@
                                 <div class="form-group row">
                                     <label class="col-md-3 col-from-label">{{translate('Unit price')}} <span class="text-danger">*</span></label>
                                     <div class="col-md-6">
-                                        <input type="text" placeholder="{{translate('Unit price')}}" name="unit_price" class="form-control" value="{{$product->unit_price}}">
+                                        <input type="text" placeholder="{{translate('Unit price')}}" name="unit_price" class="form-control @error('unit_price') is-invalid @enderror" value="{{$product->unit_price}}">
                                     </div>
                                 </div>
 
@@ -494,7 +505,7 @@
                                 <div class="form-group row">
                                     <label class="col-md-3 col-from-label">{{translate('Discount')}} <span class="text-danger">*</span></label>
                                     <div class="col-md-6">
-                                        <input type="number" lang="en" min="0" step="0.01" placeholder="{{translate('Discount')}}" name="discount" class="form-control" value="{{ $product->discount }}">
+                                        <input type="number" lang="en" min="0" step="0.01" placeholder="{{translate('Discount')}}" name="discount" class="form-control @error('discount') is-invalid @enderror" value="{{ $product->discount }}">
                                     </div>
                                     <div class="col-md-3">
                                         <select class="form-control aiz-selectpicker" name="discount_type">
@@ -503,7 +514,7 @@
                                         </select>
                                     </div>
                                 </div>
-        
+
                                 @if(addon_is_activated('club_point'))
                                     <!-- club point -->
                                     <div class="form-group row">
@@ -515,7 +526,7 @@
                                         </div>
                                     </div>
                                 @endif
-                                    
+
                                 <div id="show-hide-div">
                                     <!-- Quantity -->
                                     <div class="form-group row" id="quantity">
@@ -557,7 +568,7 @@
                                 <br>
                                 <!-- sku combination -->
                                 <div class="sku_combination" id="sku_combination">
-        
+
                                 </div>
                             </div>
 
@@ -656,7 +667,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Shipping -->
                     <div class="tab-pane fade" id="shipping" role="tabpanel" aria-labelledby="shipping-tab">
                         <div class="bg-white p-3 p-sm-2rem">
@@ -732,7 +743,7 @@
                                 </p>
                                 @endif
                             </div>
-                            
+
                             <!-- Estimate Shipping Time -->
                             <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Estimate Shipping Time')}}</h5>
                             <div class="w-100">
@@ -751,6 +762,129 @@
                         </div>
                     </div>
 
+                    <!-- Frequently Bought Product -->
+                    <div class="tab-pane fade" id="frequenty-bought-product" role="tabpanel" aria-labelledby="frequenty-bought-product-tab">
+                        <div class="bg-white p-3 p-sm-2rem">
+                            <!-- tab Title -->
+                            <h5 class="mb-3 pb-3 fs-17 fw-700">{{translate('Frequently Bought')}}</h5>
+                            <div class="w-100">
+                                <div class="d-flex mb-4">
+                                    <div class="radio mar-btm mr-5 d-flex align-items-center">
+                                        <input
+                                            id="fq_bought_select_products"
+                                            type="radio"
+                                            name="frequently_bought_selection_type"
+                                            value="product"
+                                            onchange="fq_bought_product_selection_type()"
+                                            @if($product->frequently_bought_selection_type == 'product') checked @endif
+                                        >
+                                        <label for="fq_bought_select_products" class="fs-14 fw-700 mb-0 ml-2">{{translate('Select Product')}}</label>
+                                    </div>
+                                    <div class="radio mar-btm mr-3 d-flex align-items-center">
+                                        <input
+                                            id="fq_bought_select_category"
+                                            type="radio"
+                                            name="frequently_bought_selection_type"
+                                            value="category"
+                                            onchange="fq_bought_product_selection_type()"
+                                            @if($product->frequently_bought_selection_type == 'category') checked @endif
+                                        >
+                                        <label for="fq_bought_select_category" class="fs-14 fw-700 mb-0 ml-2">{{translate('Select Category')}}</label>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="fq_bought_select_product_div d-none">
+                                            @php
+                                                $fq_bought_products = $product->frequently_bought_products()->where('category_id', null)->get();
+                                            @endphp
+
+                                            <div id="selected-fq-bought-products">
+                                                @if(count($fq_bought_products) > 0)
+                                                    <div class="table-responsive mb-4">
+                                                        <table class="table mb-0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="opacity-50 pl-0">{{ translate('Product Thumb') }}</th>
+                                                                    <th class="opacity-50">{{ translate('Product Name') }}</th>
+                                                                    <th class="opacity-50">{{ translate('Category') }}</th>
+                                                                    <th class="opacity-50 text-right pr-0">{{ translate('Options') }}</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($fq_bought_products as $fQBproduct)
+                                                                    <tr class="remove-parent">
+                                                                        <input type="hidden" name="fq_bought_product_ids[]" value="{{ $fQBproduct->frequently_bought_product->id }}">
+                                                                        <td class="w-150px pl-0" style="vertical-align: middle;">
+                                                                            <p class="d-block size-48px">
+                                                                                <img src="{{ uploaded_asset($fQBproduct->frequently_bought_product->thumbnail_img) }}" alt="{{ translate('Image')}}"
+                                                                                    class="h-100 img-fit lazyload" onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                                                            </p>
+                                                                        </td>
+                                                                        <td style="vertical-align: middle;">
+                                                                            <p class="d-block fs-13 fw-700 hov-text-primary mb-1 text-dark" title="{{ translate('Product Name') }}">
+                                                                                {{ $fQBproduct->frequently_bought_product->getTranslation('name') }}
+                                                                            </p>
+                                                                        </td>
+                                                                        <td style="vertical-align: middle;">{{ $fQBproduct->frequently_bought_product->main_category->name ?? translate('Category Not Found') }}</td>
+                                                                        <td class="text-right pr-0" style="vertical-align: middle;">
+                                                                            <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".remove-parent">
+                                                                                <i class="las la-trash"></i>
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center"
+                                                onclick="showFqBoughtProductModal()">
+                                                <i class="las la-plus"></i>
+                                                <span class="ml-2">{{ translate('Add More') }}</span>
+                                            </button>
+                                        </div>
+
+                                        {{-- Select Category for Frequently Bought Product --}}
+                                        <div class="fq_bought_select_category_div d-none">
+                                            @php
+                                                $fq_bought_product_category_id = $product->frequently_bought_products()->where('category_id','!=', null)->first();
+                                                $fqCategory = $fq_bought_product_category_id != null ? $fq_bought_product_category_id->category_id : null;
+
+                                            @endphp
+                                            <div class="form-group row">
+                                                <label class="col-md-2 col-from-label">{{translate('Category')}} <span class="text-danger">*</span></label>
+                                                <div class="col-md-10">
+                                                    <select
+                                                        class="form-control aiz-selectpicker"
+                                                        data-placeholder="{{ translate('Select a Category')}}"
+                                                        name="fq_bought_product_category_id"
+                                                        data-live-search="true"
+                                                        data-selected="{{ $fqCategory }}"
+                                                        required
+                                                    >
+                                                        @foreach ($categories as $category)
+                                                            <option value="{{ $category->id }}">{{ $category->getTranslation('name') }}</option>
+                                                            @foreach ($category->childrenCategories as $childCategory)
+                                                                @include('categories.child_category', ['child_category' => $childCategory])
+                                                            @endforeach
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Update Button -->
                     <div class="mt-4 text-right">
                         <button type="button" onclick="submitFormWithTab()" name="button" class="mx-2 btn btn-success w-230px btn-md rounded-2 fs-14 fw-700 shadow-success action-btn">{{ translate('Update') }}</button>
@@ -762,6 +896,11 @@
     </div>
 </div>
 
+@endsection
+
+@section('modal')
+	<!-- Frequently Bought Product Select Modal -->
+    @include('modals.product_select_modal')
 @endsection
 
 @section('script')
@@ -785,6 +924,9 @@
             }
         }
         $('#treeview input:radio[value='+main_id+']').prop('checked',true);
+
+        fq_bought_product_selection_type();
+
     });
 
     $("[name=shipping_type]").on("change", function (){
@@ -820,7 +962,7 @@
                         <input type="text" class="form-control" name="choice[]" value="'+name+'" placeholder="{{ translate('Choice Title') }}" readonly>\
                     </div>\
                     <div class="col-md-8">\
-                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i +'[]" multiple>\
+                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i +'[]" data-selected-text-format="count" multiple>\
                             '+obj+'\
                         </select>\
                     </div>\
@@ -871,9 +1013,9 @@
                 setTimeout(() => {
                         AIZ.uploader.previewGenerate();
                 }, "2000");
-                AIZ.plugins.fooTable();
                 if (data.trim().length > 1) {
                     $('#show-hide-div').hide();
+                    AIZ.plugins.sectionFooTable('#sku_combination');
                 }
                 else {
                     $('#show-hide-div').show();
@@ -922,6 +1064,52 @@
         update_sku();
     });
 
+    function fq_bought_product_selection_type(){
+        var productSelectionType = $("input[name='frequently_bought_selection_type']:checked").val();
+        if(productSelectionType == 'product'){
+            $('.fq_bought_select_product_div').removeClass('d-none');
+            $('.fq_bought_select_category_div').addClass('d-none');
+        }
+        else if(productSelectionType == 'category'){
+            $('.fq_bought_select_category_div').removeClass('d-none');
+            $('.fq_bought_select_product_div').addClass('d-none');
+        }
+    }
+
+    function showFqBoughtProductModal() {
+        $('#fq-bought-product-select-modal').modal('show', {backdrop: 'static'});
+    }
+
+    function filterFqBoughtProduct() {
+        var productID = $('input[name=id]').val();
+        var searchKey = $('input[name=search_keyword]').val();
+        var fqBroughCategory = $('select[name=fq_brough_category]').val();
+        $.post('{{ route('product.search') }}', { _token: AIZ.data.csrf, product_id: productID, search_key:searchKey, category:fqBroughCategory, product_type:"physical" }, function(data){
+            $('#product-list').html(data);
+            AIZ.plugins.sectionFooTable('#product-list');
+        });
+    }
+
+    function addFqBoughtProduct() {
+        var selectedProducts = [];
+        $("input:checkbox[name=fq_bought_product_id]:checked").each(function() {
+            selectedProducts.push($(this).val());
+        });
+
+        var fqBoughtProductIds = [];
+        $("input[name='fq_bought_product_ids[]']").each(function() {
+            fqBoughtProductIds.push($(this).val());
+        });
+
+        var productIds = selectedProducts.concat(fqBoughtProductIds.filter((item) => selectedProducts.indexOf(item) < 0))
+
+        $.post('{{ route('get-selected-products') }}', { _token: AIZ.data.csrf, product_ids:productIds}, function(data){
+            $('#fq-bought-product-select-modal').modal('hide');
+            $('#selected-fq-bought-products').html(data);
+            AIZ.plugins.sectionFooTable('#selected-fq-bought-products');
+        });
+    }
+
 </script>
 <script>
     $(document).ready(function(){
@@ -933,13 +1121,13 @@
             $('.nav-tabs a[href="#general"]').tab('show');
             $('#tab').val('general');
         }
-        
+
         // Change hash for page-reload
         $('.nav-tabs a').on('shown.bs.tab', function (e) {
             window.location.hash = e.target.hash;
         });
     });
-    
+
     function submitFormWithTab(){
         var hash = document.location.hash;
         if (hash) {

@@ -281,7 +281,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="row">
                                 <div class="col-md-2">
                                     <label>{{ translate('State')}}</label>
@@ -334,7 +334,7 @@
                                     </div>
                                 </div>
                             @endif
-                            
+
                             <div class="row">
                                 <div class="col-md-2">
                                     <label>{{ translate('Postal code')}}</label>
@@ -371,7 +371,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                
+
                 <div class="modal-body" id="edit_modal_body">
 
                 </div>
@@ -383,7 +383,7 @@
 
 @section('script')
     <script type="text/javascript">
-        
+
         $('.new-email-verification').on('click', function() {
             $(this).find('.loading').removeClass('d-none');
             $(this).find('.default').addClass('d-none');
@@ -409,7 +409,7 @@
         function edit_address(address) {
             var url = '{{ route("seller.addresses.edit", ":id") }}';
             url = url.replace(':id', address);
-            
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -435,7 +435,7 @@
                 }
             });
         }
-        
+
         $(document).on('change', '[name=country_id]', function() {
             var country_id = $(this).val();
             get_states(country_id);
@@ -445,7 +445,7 @@
             var state_id = $(this).val();
             get_city(state_id);
         });
-        
+
         function get_states(country_id) {
             $('[name="state"]').html("");
             $.ajax({
@@ -491,9 +491,9 @@
     </script>
 
     @if (get_setting('google_map') == 1)
-        
-        @include('frontend.'.get_setting('homepage_select').'.partials.google_map')
-        
+
+        @include('frontend.partials.google_map')
+
     @endif
 
 @endsection

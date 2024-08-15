@@ -109,10 +109,10 @@ class SearchController extends Controller
             $case1 = $query . '%';
             $case2 = '%' . $query . '%';
 
-            $products->orderByRaw("CASE 
-                WHEN name LIKE '$case1' THEN 1 
-                WHEN name LIKE '$case2' THEN 2 
-                ELSE 3 
+            $products->orderByRaw("CASE
+                WHEN name LIKE '$case1' THEN 1
+                WHEN name LIKE '$case2' THEN 2
+                ELSE 3
                 END");
         }
 
@@ -217,10 +217,10 @@ class SearchController extends Controller
         $case1 = $query . '%';
         $case2 = '%' . $query . '%';
 
-        $products_query->orderByRaw("CASE 
-                WHEN name LIKE '$case1' THEN 1 
-                WHEN name LIKE '$case2' THEN 2 
-                ELSE 3 
+        $products_query->orderByRaw("CASE
+                WHEN name LIKE '$case1' THEN 1
+                WHEN name LIKE '$case2' THEN 2
+                ELSE 3
                 END");
         $products = $products_query->limit(3)->get();
 
@@ -229,7 +229,7 @@ class SearchController extends Controller
         $shops = Shop::whereIn('user_id', verified_sellers_id())->where('name', 'like', '%' . $query . '%')->get()->take(3);
 
         if (sizeof($keywords) > 0 || sizeof($categories) > 0 || sizeof($products) > 0 || sizeof($shops) > 0) {
-            return view('frontend.'.get_setting('homepage_select').'.partials.search_content', compact('products', 'categories', 'keywords', 'shops'));
+            return view('frontend.partials.search_content', compact('products', 'categories', 'keywords', 'shops'));
         }
         return '0';
     }

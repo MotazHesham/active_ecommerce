@@ -39,7 +39,7 @@
                         <td>{{ $sizeChart->name }}</td>
                         <td>{{ $sizeChart->category ? $sizeChart->category->name : '' }}</td>
                         <td class="text-center">
-                            <button class="btn btn-info btn-xs" onclick="showSizeChartDetail({{ $sizeChart->id }}, '{{ $sizeChart->name }}')">
+                            <button class="btn btn-info btn-xs" onclick='showSizeChartDetail({{ $sizeChart->id }}, "{{ $sizeChart->name }}")'>
                                 {{ translate('Show') }}
                             </button>
                         </td>

@@ -1,54 +1,9 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-    <!-- Steps -->
-    <section class="pt-5 mb-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-xl-8 mx-auto">
-                    <div class="row gutters-5 sm-gutters-10">
-                        <div class="col active">
-                            <div class="text-center border border-bottom-6px p-2 text-primary">
-                                <i class="la-3x mb-2 las la-shopping-cart cart-animate" style="margin-left: -100px; transition: 2s;"></i>
-                                <h3 class="fs-14 fw-600 d-none d-lg-block">{{ translate('1. My Cart') }}</h3>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="text-center border border-bottom-6px p-2">
-                                <i class="la-3x mb-2 opacity-50 las la-map"></i>
-                                <h3 class="fs-14 fw-600 d-none d-lg-block opacity-50">{{ translate('2. Shipping info') }}
-                                </h3>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="text-center border border-bottom-6px p-2">
-                                <i class="la-3x mb-2 opacity-50 las la-truck"></i>
-                                <h3 class="fs-14 fw-600 d-none d-lg-block opacity-50">{{ translate('3. Delivery info') }}
-                                </h3>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="text-center border border-bottom-6px p-2">
-                                <i class="la-3x mb-2 opacity-50 las la-credit-card"></i>
-                                <h3 class="fs-14 fw-600 d-none d-lg-block opacity-50">{{ translate('4. Payment') }}</h3>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="text-center border border-bottom-6px p-2">
-                                <i class="la-3x mb-2 opacity-50 las la-check-circle"></i>
-                                <h3 class="fs-14 fw-600 d-none d-lg-block opacity-50">{{ translate('5. Confirmation') }}
-                                </h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Cart Details -->
-    <section class="mb-4" id="cart-summary">
-        @include('frontend.'.get_setting('homepage_select').'.partials.cart_details', ['carts' => $carts])
+    <section class="my-4" id="cart-details">
+        @include('frontend.partials.cart.cart_details', ['carts' => $carts])
     </section>
 
 @endsection
@@ -67,8 +22,91 @@
                 quantity: element.value
             }, function(data) {
                 updateNavCart(data.nav_cart_view, data.cart_count);
-                $('#cart-summary').html(data.cart_view);
+                $('#cart-details').html(data.cart_view);
+                AIZ.extra.plusMinus();
             });
         }
+
+        // Cart item selection
+        $(document).on("change", ".check-all", function() {
+            $('.check-one:checkbox').prop('checked', this.checked);
+            updateCartStatus();
+        });
+        $(document).on("change", ".check-seller", function() {
+            var value = this.value;
+            $('.check-one-'+value+':checkbox').prop('checked', this.checked);
+            updateCartStatus();
+        });
+        $(document).on("change", ".check-one[name='id[]']", function(e) {
+            e.preventDefault();
+            updateCartStatus();
+        });
+        function updateCartStatus() {
+            $('.aiz-refresh').addClass('active');
+            let product_id = [];
+            $(".check-one[name='id[]']:checked").each(function() {
+                product_id.push($(this).val());
+            });
+
+            $.post('{{ route('cart.updateCartStatus') }}', {
+                _token: AIZ.data.csrf,
+                product_id: product_id
+            }, function(data) {
+                $('#cart-details').html(data);
+                AIZ.extra.plusMinus();
+                $('.aiz-refresh').removeClass('active');
+            });
+        }
+
+        // coupon apply
+        $(document).on("click", "#coupon-apply", function() {
+            @if (Auth::check())
+                @if(Auth::user()->user_type != 'customer')
+                    AIZ.plugins.notify('warning', "{{ translate('Please Login as a customer to apply coupon code.') }}");
+                    return false;
+                @endif
+
+                var data = new FormData($('#apply-coupon-form')[0]);
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    method: "POST",
+                    url: "{{ route('checkout.apply_coupon_code') }}",
+                    data: data,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(data, textStatus, jqXHR) {
+                        AIZ.plugins.notify(data.response_message.response, data.response_message.message);
+                        $("#cart_summary").html(data.html);
+                    }
+                });
+            @else
+                $('#login_modal').modal('show');
+            @endif
+        });
+
+        // coupon remove
+        $(document).on("click", "#coupon-remove", function() {
+            @if (Auth::check() && Auth::user()->user_type == 'customer')
+                var data = new FormData($('#remove-coupon-form')[0]);
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    method: "POST",
+                    url: "{{ route('checkout.remove_coupon_code') }}",
+                    data: data,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(data, textStatus, jqXHR) {
+                        $("#cart_summary").html(data);
+                    }
+                });
+            @endif
+        });
+
     </script>
 @endsection

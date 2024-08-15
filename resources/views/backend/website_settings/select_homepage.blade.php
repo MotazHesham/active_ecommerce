@@ -8,7 +8,7 @@
 			<h1 class="h3">{{ translate('Select Homepage') }}</h1>
 		</div>
 		{{-- <div class="col text-right">
-			<a class="btn has-transition btn-xs btn-light hov-svg-danger rounded-0" href="{{ route('home') }}" 
+			<a class="btn has-transition btn-xs btn-light hov-svg-danger rounded-0" href="{{ route('home') }}"
 				target="_blank" data-toggle="tooltip" data-placement="top" data-title="{{ translate('View Tutorial Video') }}">
 				<svg xmlns="http://www.w3.org/2000/svg" width="19.887" height="16" viewBox="0 0 19.887 16">
 					<path id="_42fbab5a39cb8436403668a76e5a774b" data-name="42fbab5a39cb8436403668a76e5a774b" d="M18.723,8H5.5A3.333,3.333,0,0,0,2.17,11.333v9.333A3.333,3.333,0,0,0,5.5,24h13.22a3.333,3.333,0,0,0,3.333-3.333V11.333A3.333,3.333,0,0,0,18.723,8Zm-3.04,8.88-5.47,2.933a1,1,0,0,1-1.473-.88V13.067a1,1,0,0,1,1.473-.88l5.47,2.933a1,1,0,0,1,0,1.76Zm-5.61-3.257L14.5,16l-4.43,2.377Z" transform="translate(-2.17 -8)" fill="#9da3ae"/>
@@ -30,15 +30,15 @@
 							<input value="classic" type="radio" name="homepage_select" @if((get_setting('homepage_select') == null) || (get_setting('homepage_select') == 'classic')) checked @endif>
 							<span class="d-block aiz-megabox-elem rounded-0 img-overlay">
 								<div class="h-350px w-100 overflow-hidden">
-									<img src="{{ static_asset('assets/img/pages/home-classic.png') }}" class="w-100" alt="home-page">
+									<img src="{{ static_asset('assets/img/pages/home-classic.webp') }}" class="w-100" alt="home-page-1">
 								</div>
 							</span>
 						</label>
 						<div class="d-flex flex-wrap justify-content-between align-items-center">
 							<span class="fs-14 fw-500 text-dark">{{ translate('Homepage 1 - Classic') }}</span>
 							<span>
-								<a href="javascript:void(0);" class="btn btn-xs btn-danger rounded-0" 
-									onclick="imageShowOverlay('{{ static_asset('assets/img/pages/home-classic.png') }}')">{{ translate('View') }}</a>
+								<a href="javascript:void(0);" class="btn btn-xs btn-danger rounded-0"
+									onclick="imageShowOverlay('{{ static_asset('assets/img/pages/home-classic.webp') }}')">{{ translate('View') }}</a>
 							</span>
 						</div>
 					</div>
@@ -48,7 +48,7 @@
 							<input value="metro" type="radio" name="homepage_select" @if(get_setting('homepage_select') == 'metro') checked @endif>
 							<span class="d-block aiz-megabox-elem rounded-0 img-overlay">
 								<div class="h-350px w-100 overflow-hidden">
-									<img src="{{ static_asset('assets/img/pages/home-metro.png') }}" class="w-100" alt="home-page">
+									<img src="{{ static_asset('assets/img/pages/home-metro.webp') }}" class="w-100" alt="home-page-2">
 								</div>
 							</span>
 						</label>
@@ -56,7 +56,7 @@
 							<span class="fs-14 fw-500 text-dark">{{ translate('Homepage 2 - Metro') }}</span>
 							<span>
 								<a href="javascript:void(0);" class="btn btn-xs btn-danger rounded-0"
-									onclick="imageShowOverlay('{{ static_asset('assets/img/pages/home-metro.png') }}')">{{ translate('View') }}</a>
+									onclick="imageShowOverlay('{{ static_asset('assets/img/pages/home-metro.webp') }}')">{{ translate('View') }}</a>
 							</span>
 						</div>
 					</div>
@@ -66,7 +66,7 @@
 							<input value="minima" type="radio" name="homepage_select" @if(get_setting('homepage_select') == 'minima') checked @endif>
 							<span class="d-block aiz-megabox-elem rounded-0 img-overlay">
 								<div class="h-350px w-100 overflow-hidden">
-									<img src="{{ static_asset('assets/img/pages/home-minima.png') }}" class="w-100" alt="home-page">
+									<img src="{{ static_asset('assets/img/pages/home-minima.webp') }}" class="w-100" alt="home-page-3">
 								</div>
 							</span>
 						</label>
@@ -74,7 +74,43 @@
 							<span class="fs-14 fw-500 text-dark">{{ translate('Homepage 3 - Minima') }}</span>
 							<span>
 								<a href="javascript:void(0);" class="btn btn-xs btn-danger rounded-0"
-									onclick="imageShowOverlay('{{ static_asset('assets/img/pages/home-minima.png') }}')">{{ translate('View') }}</a>
+									onclick="imageShowOverlay('{{ static_asset('assets/img/pages/home-minima.webp') }}')">{{ translate('View') }}</a>
+							</span>
+						</div>
+					</div>
+					<!-- Home Megamart -->
+					<div class="col-xxl-3 col-lg-4 col-sm-6 my-3">
+						<label class="aiz-megabox d-block mb-3">
+							<input value="megamart" type="radio" name="homepage_select" @if(get_setting('homepage_select') == 'megamart') checked @endif>
+							<span class="d-block aiz-megabox-elem rounded-0 img-overlay">
+								<div class="h-350px w-100 overflow-hidden">
+									<img src="{{ static_asset('assets/img/pages/home-megamart.webp') }}" class="w-100" alt="home-page-4">
+								</div>
+							</span>
+						</label>
+						<div class="d-flex flex-wrap justify-content-between align-items-center">
+							<span class="fs-14 fw-500 text-dark">{{ translate('Homepage 4 - Megamart') }}</span>
+							<span>
+								<a href="javascript:void(0);" class="btn btn-xs btn-danger rounded-0"
+									onclick="imageShowOverlay('{{ static_asset('assets/img/pages/home-megamart.webp') }}')">{{ translate('View') }}</a>
+							</span>
+						</div>
+					</div>
+					<!-- Home Re-Classic -->
+					<div class="col-xxl-3 col-lg-4 col-sm-6 my-3">
+						<label class="aiz-megabox d-block mb-3">
+							<input value="reclassic" type="radio" name="homepage_select" @if(get_setting('homepage_select') == 'reclassic') checked @endif>
+							<span class="d-block aiz-megabox-elem rounded-0 img-overlay">
+								<div class="h-350px w-100 overflow-hidden">
+									<img src="{{ static_asset('assets/img/pages/home-reclassic.webp') }}" class="w-100" alt="home-page-5">
+								</div>
+							</span>
+						</label>
+						<div class="d-flex flex-wrap justify-content-between align-items-center">
+							<span class="fs-14 fw-500 text-dark">{{ translate('Homepage 5 - Re-Classic') }}</span>
+							<span>
+								<a href="javascript:void(0);" class="btn btn-xs btn-danger rounded-0"
+									onclick="imageShowOverlay('{{ static_asset('assets/img/pages/home-reclassic.webp') }}')">{{ translate('View') }}</a>
 							</span>
 						</div>
 					</div>

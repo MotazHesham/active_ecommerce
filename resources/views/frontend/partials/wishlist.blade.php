@@ -6,8 +6,11 @@
               <path id="Path_32650" data-name="Path 32650" d="M11.3,5.507l-.247.246L10.8,5.506A4.538,4.538,0,1,0,4.38,11.919l.247.247,6.422,6.412,6.422-6.412.247-.247A4.538,4.538,0,1,0,11.3,5.507Z" transform="translate(0 0)" fill="#919199"/>
             </g>
         </svg>
-        @if(Auth::check() && count(Auth::user()->wishlists)>0)
-            <span class="badge badge-primary badge-inline badge-pill absolute-top-right--10px">{{ count(Auth::user()->wishlists)}}</span>
+        @if(Auth::check())
+            @php $wishlistProductCount = get_wishlists()->count(); @endphp
+            @if($wishlistProductCount > 0)
+                <span class="badge badge-primary badge-inline badge-pill absolute-top-right--10px">{{ $wishlistProductCount}}</span>
+            @endif
         @endif
     </span>
 </a>

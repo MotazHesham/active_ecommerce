@@ -16,7 +16,7 @@
             <div class="col">
                 <h5 class="mb-md-0 h6">{{ translate('Sellers') }}</h5>
             </div>
-            
+
             @can('delete_seller')
                 <div class="dropdown mb-2 mb-md-0">
                     <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
@@ -27,7 +27,7 @@
                     </div>
                 </div>
             @endcan
-            
+
             <div class="col-md-3 ml-auto">
                 <select class="form-control aiz-selectpicker" name="approved_status" id="approved_status" onchange="sort_sellers()">
                     <option value="">{{translate('Filter by Approval')}}</option>
@@ -41,12 +41,12 @@
                 </div>
             </div>
         </div>
-    
+
         <div class="card-body">
             <table class="table aiz-table mb-0">
                 <thead>
                 <tr>
-                    
+
                     <th>
                         @if(auth()->user()->can('delete_seller'))
                             <div class="form-group">
@@ -101,10 +101,10 @@
                         </td>
                         <td>
                             <label class="aiz-switch aiz-switch-success mb-0">
-                                <input 
+                                <input
                                     @can('approve_seller') onchange="update_approved(this)" @endcan
-                                    value="{{ $shop->id }}" type="checkbox" 
-                                    <?php if($shop->verification_status == 1) echo "checked";?> 
+                                    value="{{ $shop->id }}" type="checkbox"
+                                    <?php if($shop->verification_status == 1) echo "checked";?>
                                     @cannot('approve_seller') disabled @endcan
                                 >
                                 <span class="slider round"></span>
@@ -132,7 +132,7 @@
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-xs">
                                     @can('view_seller_profile')
-                                        <a href="#" onclick="show_seller_profile('{{$shop->id}}');"  class="dropdown-item">
+                                        <a href="javascript:void();" onclick="show_seller_profile('{{$shop->id}}');"  class="dropdown-item">
                                             {{translate('Profile')}}
                                         </a>
                                     @endcan
@@ -142,7 +142,7 @@
                                         </a>
                                     @endcan
                                     @can('pay_to_seller')
-                                        <a href="#" onclick="show_seller_payment_modal('{{$shop->id}}');" class="dropdown-item">
+                                        <a href="javascript:void();" onclick="show_seller_payment_modal('{{$shop->id}}');" class="dropdown-item">
                                             {{translate('Go to Payment')}}
                                         </a>
                                     @endcan
@@ -158,19 +158,19 @@
                                     @endcan
                                     @can('ban_seller')
                                         @if($shop->user->banned != 1)
-                                            <a href="#" onclick="confirm_ban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item">
+                                            <a href="javascript:void();" onclick="confirm_ban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item">
                                                 {{translate('Ban this seller')}}
                                                 <i class="fa fa-ban text-danger" aria-hidden="true"></i>
                                             </a>
                                         @else
-                                            <a href="#" onclick="confirm_unban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item">
+                                            <a href="javascript:void();" onclick="confirm_unban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item">
                                                 {{translate('Unban this seller')}}
                                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
                                             </a>
                                         @endif
                                     @endcan
                                     @can('delete_seller')
-                                        <a href="#" class="dropdown-item confirm-delete" data-href="{{route('sellers.destroy', $shop->id)}}" class="">
+                                        <a href="javascript:void();" class="dropdown-item confirm-delete" data-href="{{route('sellers.destroy', $shop->id)}}" class="">
                                             {{translate('Delete')}}
                                         </a>
                                     @endcan
@@ -261,16 +261,16 @@
             if(this.checked) {
                 // Iterate each checkbox
                 $('.check-one:checkbox').each(function() {
-                    this.checked = true;                        
+                    this.checked = true;
                 });
             } else {
                 $('.check-one:checkbox').each(function() {
-                    this.checked = false;                       
+                    this.checked = false;
                 });
             }
-          
+
         });
-        
+
         function show_seller_payment_modal(id){
             $.post('{{ route('sellers.payment_modal') }}',{_token:'{{ @csrf_token() }}', id:id}, function(data){
                 $('#payment_modal #payment-modal-content').html(data);
@@ -287,6 +287,11 @@
         }
 
         function update_approved(el){
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var status = 1;
             }
@@ -309,16 +314,26 @@
 
         function confirm_ban(url)
         {
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             $('#confirm-ban').modal('show', {backdrop: 'static'});
             document.getElementById('confirmation').setAttribute('href' , url);
         }
 
         function confirm_unban(url)
         {
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             $('#confirm-unban').modal('show', {backdrop: 'static'});
             document.getElementById('confirmationunban').setAttribute('href' , url);
         }
-        
+
         function bulk_delete() {
             var data = new FormData($('#sort_sellers')[0]);
             $.ajax({

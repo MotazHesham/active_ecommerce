@@ -165,7 +165,7 @@ class RouteServiceProvider extends ServiceProvider
 
 
   /**
-   * Define the "offline payment" routes for the application.
+   * Define the "Asian payment" routes for the application.
    *
    * These routes all receive session state, CSRF protection, etc.
    *
@@ -179,7 +179,7 @@ class RouteServiceProvider extends ServiceProvider
   }
 
   /**
-   * Define the "offline payment" routes for the application.
+   * Define the "African payment" routes for the application.
    *
    * These routes all receive session state, CSRF protection, etc.
    *

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Models\CombinedOrder;
+use App\Models\Order;
 use App\Models\User;
 use Exception;
 use Rave as Flutterwave;
@@ -15,28 +16,26 @@ class FlutterwaveController extends Controller
     public function getUrl(Request $request)
     {
         $payment_type = $request->payment_type;
-        $combined_order_id = $request->combined_order_id;
-        $amount = $request->amount;
         $user_id = $request->user_id;
-        if (isset($request->package_id)) {
-            $package_id = $request->package_id;
-        }
-
 
         if ($payment_type == 'cart_payment') {
-            $combined_order = CombinedOrder::find($combined_order_id);
-            return $this->initialize($payment_type, $combined_order_id, $combined_order->grand_total, $user_id);
+            $combined_order = CombinedOrder::find($request->combined_order_id);
+            return $this->initialize($payment_type, $combined_order->id, $combined_order->grand_total, $user_id);
+        } elseif ($payment_type == 'order_re_payment') {
+            $order = Order::findOrFail($request->order_id);
+            return $this->initialize($payment_type, $order->id, $order->grand_total, $user_id);
         } elseif ($payment_type == 'wallet_payment') {
-            return $this->initialize($payment_type, $combined_order_id, $amount, $user_id);
+            $id = 0;
+            return $this->initialize($payment_type, $id, $request->amount, $user_id);
         } elseif (
             $payment_type == 'seller_package_payment' ||
             $payment_type == 'customer_package_payment'
         ) {
-            return $this->initialize($payment_type, $combined_order_id, $amount, $user_id, $package_id);
+            return $this->initialize($payment_type, $request->package_id, $request->amount, $user_id);
         }
     }
 
-    public function initialize($payment_type, $combined_order_id, $amount, $user_id, $package_id = 0)
+    public function initialize($payment_type, $data, $amount, $user_id)
     {
         $user = User::find($user_id);
         //This generates a payment reference
@@ -53,10 +52,9 @@ class FlutterwaveController extends Controller
                 'api.flutterwave.callback',
                 [
                     "payment_type" => $payment_type,
-                    "combined_order_id" => $combined_order_id,
+                    "data" => $data,  // $data = Combined Order Id / Order Id / Package Id
                     "amount" => $amount,
-                    "user_id" => $user_id,
-                    'package_id' => $package_id
+                    "user_id" => $user_id
                 ]
             ),
             'customer' => [
@@ -97,18 +95,19 @@ class FlutterwaveController extends Controller
 
                 if ($payment['status'] == "successful") {
                     if ($request->payment_type == 'cart_payment') {
-                        checkout_done($request->combined_order_id, json_encode($payment));
+                        checkout_done($request->data, json_encode($payment));
                     }
-
-                    if ($request->payment_type == 'wallet_payment') {
+                    elseif ($request->payment_type == 'order_re_payment') {
+                        order_re_payment_done($request->data, 'Flutterwave', json_encode($payment));
+                    }
+                    elseif ($request->payment_type == 'wallet_payment') {
                         wallet_payment_done($request->user_id, $request->amount, 'Flutterwave', json_encode($payment));
                     }
-
-                    if ($request->payment_type == 'seller_package_payment') {
-                        seller_purchase_payment_done($request->user_id, $request->package_id, $request->amount, 'Flutterwave', json_encode($payment));
+                    elseif ($request->payment_type == 'seller_package_payment') {
+                        seller_purchase_payment_done($request->user_id, $request->data, 'Flutterwave', json_encode($payment));
                     }
-                    if ($request->payment_type == 'customer_package_payment') {
-                        customer_purchase_payment_done($request->user_id, $request->package_id);
+                    elseif ($request->payment_type == 'customer_package_payment') {
+                        customer_purchase_payment_done($request->user_id, $request->data, 'Flutterwave', json_encode($payment));
                     }
 
                     return response()->json(['result' => true, 'message' => translate("Payment is successful")]);

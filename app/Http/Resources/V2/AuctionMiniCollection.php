@@ -14,6 +14,7 @@ class AuctionMiniCollection extends ResourceCollection
 
                 return [
                     'id' => $data->id,
+                    'slug' => $data->slug,
                     'name' => $data->getTranslation('name'),
                     'thumbnail_image' => uploaded_asset($data->thumbnail_img),
                     'has_discount' => home_base_price($data, false) != home_discounted_base_price($data, false),

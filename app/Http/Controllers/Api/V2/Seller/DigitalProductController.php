@@ -7,6 +7,7 @@ use App\Http\Requests\ProductRequest;
 use App\Http\Resources\V2\Seller\DigitalProductCollection;
 use App\Http\Resources\V2\Seller\CategoriesCollection;
 use App\Http\Resources\V2\Seller\DigitalProductDetailsResource;
+use App\Services\FrequentlyBoughtProductService;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Product;
@@ -14,8 +15,6 @@ use App\Models\ProductTax;
 use App\Models\ProductTranslation;
 use App\Models\Upload;
 use Auth;
-
-
 use App\Services\ProductService;
 use App\Services\ProductStockService;
 use App\Services\ProductTaxService;
@@ -71,6 +70,10 @@ class DigitalProductController extends Controller
                 'tax_id', 'tax', 'tax_type', 'product_id'
             ]));
         }
+        // Frequently Bought Products
+        (new FrequentlyBoughtProductService)->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+        ]));
 
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
@@ -119,6 +122,12 @@ class DigitalProductController extends Controller
             ]));
         }
 
+        // Frequently Bought Products
+        $product->frequently_bought_products()->delete();
+        (new FrequentlyBoughtProductService)->store($request->only([
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+        ]));
+        
         // Product Translations
         ProductTranslation::updateOrCreate(
             $request->only(['lang', 'product_id']),

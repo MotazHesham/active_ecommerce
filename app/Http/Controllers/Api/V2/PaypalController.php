@@ -7,6 +7,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\WalletController;
 use App\Models\CombinedOrder;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\ProductionEnvironment;
@@ -23,6 +24,7 @@ class PaypalController extends Controller
 
         $clientId = env('PAYPAL_CLIENT_ID');
         $clientSecret = env('PAYPAL_CLIENT_SECRET');
+        $amount = $request->amount;
 
         if (get_setting('paypal_sandbox') == 1) {
             $environment = new SandboxEnvironment($clientId, $clientSecret);
@@ -34,14 +36,10 @@ class PaypalController extends Controller
         if ($request->payment_type == 'cart_payment') {
             $combined_order = CombinedOrder::find($request->combined_order_id);
             $amount = $combined_order->grand_total;
-        } elseif ($request->payment_type == 'wallet_payment') {
-            $amount = $request->amount;
         }
-        elseif ($request->payment_type == 'seller_package_payment') {
-            $amount = $request->amount;
-        }
-        elseif ($request->payment_type == 'customer_package_payment') {
-            $amount = $request->amount;
+        elseif ($request->payment_type == 'order_re_payment') {
+            $order = Order::findOrFail($request->order_id);
+            $amount = $order->grand_total;
         }
 
         $data = array();
@@ -50,6 +48,10 @@ class PaypalController extends Controller
         $data['amount'] = $request->amount;
         $data['user_id'] = $request->user_id;
         $data['package_id'] = 0;
+        $data['order_id'] = 0;
+        if(isset($request->order_id)) {
+            $data['order_id'] = $request->order_id;
+        }
         if(isset($request->package_id)) {
             $data['package_id'] = $request->package_id;
         }
@@ -113,21 +115,15 @@ class PaypalController extends Controller
             // If call returns body in response, you can get the deserialized version from the result attribute of the response
 
             if ($request->payment_type == 'cart_payment') {
-
                 checkout_done($request->combined_order_id, json_encode($response));
-            }
-
-            if ($request->payment_type == 'wallet_payment') {
-
+            } elseif ($request->payment_type == 'order_re_payment') {
+                order_re_payment_done($request->order_id, 'Paypal', json_encode($response));
+            } elseif ($request->payment_type == 'wallet_payment') {
                 wallet_payment_done($request->user_id, $request->amount, 'Paypal', json_encode($response));
-            }
-
-            if ($request->payment_type == 'seller_package_payment') {
-                seller_purchase_payment_done($request->user_id, $request->package_id, $request->amount, 'Paypal', json_encode($response));
-            }
-
-            if ($request->payment_type == 'customer_package_payment') {
-                customer_purchase_payment_done($request->user_id, $request->package_id);
+            } elseif ($request->payment_type == 'seller_package_payment') {
+                seller_purchase_payment_done($request->user_id, $request->package_id, 'Paypal', json_encode($response));
+            } elseif ($request->payment_type == 'customer_package_payment') {
+                customer_purchase_payment_done($request->user_id, $request->package_id, 'Paypal', json_encode($response));
             }
 
             return response()->json(['result' => true, 'message' => translate("Payment is successful")]);

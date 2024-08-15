@@ -129,7 +129,7 @@
             font-family: 'Public Sans', sans-serif;
             font-weight: 400;
         }
-        
+
         .pagination .page-link,
         .page-item.disabled .page-link {
             min-width: 32px;
@@ -144,10 +144,6 @@
         }
         .pagination .page-item {
             margin: 0 5px;
-        }
-
-        .aiz-carousel.coupon-slider .slick-track{
-            margin-left: 0;
         }
 
         .form-control:focus {
@@ -227,16 +223,12 @@
             }
 
             $system_language = get_system_language();
-            
-            // if ($user != null) {
-            //     $carts = App\Models\Cart::where('user_id', auth()->user()->id)->get();
-            // }
         @endphp
         <!-- Header -->
         @include('frontend.inc.nav')
 
         @yield('content')
-        
+
         <!-- footer -->
         @include('frontend.inc.footer')
 
@@ -245,60 +237,121 @@
     <!-- Floating Buttons -->
     @include('frontend.inc.floating_buttons')
 
+    <div class="aiz-refresh">
+        <div class="aiz-refresh-content"><div></div><div></div><div></div></div>
+    </div>
+
+
     @if (env("DEMO_MODE") == "On")
         <!-- demo nav -->
         @include('frontend.inc.demo_nav')
     @endif
 
     <!-- cookies agreement -->
-    @if (get_setting('show_cookies_agreement') == 'on')
-        <div class="aiz-cookie-alert shadow-xl">
-            <div class="p-3 bg-dark rounded">
-                <div class="text-white mb-3">
-                    @php
-                        echo get_setting('cookies_agreement_text');
-                    @endphp
+    @php
+        $alert_location = get_setting('custom_alert_location');
+        $order = in_array($alert_location, ['top-left', 'top-right']) ? 'asc' : 'desc';
+        $custom_alerts = App\Models\CustomAlert::where('status', 1)->orderBy('id', $order)->get();
+    @endphp
+
+    <div class="aiz-custom-alert {{ get_setting('custom_alert_location') }}">
+        @foreach ($custom_alerts as $custom_alert)
+            @if($custom_alert->id == 1)
+                <div class="aiz-cookie-alert mb-3" style="box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
+                    <div class="p-3 px-lg-2rem rounded-0" style="background: {{ $custom_alert->background_color }};">
+                        <div class="text-{{ $custom_alert->text_color }} mb-3">
+                            {!! $custom_alert->description !!}
+                        </div>
+                        <button class="btn btn-block btn-primary rounded-0 aiz-cookie-accept">
+                            {{ translate('Ok. I Understood') }}
+                        </button>
+                    </div>
                 </div>
-                <button class="btn btn-primary aiz-cookie-accept">
-                    {{ translate('Ok. I Understood') }}
-                </button>
-            </div>
-        </div>
-    @endif
+            @else
+                <div class="mb-3 custom-alert-box removable-session d-none" data-key="custom-alert-box-{{ $custom_alert->id }}" data-value="removed" style="box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
+                    <div class="rounded-0 position-relative" style="background: {{ $custom_alert->background_color }};">
+                        <a href="{{ $custom_alert->link }}" class="d-block h-100 w-100">
+                            <div class="@if ($custom_alert->type == 'small') d-flex @endif">
+                                <img class="@if ($custom_alert->type == 'small') h-140px w-120px img-fit @else w-100 @endif" src="{{ uploaded_asset($custom_alert->banner) }}" alt="custom_alert">
+                                <div class="text-{{ $custom_alert->text_color }} p-2rem">
+                                    {!! $custom_alert->description !!}
+                                </div>
+                            </div>
+                        </a>
+                        <button class="absolute-top-right bg-transparent btn btn-circle btn-icon d-flex align-items-center justify-content-center text-{{ $custom_alert->text_color }} hov-text-primary set-session" data-key="custom-alert-box-{{ $custom_alert->id }}" data-value="removed" data-toggle="remove-parent" data-parent=".custom-alert-box">
+                            <i class="la la-close fs-20"></i>
+                        </button>
+                    </div>
+                </div>
+            @endif
+        @endforeach
+    </div>
 
     <!-- website popup -->
-    @if (get_setting('show_website_popup') == 'on')
-        <div class="modal website-popup removable-session d-none" data-key="website-popup" data-value="removed">
-            <div class="absolute-full bg-black opacity-60"></div>
-            <div class="modal-dialog modal-dialog-centered modal-dialog-zoom modal-md mx-4 mx-md-auto">
-                <div class="modal-content position-relative border-0 rounded-0">
-                    <div class="aiz-editor-data">
-                        {!! get_setting('website_popup_content') !!}
-                    </div>
-                    @if (get_setting('show_subscribe_form') == 'on')
-                        <div class="pb-5 pt-4 px-3 px-md-5">
-                            <form class="" method="POST" action="{{ route('subscribers.store') }}">
-                                @csrf
-                                <div class="form-group mb-0">
-                                    <input type="email" class="form-control" placeholder="{{ translate('Your Email Address') }}" name="email" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-block mt-3">
-                                    {{ translate('Subscribe Now') }}
-                                </button>
-                            </form>
+    @php
+        $dynamic_popups = App\Models\DynamicPopup::where('status', 1)->orderBy('id', 'asc')->get();
+    @endphp
+    @foreach ($dynamic_popups as $key => $dynamic_popup)
+        @if($dynamic_popup->id == 1)
+            <div class="modal website-popup removable-session d-none" data-key="website-popup" data-value="removed">
+                <div class="absolute-full bg-black opacity-60"></div>
+                <div class="modal-dialog modal-dialog-centered modal-dialog-zoom modal-md mx-4 mx-md-auto">
+                    <div class="modal-content position-relative border-0 rounded-0">
+                        <div class="aiz-editor-data">
+                            <div class="d-block">
+                                <img class="w-100" src="{{ uploaded_asset($dynamic_popup->banner) }}" alt="dynamic_popup">
+                            </div>
                         </div>
-                    @endif
-                    <button class="absolute-top-right bg-white shadow-lg btn btn-circle btn-icon mr-n3 mt-n3 set-session" data-key="website-popup" data-value="removed" data-toggle="remove-parent" data-parent=".website-popup">
-                        <i class="la la-close fs-20"></i>
-                    </button>
+                        <div class="pb-5 pt-4 px-3 px-md-2rem">
+                            <h1 class="fs-30 fw-700 text-dark">{{ $dynamic_popup->title }}</h1>
+                            <p class="fs-14 fw-400 mt-3 mb-4">{{ $dynamic_popup->summary }}</p>
+                            @if ($dynamic_popup->show_subscribe_form == 'on')
+                                <form class="" method="POST" action="{{ route('subscribers.store') }}">
+                                    @csrf
+                                    <div class="form-group mb-0">
+                                        <input type="email" class="form-control" placeholder="{{ translate('Your Email Address') }}" name="email" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-block mt-3 rounded-0 text-{{ $dynamic_popup->btn_text_color }}" style="background: {{ $dynamic_popup->btn_background_color }};">
+                                        {{ $dynamic_popup->btn_text }}
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                        <button class="absolute-top-right bg-white shadow-lg btn btn-circle btn-icon mr-n3 mt-n3 set-session" data-key="website-popup" data-value="removed" data-toggle="remove-parent" data-parent=".website-popup">
+                            <i class="la la-close fs-20"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    @endif
+        @else
+            <div class="modal website-popup removable-session d-none" data-key="website-popup-{{ $dynamic_popup->id }}" data-value="removed">
+                <div class="absolute-full bg-black opacity-60"></div>
+                <div class="modal-dialog modal-dialog-centered modal-dialog-zoom modal-md mx-4 mx-md-auto">
+                    <div class="modal-content position-relative border-0 rounded-0">
+                        <div class="aiz-editor-data">
+                            <div class="d-block">
+                                <img class="w-100" src="{{ uploaded_asset($dynamic_popup->banner) }}" alt="dynamic_popup">
+                            </div>
+                        </div>
+                        <div class="pb-5 pt-4 px-3 px-md-2rem">
+                            <h1 class="fs-30 fw-700 text-dark">{{ $dynamic_popup->title }}</h1>
+                            <p class="fs-14 fw-400 mt-3 mb-4">{{ $dynamic_popup->summary }}</p>
+                            <a href="{{ $dynamic_popup->btn_link }}" class="btn btn-block mt-3 rounded-0 text-{{ $dynamic_popup->btn_text_color }}" style="background: {{ $dynamic_popup->btn_background_color }};">
+                                {{ $dynamic_popup->btn_text }}
+                            </a>
+                        </div>
+                        <button class="absolute-top-right bg-white shadow-lg btn btn-circle btn-icon mr-n3 mt-n3 set-session" data-key="website-popup-{{ $dynamic_popup->id }}" data-value="removed" data-toggle="remove-parent" data-parent=".website-popup">
+                            <i class="la la-close fs-20"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
 
-    @include('frontend.'.get_setting('homepage_select').'.partials.modal')
-    
-    @include('frontend.'.get_setting('homepage_select').'.partials.account_delete_modal')
+    @include('frontend.partials.modal')
+
+    @include('frontend.partials.account_delete_modal')
 
     <div class="modal fade" id="addToCart">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-zoom product-modal" id="modal-size" role="document">
@@ -357,7 +410,7 @@
 
     <script>
         @if (Route::currentRouteName() == 'home' || Route::currentRouteName() == '/')
-            
+
             $.post('{{ route('home.section.featured') }}', {
                 _token: '{{ csrf_token() }}'
             }, function(data) {
@@ -399,6 +452,7 @@
                 $('#section_home_categories').html(data);
                 AIZ.plugins.slickCarousel();
             });
+
         @endif
 
         $(document).ready(function() {
@@ -407,7 +461,7 @@
                 $(el).on('mouseover', function(){
                     if(!$(el).find('.sub-cat-menu').hasClass('loaded')){
                         $.post('{{ route('category.elements') }}', {
-                            _token: AIZ.data.csrf, 
+                            _token: AIZ.data.csrf,
                             id:$(el).data('id'
                             )}, function(data){
                             $(el).find('.sub-cat-menu').addClass('loaded').html(data);
@@ -493,7 +547,7 @@
             if($trigger !== event.target && !$trigger.has(event.target).length){
                 $("#click-category-menu").slideUp("fast");;
                 $("#category-menu-bar-icon").removeClass('show');
-            }   
+            }
         });
 
         function updateNavCart(view,count){
@@ -507,7 +561,7 @@
                 id      :  key
             }, function(data){
                 updateNavCart(data.nav_cart_view,data.cart_count);
-                $('#cart-summary').html(data.cart_view);
+                $('#cart-details').html(data.cart_view);
                 AIZ.plugins.notify('success', "{{ translate('Item has been removed from cart') }}");
                 $('#cart_items_sidenav').html(parseInt($('#cart_items_sidenav').html())-1);
             });
@@ -638,6 +692,12 @@
                        updateNavCart(data.nav_cart_view,data.cart_count);
                     }
                 });
+
+                if ("{{ get_setting('facebook_pixel') }}" == 1){
+                    // Facebook Pixel AddToCart Event
+                    fbq('track', 'AddToCart', {content_type: 'product'});
+                    // Facebook Pixel AddToCart Event
+                }
             }
             else{
                 AIZ.plugins.notify('warning', "{{ translate('Please choose all the options') }}");
@@ -649,7 +709,7 @@
                 AIZ.plugins.notify('warning', "{{ translate('Please Login as a customer to add products to the Cart.') }}");
                 return false;
             @endif
-            
+
             if(checkAddToCartValidity()) {
                 $('#addToCart-modal-body').html(null);
                 $('#addToCart').modal();
@@ -691,7 +751,7 @@
                 $('#login_modal').modal('show');
             @endif
         }
-        
+
         function clickToSlide(btn,id){
             $('#'+id+' .aiz-carousel').find('.'+btn).trigger('click');
             $('#'+id+' .slide-arrow').removeClass('link-disable');
@@ -725,12 +785,19 @@
             setTimeout(function(){
                 $('.cart-ok').css({ fill: '#d43533' });
             }, 2000);
-            
+
         });
+
+        function nonLinkableNotificationRead(){
+            $.get('{{ route('non-linkable-notification-read') }}',function(data){
+                $('.unread-notification-count').html(data);
+            });
+        }
     </script>
 
-    @if (addon_is_activated('otp_system'))
-        <script type="text/javascript">
+
+    <script type="text/javascript">
+        if ($('input[name=country_code]').length > 0){
             // Country Code
             var isPhoneShown = true,
                 countryData = window.intlTelInputGlobals.getCountryData(),
@@ -780,8 +847,8 @@
                     $(el).html('<i>*{{ translate('Use Email Instead') }}</i>');
                 }
             }
-        </script> 
-    @endif
+        }
+    </script>
 
     <script>
         var acc = document.getElementsByClassName("aiz-accordion-heading");

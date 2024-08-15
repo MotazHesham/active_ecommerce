@@ -2,6 +2,8 @@
 
     @section('content')
         <div class="row">
+
+            {{-- Paypal --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -53,6 +55,7 @@
                 </div>
             </div>
 
+            {{-- Stripe --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -92,56 +95,7 @@
                 </div>
             </div>
 
-            {{-- <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0 h6 ">{{translate('Mercadopago Credential')}}</h5>
-                </div>
-                <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('payment_method.update') }}" method="POST">
-                        <input type="hidden" name="payment_method" value="paypal">
-                        @csrf
-                        <div class="form-group row">
-                            <input type="hidden" name="types[]" value="MERCADOPAGO_KEY">
-                            <div class="col-md-4">
-                                <label class="col-from-label">{{translate('Mercadopago Key')}}</label>
-                            </div>
-                            <div class="col-md-8">
-                                <input type="text" class="form-control" name="MERCADOPAGO_KEY" value="{{  env('MERCADOPAGO_KEY') }}" placeholder="{{ translate('Mercadopago Key') }}" required>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <input type="hidden" name="types[]" value="MERCADOPAGO_ACCESS">
-                            <div class="col-md-4">
-                                <label class="col-from-label">{{translate('Mercadopago Access')}}</label>
-                            </div>
-                            <div class="col-md-8">
-                                <input type="text" class="form-control" name="MERCADOPAGO_ACCESS" value="{{  env('MERCADOPAGO_ACCESS') }}" placeholder="{{ translate('Mercadopago Access') }}" required>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <input type="hidden" name="types[]" value="MERCADOPAGO_CURRENCY">
-                            <div class="col-lg-4">
-                                <label class="col-from-label">{{translate('MERCADOPAGO CURRENCY')}}</label>
-                            </div>
-                            <div class="col-lg-8">
-                                <input type="text" class="form-control" name="MERCADOPAGO_CURRENCY" value="{{  env('MERCADOPAGO_CURRENCY') }}" placeholder="{{ translate('MERCADOPAGO CURRENCY') }}" required>
-                                <br>
-                                <div class="alert alert-primary" role="alert">
-                                    Currency must be <b>es-AR</b> or <b>es-CL</b> or <b>es-CO</b> or <b>es-MX</b> or <b>es-VE</b> or <b>es-UY</b> or <b>es-PE</b> or <b>pt-BR</b><br>
-                                    If kept empty, <b>en-US</b> will be used automatically
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group mb-0 text-right">
-                            <button type="submit" class="btn btn-sm btn-primary">{{translate('Save')}}</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div> --}}
-
+            {{-- Bkash --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header ">
@@ -215,6 +169,7 @@
                 </div>
             </div>
 
+            {{-- Nagad --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -287,6 +242,7 @@
                 </div>
             </div>
 
+            {{-- Sslcommerz --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header ">
@@ -338,6 +294,7 @@
                 </div>
             </div>
 
+            {{-- Aamarpay --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header ">
@@ -389,6 +346,7 @@
                 </div>
             </div>
 
+            {{-- Iyzico --}}
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header">
@@ -453,6 +411,7 @@
                 </div>
             </div>
 
+            {{-- Instamojo --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -504,6 +463,7 @@
                 </div>
             </div>
 
+            {{-- PayStack --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -565,6 +525,7 @@
                 </div>
             </div>
 
+            {{-- Payhere --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -626,6 +587,8 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Ngenius --}}
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header">
@@ -681,6 +644,7 @@
                 </div>
             </div>
 
+            {{-- VoguePay --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -721,6 +685,7 @@
                 </div>
             </div>
 
+            {{-- RazorPay --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -759,6 +724,7 @@
                     </div>
                 </div>
             </div>
+
             {{-- Authorize Net --}}
             <div class="col-lg-6">
                 <div class="card">
@@ -813,6 +779,7 @@
                 </div>
             </div>
 
+            {{-- Payku --}}
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header">
@@ -864,6 +831,7 @@
                 </div>
             </div>
 
+            {{-- Mercadopago --}}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -913,6 +881,69 @@
                                 </div>
                             </div>
 
+                            <div class="form-group mb-0 text-right">
+                                <button type="submit" class="btn btn-sm btn-primary">{{ translate('Save') }}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Paymob --}}
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0 h6">{{ translate('Paymob') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <form class="form-horizontal" action="{{ route('payment_method.update') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="payment_method" value="paymob">
+
+                            <div class="form-group row">
+                                <input type="hidden" name="types[]" value="PAYMOB_API_KEY">
+                                <div class="col-lg-4">
+                                    <label class="col-from-label">{{ translate('Paymob API Key') }}</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control" name="PAYMOB_API_KEY"
+                                        value="{{ env('PAYMOB_API_KEY') }}"
+                                        placeholder="{{ translate('Paymob API Key') }}" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <input type="hidden" name="types[]" value="PAYMOB_IFRAME_ID">
+                                <div class="col-md-4">
+                                    <label class="col-from-label">{{ translate('Paymob Iframe ID') }}</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control" name="PAYMOB_IFRAME_ID"
+                                        value="{{ env('PAYMOB_IFRAME_ID') }}"
+                                        placeholder="{{ translate('Paymob Iframe ID') }}" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <input type="hidden" name="types[]" value="PAYMOB_INTEGRATION_ID">
+                                <div class="col-md-4">
+                                    <label class="col-from-label">{{ translate('Paymob Integration ID') }}</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control" name="PAYMOB_INTEGRATION_ID"
+                                        value="{{ env('PAYMOB_INTEGRATION_ID') }}"
+                                        placeholder="{{ translate('Paymob Integration ID') }}" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <input type="hidden" name="types[]" value="PAYMOB_HMAC">
+                                <div class="col-md-4">
+                                    <label class="col-from-label">{{ translate('Paymob HMAC') }}</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control" name="PAYMOB_HMAC"
+                                        value="{{ env('PAYMOB_HMAC') }}"
+                                        placeholder="{{ translate('Paymob HMAC') }}" required>
+                                </div>
+                            </div>
                             <div class="form-group mb-0 text-right">
                                 <button type="submit" class="btn btn-sm btn-primary">{{ translate('Save') }}</button>
                             </div>

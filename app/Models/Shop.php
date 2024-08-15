@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDemoModeChanges;
 
 class Shop extends Model
 {
+  use PreventDemoModeChanges;
+
 
   protected $with = ['user'];
 

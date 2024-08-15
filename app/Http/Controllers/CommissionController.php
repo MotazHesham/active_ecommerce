@@ -80,8 +80,14 @@ class CommissionController extends Controller
             $seller_withdraw_request->save();
         }
 
-        $users = User::findMany([$shop->user->id, User::where('user_type', 'admin')->first()->id]);
-        Notification::send($users, new PayoutNotification($shop->user, $payment_data['amount'], 'paid'));
+        // Seller Payout Notification to seller
+        $users = User::findMany($shop->user->id);
+        $data = array();
+        $data['user'] = $shop->user;
+        $data['amount'] = $payment_data['amount'];
+        $data['status'] = 'paid';
+        $data['notification_type_id'] = get_notification_type('seller_payout', 'type')->id;
+        Notification::send($users, new PayoutNotification($data));
 
         Session::forget('payment_data');
         Session::forget('payment_type');

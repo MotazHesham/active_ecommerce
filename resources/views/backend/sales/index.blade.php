@@ -8,14 +8,18 @@
                     <h5 class="mb-md-0 h6">{{ translate('All Orders') }}</h5>
                 </div>
 
-                @can('delete_order')
+                @canany(['delete_order', 'export_order'])
                     <div class="dropdown mb-2 mb-md-0">
                         <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
                             {{ translate('Bulk Action') }}
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item confirm-alert" href="javascript:void(0)"  data-target="#bulk-delete-modal">
-                                {{ translate('Delete selection') }}</a>
+                            @can('delete_order')
+                                <a class="dropdown-item confirm-alert" href="javascript:void(0)"  data-target="#bulk-delete-modal">{{ translate('Delete selection') }}</a>
+                            @endcan
+                            @can('export_order')
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="order_bulk_export()">{{ translate('Export') }}</a>
+                            @endcan
                         </div>
                     </div>
                 @endcan
@@ -73,8 +77,7 @@
                 <table class="table aiz-table mb-0">
                     <thead>
                         <tr>
-                            <!--<th>#</th>-->
-                            @if (auth()->user()->can('delete_order'))
+                            @if (auth()->user()->can('delete_order') || auth()->user()->can('export_order'))
                                 <th>
                                     <div class="form-group">
                                         <div class="aiz-checkbox-inline">
@@ -106,7 +109,7 @@
                     <tbody>
                         @foreach ($orders as $key => $order)
                             <tr>
-                                @if (auth()->user()->can('delete_order'))
+                                @if (auth()->user()->can('delete_order') || auth()->user()->can('export_order'))
                                     <td>
                                         <div class="form-group">
                                             <div class="aiz-checkbox-inline">
@@ -247,27 +250,7 @@
             }
 
         });
-
-        //        function change_status() {
-        //            var data = new FormData($('#order_form')[0]);
-        //            $.ajax({
-        //                headers: {
-        //                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //                },
-        //                url: "{{ route('bulk-order-status') }}",
-        //                type: 'POST',
-        //                data: data,
-        //                cache: false,
-        //                contentType: false,
-        //                processData: false,
-        //                success: function (response) {
-        //                    if(response == 1) {
-        //                        location.reload();
-        //                    }
-        //                }
-        //            });
-        //        }
-
+        
         function bulk_delete() {
             var data = new FormData($('#sort_orders')[0]);
             $.ajax({
@@ -286,6 +269,13 @@
                     }
                 }
             });
+        }
+        
+        function order_bulk_export (){
+            var url = '{{route('order-bulk-export')}}';
+            $("#sort_orders").attr("action", url);
+            $('#sort_orders').submit();
+            $("#sort_orders").attr("action", '');
         }
     </script>
 @endsection

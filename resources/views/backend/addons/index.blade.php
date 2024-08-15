@@ -83,6 +83,13 @@
 @section('script')
     <script type="text/javascript">
         function updateStatus(el, id){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
+
             if($(el).is(':checked')){
                 var status = 1;
             }

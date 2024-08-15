@@ -8,20 +8,17 @@
                 {{ count($carts) }}
                 {{ translate('Items') }}
             </span>
-            
+
             <!-- Minimum Order Amount -->
             @php
                 $coupon_discount = 0;
             @endphp
-            @if (Auth::check() && get_setting('coupon_system') == 1)
+            @if (get_setting('coupon_system') == 1)
                 @php
                     $coupon_code = null;
                 @endphp
 
                 @foreach ($carts as $key => $cartItem)
-                    @php
-                        $product = get_single_product($cartItem['product_id']);
-                    @endphp
                     @if ($cartItem->coupon_applied == 1)
                         @php
                             $coupon_code = $cartItem->coupon_code;
@@ -31,7 +28,7 @@
                 @endforeach
 
                 @php
-                    $coupon_discount = carts_coupon_discount($coupon_code);
+                    $coupon_discount = $carts->sum('discount');
                 @endphp
             @endif
 
@@ -44,7 +41,7 @@
                     {{ translate('Minimum Order Amount') . ' ' . single_price(get_setting('minimum_order_amount')) }}
                 </span>
             @endif
-            
+
         </div>
     </div>
 
@@ -53,7 +50,7 @@
     <div class="px-4 pt-1 w-100 d-flex align-items-center justify-content-between">
         <h3 class="fs-14 fw-700 mb-0">{{ translate('Total Clubpoint') }}</h3>
         <div class="text-right">
-            <span class="badge badge-inline badge-warning fs-12 rounded-0 px-2 text-white">
+            <span class="badge badge-inline badge-secondary-base fs-12 rounded-0 px-2 text-white">
                 @php
                     $total_point = 0;
                 @endphp
@@ -95,7 +92,6 @@
                     $tax = 0;
                     $shipping = 0;
                     $product_shipping_cost = 0;
-                    $shipping_region = $shipping_info['city'];
                 @endphp
                 @foreach ($carts as $key => $cartItem)
                     @php
@@ -103,9 +99,9 @@
                         $subtotal += cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
                         $tax += cart_product_tax($cartItem, $product, false) * $cartItem['quantity'];
                         $product_shipping_cost = $cartItem['shipping_cost'];
-                        
+
                         $shipping += $product_shipping_cost;
-                        
+
                         $product_name_with_choice = $product->getTranslation('name');
                         if ($cartItem['variant'] != null) {
                             $product_name_with_choice = $product->getTranslation('name') . ' - ' . $cartItem['variant'];
@@ -190,27 +186,8 @@
             </tfoot>
         </table>
 
-        <!-- Remove Redeem Point -->
-        @if (addon_is_activated('club_point'))
-            @if (Session::has('club_point'))
-                <div class="mt-3">
-                    <form class="" action="{{ route('checkout.remove_club_point') }}" method="POST"
-                        enctype="multipart/form-data">
-                        @csrf
-                        <div class="input-group">
-                            <div class="form-control">{{ Session::get('club_point') }}</div>
-                            <div class="input-group-append">
-                                <button type="submit"
-                                    class="btn btn-primary">{{ translate('Remove Redeem Point') }}</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            @endif
-        @endif
-
         <!-- Coupon System -->
-        @if (Auth::check() && get_setting('coupon_system') == 1)
+        @if (get_setting('coupon_system') == 1)
             @if ($coupon_discount > 0 && $coupon_code)
                 <div class="mt-3">
                     <form class="" id="remove-coupon-form" enctype="multipart/form-data">

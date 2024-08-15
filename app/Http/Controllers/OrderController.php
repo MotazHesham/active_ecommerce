@@ -8,7 +8,6 @@ use App\Models\Order;
 use App\Models\Cart;
 use App\Models\Address;
 use App\Models\Product;
-use App\Models\ProductStock;
 use App\Models\OrderDetail;
 use App\Models\CouponUsage;
 use App\Models\Coupon;
@@ -18,10 +17,12 @@ use App\Models\SmsTemplate;
 use Auth;
 use Mail;
 use App\Mail\InvoiceEmailManager;
+use App\Models\OrdersExport;
 use App\Utility\NotificationUtility;
 use CoreComponentRepository;
 use App\Utility\SmsUtility;
 use Illuminate\Support\Facades\Route;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
@@ -107,13 +108,17 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::findOrFail(decrypt($id));
+        
         $order_shipping_address = json_decode($order->shipping_address);
         $delivery_boys = User::where('city', $order_shipping_address->city)
-            ->where('user_type', 'delivery_boy')
-            ->get();
+                ->where('user_type', 'delivery_boy')
+                ->get();
+                
+        if(env('DEMO_MODE') == 'On') {
+            $order->viewed = 1;
+            $order->save();
+        }
 
-        $order->viewed = 1;
-        $order->save();
         return view('backend.sales.show', compact('order', 'delivery_boys'));
     }
 
@@ -135,8 +140,7 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $carts = Cart::where('user_id', Auth::user()->id)
-            ->get();
+        $carts = Cart::where('user_id', Auth::user()->id)->active()->get();
 
         if ($carts->isEmpty()) {
             flash(translate('Your cart is empty'))->warning();
@@ -181,17 +185,7 @@ class OrderController extends Controller
             $order->combined_order_id = $combined_order->id;
             $order->user_id = Auth::user()->id;
             $order->shipping_address = $combined_order->shipping_address;
-
             $order->additional_info = $request->additional_info;
-
-            // $order->shipping_type = $carts[0]['shipping_type'];
-            // if ($carts[0]['shipping_type'] == 'pickup_point') {
-            //     $order->pickup_point_id = $cartItem['pickup_point'];
-            // }
-            // if ($carts[0]['shipping_type'] == 'carrier') {
-            //     $order->carrier_id = $cartItem['carrier_id'];
-            // }
-
             $order->payment_type = $request->payment_option;
             $order->delivery_viewed = '0';
             $order->payment_status_viewed = '0';
@@ -243,7 +237,7 @@ class OrderController extends Controller
                 if (addon_is_activated('club_point')) {
                     $order_detail->earn_point = $product->earn_point;
                 }
-                
+
                 $order_detail->save();
 
                 $product->num_of_sale += $cartItem['quantity'];
@@ -251,7 +245,7 @@ class OrderController extends Controller
 
                 $order->seller_id = $product->user_id;
                 $order->shipping_type = $cartItem['shipping_type'];
-                
+
                 if ($cartItem['shipping_type'] == 'pickup_point') {
                     $order->pickup_point_id = $cartItem['pickup_point'];
                 }
@@ -293,10 +287,6 @@ class OrderController extends Controller
         }
 
         $combined_order->save();
-
-        foreach($combined_order->orders as $order){
-            NotificationUtility::sendOrderPlacedNotification($order);
-        }
 
         $request->session()->put('combined_order_id', $combined_order->id);
     }
@@ -342,14 +332,10 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
         if ($order != null) {
+            $order->commissionHistory()->delete();
             foreach ($order->orderDetails as $key => $orderDetail) {
                 try {
-
-                    $product_stock = ProductStock::where('product_id', $orderDetail->product_id)->where('variant', $orderDetail->variation)->first();
-                    if ($product_stock != null) {
-                        $product_stock->qty += $orderDetail->quantity;
-                        $product_stock->save();
-                    }
+                    product_restock($orderDetail);
                 } catch (\Exception $e) {
                 }
 
@@ -394,25 +380,21 @@ class OrderController extends Controller
             $user->save();
         }
 
+        // If the order is cancelled and the seller commission is calculated, deduct seller earning
+        if($request->status == 'cancelled' && $order->user->user_type == 'seller' && $order->payment_status == 'paid' && $order->commission_calculated == 1){
+            $sellerEarning = $order->commissionHistory->seller_earning;
+            $shop = $order->shop;
+            $shop->admin_to_pay -= $sellerEarning;
+            $shop->save();
+        }
+
         if (Auth::user()->user_type == 'seller') {
             foreach ($order->orderDetails->where('seller_id', Auth::user()->id) as $key => $orderDetail) {
                 $orderDetail->delivery_status = $request->status;
                 $orderDetail->save();
 
                 if ($request->status == 'cancelled') {
-                    $variant = $orderDetail->variation;
-                    if ($orderDetail->variation == null) {
-                        $variant = '';
-                    }
-
-                    $product_stock = ProductStock::where('product_id', $orderDetail->product_id)
-                        ->where('variant', $variant)
-                        ->first();
-
-                    if ($product_stock != null) {
-                        $product_stock->qty += $orderDetail->quantity;
-                        $product_stock->save();
-                    }
+                    product_restock($orderDetail);
                 }
             }
         } else {
@@ -422,19 +404,7 @@ class OrderController extends Controller
                 $orderDetail->save();
 
                 if ($request->status == 'cancelled') {
-                    $variant = $orderDetail->variation;
-                    if ($orderDetail->variation == null) {
-                        $variant = '';
-                    }
-
-                    $product_stock = ProductStock::where('product_id', $orderDetail->product_id)
-                        ->where('variant', $variant)
-                        ->first();
-
-                    if ($product_stock != null) {
-                        $product_stock->qty += $orderDetail->quantity;
-                        $product_stock->save();
-                    }
+                    product_restock($orderDetail);
                 }
 
                 if (addon_is_activated('affiliate_system')) {
@@ -607,5 +577,13 @@ class OrderController extends Controller
         }
 
         return 1;
+    }
+
+    public function orderBulkExport(Request $request)
+    {
+        if($request->id){
+          return Excel::download(new OrdersExport($request->id), 'orders.xlsx');
+        }
+        return back();
     }
 }

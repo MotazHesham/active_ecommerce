@@ -6,12 +6,6 @@ use App\Http\Resources\V2\Seller\SellerPackageResource;
 use Illuminate\Http\Request;
 use App\Models\SellerPackage;
 use App\Models\SellerPackagePayment;
-use App\Models\Seller;
-use App\Models\Order;
-use App\Utility\PayfastUtility;
-use Auth;
-use Session;
-use Carbon\Carbon;
 
 class SellerPackageController extends Controller
 {
@@ -58,6 +52,7 @@ class SellerPackageController extends Controller
         $seller_package = new SellerPackagePayment;
         $seller_package->user_id = auth()->user()->id;
         $seller_package->seller_package_id = $request->package_id;
+        $seller_package->amount = $seller_package->amount;
         $seller_package->payment_method = $request->payment_option;
         $seller_package->payment_details = $request->trx_id;
         $seller_package->approval = 0;

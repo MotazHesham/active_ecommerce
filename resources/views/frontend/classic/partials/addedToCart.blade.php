@@ -27,7 +27,6 @@
                     <div class="fs-16 fw-700 text-primary">
                         <strong>
                             {{ single_price(cart_product_price($cart, $product, false) * $cart->quantity) }}
-                            {{-- {{ single_price(($cart->price + $cart->tax) * $cart->quantity) }} --}}
                         </strong>
                     </div>
                 </div>

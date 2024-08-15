@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Models\CombinedOrder;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Redirect;
 
@@ -14,6 +15,10 @@ class KhaltiController extends Controller
             $combined_order = CombinedOrder::find($request->combined_order_id);
             $purchase_order_id = $combined_order->id . '-' . uniqid();
             $amount = $combined_order->grand_total;
+        } elseif ($request->payment_type == 'order_re_payment') {
+            $order = Order::find($request->order_id);
+            $purchase_order_id = $order->id . '-' . uniqid();
+            $amount = $order->grand_total;
         } elseif ($request->payment_type == 'wallet_payment') {
             $amount = $request->amount;
             $purchase_order_id = $request->payment_type . '-' . $amount  . '-' . uniqid();
@@ -91,21 +96,19 @@ class KhaltiController extends Controller
         if ($response->status == 'Completed') {
 
             if ($request->payment_type == 'cart_payment') {
-
                 checkout_done($request->combined_order_id, json_encode($response));
             }
-
-            if ($request->payment_type == 'wallet_payment') {
-
+            elseif ($request->payment_type == 'order_re_payment') {
+                order_re_payment_done($request->order_id, 'khalti', json_encode($response));
+            }
+            elseif ($request->payment_type == 'wallet_payment') {
                 wallet_payment_done($request->user_id, $request->amount, 'khalti', json_encode($response));
             }
-
-            if ($request->payment_type == 'seller_package_payment') {
-                seller_purchase_payment_done($request->user_id, $request->package_id, $request->amount, 'khalti', json_encode($response));
+            elseif ($request->payment_type == 'seller_package_payment') {
+                seller_purchase_payment_done($request->user_id, $request->package_id, 'khalti', json_encode($response));
             }
-
-            if ($request->payment_type == 'customer_package_payment') {
-                customer_purchase_payment_done($request->user_id, $request->package_id);
+            elseif ($request->payment_type == 'customer_package_payment') {
+                customer_purchase_payment_done($request->user_id, $request->package_id, 'khalti', json_encode($response));
             }
 
             return response()->json(['result' => true, 'message' => translate("Payment is successful")]);

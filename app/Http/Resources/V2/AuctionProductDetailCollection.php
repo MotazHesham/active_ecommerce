@@ -36,6 +36,7 @@ class AuctionProductDetailCollection extends ResourceCollection
 
                 $brand = [
                     'id' => 0,
+                    'slug' => "",
                     'name' => "",
                     'logo' => "",
                 ];
@@ -43,6 +44,7 @@ class AuctionProductDetailCollection extends ResourceCollection
                 if ($data->brand != null) {
                     $brand = [
                         'id' => $data->brand->id,
+                        'id' => $data->brand->slug,
                         'name' => $data->brand->getTranslation('name'),
                         'logo' => uploaded_asset($data->brand->logo),
                     ];
@@ -61,6 +63,7 @@ class AuctionProductDetailCollection extends ResourceCollection
                     'added_by' => $data->added_by,
                     'seller_id' => $data->user->id,
                     'shop_id' => $data->added_by == 'admin' ? 0 : $data->user->shop->id,
+                    'shop_slug' => $data->added_by == 'admin' ? '' : $data->user->shop->slug,
                     'shop_name' => $data->added_by == 'admin' ? translate('In House Product') : $data->user->shop->name,
                     'shop_logo' => $data->added_by == 'admin' ? uploaded_asset(get_setting('header_logo')) : uploaded_asset($data->user->shop->logo) ?? "",
                     'photos' => $photos,
@@ -73,7 +76,7 @@ class AuctionProductDetailCollection extends ResourceCollection
                     "auction_end_date" => $data->auction_end_date > strtotime('now') ?  $data->auction_end_date  : 'Ended',
                     "starting_bid" =>  single_price($data->starting_bid),
                     'unit' => $unit,
-                    'min_bid_price' => $highest_bid != null? ($highest_bid +1): $data->starting_bid,
+                    'min_bid_price' => $highest_bid != null ? ($highest_bid + 1) : $data->starting_bid,
                     'highest_bid' => $highest_bid != null ?  single_price($highest_bid) : '',
                     'description' => str_replace('&nbsp;', ' ', strip_tags($data->getTranslation('description'))),
                     'video_link' => $data->video_link != null ?  $data->video_link : "",

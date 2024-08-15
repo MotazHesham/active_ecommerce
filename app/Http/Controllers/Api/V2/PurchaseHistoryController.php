@@ -73,7 +73,7 @@ class PurchaseHistoryController extends Controller
         //          $q->where('user_id', auth()->id());
         //     }])
         //     ->where('digital', 1)
-        //     ->paginate(15);  
+        //     ->paginate(15);
 
         // dd($order_detail_products);
 
@@ -117,7 +117,7 @@ class PurchaseHistoryController extends Controller
 
 
 
-            // If product min qty is greater then the ordered qty, then update the order qty 
+            // If product min qty is greater then the ordered qty, then update the order qty
             $order_qty = $orderDetail->quantity;
             if ($product->digital == 0 && $order_qty < $product->min_qty) {
                 $order_qty = $product->min_qty;

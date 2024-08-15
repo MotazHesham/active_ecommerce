@@ -24,7 +24,7 @@
 
 @section('script')
     <script type="text/javascript">
-        function autoFill(){
+        function autoFillAdmin(){
             $('#email').val('admin@example.com');
             $('#password').val('123456');
         }

@@ -4,7 +4,7 @@
 <div class="aiz-titlebar mt-2 mb-3">
 	<div class="row align-items-center">
 		<div class="col-md-6">
-			<h1 class="h3">{{translate('All Seller Packages')}}</h1>
+			<h3 class="h3">{{translate('All Seller Packages')}}</h3>
 		</div>
         @can('add_seller_package')
             <div class="col-md-6 text-md-right">

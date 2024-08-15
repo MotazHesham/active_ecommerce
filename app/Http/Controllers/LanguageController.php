@@ -136,7 +136,7 @@ class LanguageController extends Controller
             }
         }
         Cache::forget('translations-'.$language->code);
-        flash(translate('Translations updated for ').$language->name)->success();
+        flash(translate('Translations updated for').' '.$language->name)->success();
         return back();
     }
 

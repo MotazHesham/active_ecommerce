@@ -56,7 +56,7 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Banner')}} <small>({{ translate('200x200') }})</small></label>
+                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Banner')}}</label>
                         <div class="col-md-9">
                             <div class="input-group" data-toggle="aizuploader" data-type="image">
                                 <div class="input-group-prepend">
@@ -67,10 +67,11 @@
                             </div>
                             <div class="file-preview box sm">
                             </div>
+                            <small class="text-muted">{{ translate('Minimum dimensions required: 150px width X 150px height.') }}</small>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Icon')}} <small>({{ translate('32x32') }})</small></label>
+                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Icon')}}</label>
                         <div class="col-md-9">
                             <div class="input-group" data-toggle="aizuploader" data-type="image">
                                 <div class="input-group-prepend">
@@ -81,10 +82,11 @@
                             </div>
                             <div class="file-preview box sm">
                             </div>
+                            <small class="text-muted">{{ translate('Minimum dimensions required: 16px width X 16px height.') }}</small>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Cover Image')}} <small>({{ translate('360x360') }})</small></label>
+                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Cover Image')}}</label>
                         <div class="col-md-9">
                             <div class="input-group" data-toggle="aizuploader" data-type="image">
                                 <div class="input-group-prepend">
@@ -95,6 +97,7 @@
                             </div>
                             <div class="file-preview box sm">
                             </div>
+                            <small class="text-muted">{{ translate('Minimum dimensions required: 260px width X 260px height.') }}</small>
                         </div>
                     </div>
                     <div class="form-group row">

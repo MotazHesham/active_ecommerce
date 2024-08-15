@@ -6,7 +6,7 @@ use App\Http\Controllers\Payment\PaytmController;
 use App\Http\Controllers\Payment\ToyyibpayController;
 use App\Http\Controllers\Payment\MyfatoorahController;
 use App\Http\Controllers\Payment\KhaltiController;
-
+use App\Http\Controllers\Payment\PhonepeController;
 
 Route::controller(PaytmController::class)->group(function () {
     Route::get('/paytm/index', 'pay');
@@ -32,3 +32,10 @@ Route::get('/myfatoorah/callback', [MyfatoorahController::class,'callback'])->na
 
 //Khalti START
 Route::any('/khalti/payment/done', [KhaltiController::class,'paymentDone'])->name('khalti.success');
+
+// phonepe
+Route::controller(PhonepeController::class)->group(function () {
+    Route::any('/phonepe/pay', 'pay')->name('phonepe.pay');
+    Route::any('/phonepe/redirecturl', 'phonepe_redirecturl')->name('phonepe.redirecturl');
+    Route::any('/phonepe/callbackUrl', 'phonepe_callbackUrl')->name('phonepe.callbackUrl');
+});

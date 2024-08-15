@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Utility\NotificationUtility;
 use App\Utility\SmsUtility;
 use Illuminate\Http\Request;
+use App\Models\OrdersExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Auth;
 use DB;
 
@@ -69,7 +71,8 @@ class OrderController extends Controller
 
     // Update Delivery Status
     public function update_delivery_status(Request $request)
-    {
+    {   
+        $authUser = Auth::user();
         $order = Order::findOrFail($request->order_id);
         $order->delivery_viewed = '0';
         $order->delivery_status = $request->status;
@@ -81,25 +84,20 @@ class OrderController extends Controller
             $user->save();
         }
 
-        
-        foreach ($order->orderDetails->where('seller_id', Auth::user()->id) as $key => $orderDetail) {
+        // If the order is cancelled and the seller commission is calculated, deduct seller earning
+        if($request->status == 'cancelled' && $order->payment_status == 'paid' && $order->commission_calculated == 1){
+            $sellerEarning = $order->commissionHistory->seller_earning;
+            $shop = $order->shop;
+            $shop->admin_to_pay -= $sellerEarning;
+            $shop->save();
+        }
+
+        foreach ($order->orderDetails->where('seller_id', $authUser->id) as $key => $orderDetail) {
             $orderDetail->delivery_status = $request->status;
             $orderDetail->save();
 
             if ($request->status == 'cancelled') {
-                $variant = $orderDetail->variation;
-                if ($orderDetail->variation == null) {
-                    $variant = '';
-                }
-
-                $product_stock = ProductStock::where('product_id', $orderDetail->product_id)
-                    ->where('variant', $variant)
-                    ->first();
-
-                if ($product_stock != null) {
-                    $product_stock->qty += $orderDetail->quantity;
-                    $product_stock->save();
-                }
+                product_restock($orderDetail);
             }
         }
 
@@ -128,7 +126,7 @@ class OrderController extends Controller
 
 
         if (addon_is_activated('delivery_boy')) {
-            if (Auth::user()->user_type == 'delivery_boy') {
+            if ($authUser->user_type == 'delivery_boy') {
                 $deliveryBoyController = new DeliveryBoyController;
                 $deliveryBoyController->store_delivery_history($order);
             }
@@ -187,6 +185,14 @@ class OrderController extends Controller
             }
         }
         return 1;
+    }
+
+    public function orderBulkExport(Request $request)
+    {
+        if($request->id){
+          return Excel::download(new OrdersExport($request->id), 'orders.xlsx');
+        }
+        return back();
     }
 
 }

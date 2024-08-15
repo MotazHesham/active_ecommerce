@@ -11,10 +11,10 @@
     </div>
 
 	<!-- Language -->
-    <ul class="nav nav-tabs nav-fill border-light">
+    <ul class="nav nav-tabs nav-fill language-bar">
         @foreach (get_all_active_language() as $key => $language)
             <li class="nav-item">
-                <a class="nav-link text-reset @if ($language->code == $lang) active @else bg-soft-dark border-light border-left-0 @endif py-3" href="{{ route('website.footer', ['lang'=> $language->code] ) }}">
+                <a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3" href="{{ route('website.footer', ['lang'=> $language->code] ) }}">
                     <img src="{{ static_asset('assets/img/flags/'.$language->code.'.png') }}" height="11" class="mr-1">
                     <span>{{$language->name}}</span>
                 </a>
@@ -81,6 +81,7 @@
     			                        <input type="hidden" name="footer_logo" class="selected-files" value="{{ get_setting('footer_logo') }}">
     			                    </div>
     								<div class="file-preview"></div>
+                                    <small class="text-muted">{{ translate("Minimum dimensions required: 275px width X 44px height.") }}</small>
     			                </div>
 								<!-- About description -->
     			                <div class="form-group">
@@ -367,8 +368,8 @@
 								<input type="hidden" name="types[]" value="payment_method_images">
 								<input type="hidden" name="payment_method_images" class="selected-files" value="{{ get_setting('payment_method_images')}}">
 							</div>
-							<div class="file-preview box sm">
-							</div>
+							<div class="file-preview box sm"></div>
+                            <small class="text-muted">{{ translate("Minimum dimensions required: 144px width X 20px height.") }}</small>
 						</div>
 					</div>
                 </div>

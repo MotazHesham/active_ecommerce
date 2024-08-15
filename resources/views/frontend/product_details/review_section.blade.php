@@ -19,7 +19,7 @@
                                 $total = 0;
                                 $total += $detailedProduct->reviews->count();
                             @endphp
-                            <span class="rating rating-mr-1">
+                            <span class="rating rating-mr-2">
                                 {{ renderStarRating($detailedProduct->rating) }}
                             </span>
                             <span class="ml-1 fs-14">({{ $total }}
@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div class="col-md-4 text-right">
-                    <a  href="javascript:void(0);" onclick="product_review('{{ $detailedProduct->id }}')" 
+                    <a  href="javascript:void(0);" onclick="product_review('{{ $detailedProduct->id }}')"
                         class="btn btn-secondary-base fw-400 rounded-0 text-white">
                         <span class="d-md-inline-block"> {{ translate('Rate this Product') }}</span>
                     </a>

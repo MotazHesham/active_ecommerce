@@ -76,7 +76,6 @@ class PosController extends Controller
         $shop->save();
 
         return $this->success(translate('Pos Configuration Updated Successfully'));
-        
     }
 
     public function posConfiguration(Request $request) {
@@ -85,7 +84,6 @@ class PosController extends Controller
         return $this->success($data);
         
     }
-
 
     public function createShippingAddress(Request $request)
     {
@@ -166,9 +164,6 @@ class PosController extends Controller
         Cart::where('id', $request->id)->delete();
         return $this->success( translate('Cart has been deleted successfully'));
     }
-
-
-
 
     //order place
     public function orderStore(Request $request)

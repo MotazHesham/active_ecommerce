@@ -140,7 +140,7 @@ class BrandController extends Controller
     public function destroy($id)
     {
         $brand = Brand::findOrFail($id);
-        Product::where('brand_id', $brand->id)->delete();
+        Product::where('brand_id', $brand->id)->update(['brand_id' => null]);
         foreach ($brand->brand_translations as $key => $brand_translation) {
             $brand_translation->delete();
         }

@@ -46,12 +46,14 @@ class ProductDetailCollection extends ResourceCollection
                 $brand = [
                     'id' => 0,
                     'name' => "",
+                    'slug' => "",
                     'logo' => "",
                 ];
 
                 if ($data->brand != null) {
                     $brand = [
                         'id' => $data->brand->id,
+                        'slug' => $data->brand->slug,
                         'name' => $data->brand->getTranslation('name'),
                         'logo' => uploaded_asset($data->brand->logo),
                     ];
@@ -67,6 +69,7 @@ class ProductDetailCollection extends ResourceCollection
                     'added_by' => $data->added_by,
                     'seller_id' => $data->user->id,
                     'shop_id' => $data->added_by == 'admin' ? 0 : $data->user->shop->id,
+                    'shop_slug' => $data->added_by == 'admin' ? '' : $data->user->shop->slug,
                     'shop_name' => $data->added_by == 'admin' ? translate('In House Product') : $data->user->shop->name,
                     'shop_logo' => $data->added_by == 'admin' ? uploaded_asset(get_setting('header_logo')) : uploaded_asset($data->user->shop->logo) ?? "",
                     'photos' => $photos,

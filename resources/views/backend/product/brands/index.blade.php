@@ -87,6 +87,7 @@
 							</div>
 							<div class="file-preview box sm">
 							</div>
+                            <small class="text-muted">{{ translate('Minimum dimensions required: 126px width X 100px height.') }}</small>
 						</div>
 						<div class="form-group mb-3">
 							<label for="name">{{translate('Meta Title')}}</label>

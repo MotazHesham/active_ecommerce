@@ -20,18 +20,19 @@ class OnlinePaymentController extends Controller
             $payment_type = $request->payment_type;
 
             if ($payment_type == 'cart_payment') {
-                checkout_done($request->combined_order_id, $request->payment_details);
+                checkout_done($request->order_id, $request->payment_details);
             }
-
-            if ($payment_type == 'wallet_payment') {
+            elseif ($payment_type == 'order_re_payment') {
+                order_re_payment_done($request->order_id, 'Iyzico', $request->payment_details);
+            }
+            elseif ($payment_type == 'wallet_payment') {
                 wallet_payment_done($request->user_id, $request->amount, 'Iyzico', $request->payment_details);
             }
-
-            if ($payment_type == 'seller_package_payment') {
-                seller_purchase_payment_done($request->user_id, $request->package_id, $request->amount, 'Iyzico', $request->payment_details);
+            elseif ($payment_type == 'seller_package_payment') {
+                seller_purchase_payment_done($request->user_id, $request->package_id, 'Iyzico', $request->payment_details);
             }
-            if ($payment_type == 'customer_package_payment') {
-                customer_purchase_payment_done($request->user_id, $request->package_id);
+            elseif ($payment_type == 'customer_package_payment') {
+                customer_purchase_payment_done($request->user_id, $request->package_id, 'Iyzico', $request->payment_details);
             }
             return redirect(url("api/v2/online-pay/done"));
         } catch (\Exception $e) {

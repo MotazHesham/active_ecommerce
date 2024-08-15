@@ -150,6 +150,12 @@
 @section('script')
     <script type="text/javascript">
         function update_rtl_status(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var status = 1;
             }
@@ -166,6 +172,12 @@
             });
         }
         function update_status(el){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if(el.checked){
                 var status = 1;
             }
@@ -173,14 +185,14 @@
                 var status = 0;
             }
             $.post('{{ route('languages.update-status') }}', {
-                    _token : '{{ csrf_token() }}', 
-                    id : el.value, 
+                    _token : '{{ csrf_token() }}',
+                    id : el.value,
                     status : status
                 }, function(data) {
                 if(data == 1) {
                     location.reload();
                 }
-                else { 
+                else {
                     AIZ.plugins.notify('danger', '{{ translate('Something went wrong') }}');
                 }
             });

@@ -65,7 +65,7 @@
                 </div>
             </div>
         </div>
-        @if (get_setting('google_map') == 1)            
+        @if (get_setting('google_map') == 1)
             <div class="col-md-8 mx-auto">
                 <div class="card">
                     <div class="card-header">
@@ -73,8 +73,8 @@
                     </div>
                     <div class="card-body">
                         <form class="form-horizontal" action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
-                            @csrf     
-                                          
+                            @csrf
+
                             <div class="row">
                                 <div id="map"></div>
                                 <ul id="geoData">
@@ -112,12 +112,12 @@
             </div>
         @endif
     </div>
-    
+
 @endsection
 
 
 @section('script')
     @if (get_setting('google_map') == 1)
-        @include('frontend.'.get_setting('homepage_select').'.partials.google_map')
+        @include('frontend.partials.google_map')
     @endif
 @endsection

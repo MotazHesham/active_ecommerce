@@ -115,8 +115,12 @@ class ShopController extends Controller
         $shop = Auth::user()->shop;
         $shop->verification_info = json_encode($data);
         if ($shop->save()) {
-            $users = User::findMany([auth()->user()->id, User::where('user_type', 'admin')->first()->id]);
-            Notification::send($users, new ShopVerificationNotification($shop));
+            $users = User::findMany([User::where('user_type', 'admin')->first()->id]);
+            $data = array();
+            $data['shop'] = $shop;
+            $data['status'] = 'submitted';
+            $data['notification_type_id'] = get_notification_type('shop_verify_request_submitted', 'type')->id;
+            Notification::send($users, new ShopVerificationNotification($data));
             
             flash(translate('Your shop verification request has been submitted successfully!'))->success();
             return redirect()->route('seller.dashboard');

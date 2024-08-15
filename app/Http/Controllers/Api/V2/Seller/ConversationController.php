@@ -9,11 +9,6 @@ use Illuminate\Http\Request;
 use App\Models\Conversation;
 use App\Models\BusinessSetting;
 use App\Models\Message;
-use Auth;
-use App\Models\Product;
-use Mail;
-use App\Mail\ConversationMailManager;
-use DB;
 
 class ConversationController extends Controller
 {
@@ -25,13 +20,6 @@ class ConversationController extends Controller
     public function index()
     {
         if (BusinessSetting::where('type', 'conversation_system')->first()->value == 1) {
-
-            //SELECT sender_id, receiver_id, title, MAX(created_at) AS max_created_at FROM `conversations` WHERE receiver_id = 3 GROUP BY sender_id order by max_created_at desc;
-            // $conversations = Conversation::select('sender_id', 'receiver_id', 'title', DB::raw("MAX(created_at) as max_created_at"))
-            //     ->where('receiver_id', '=', auth()->user()->id)
-            //     ->orderBy('max_created_at', 'DESC')
-            //     ->groupBy('sender_id')
-            //     ->get();
             $conversations = Conversation::where('receiver_id', auth()->user()->id)
                 ->orderBy('created_at', 'desc')
                 ->get();
@@ -83,16 +71,11 @@ class ConversationController extends Controller
         $conversation = Conversation::findOrFail($id);
         if ($conversation->receiver_id == auth()->user()->id) {
             $messages = Message::where("conversation_id",$id)->orderBy('created_at', 'DESC')->get();
-
             return new MessageCollection($messages);
         } else {
-
             return $this->failed(translate('You cannot see this message.'));
-
         }
-        
     }
-
 
     /**
      * Remove the specified resource from storage.

@@ -1,8 +1,18 @@
 @extends('seller.layouts.app')
 
 @section('panel_content')
+<div class="page-content mx-0">
     <div class="aiz-titlebar text-left mt-2 mb-3">
-        <h5 class="mb-0 h6">{{ translate('Add New Auction Product') }}</h5>
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="h3">{{ translate('Add New Auction Product') }}</h1>
+            </div>
+            <div class="col text-right">
+                <a class="btn btn-xs btn-soft-primary" href="javascript:void(0);" onclick="clearTempdata()">
+                    {{ translate('Clear Tempdata') }}
+                </a>
+            </div>
+        </div>
     </div>
     <div class="">
         <!-- Error Meassages -->
@@ -15,6 +25,9 @@
                 </ul>
             </div>
         @endif
+        <!-- Data type -->
+        <input type="hidden" id="data_type" value="auction">
+        
         <form class=" form form-horizontal mar-top" action="{{ route('auction_product_store.seller') }}"
             method="POST" enctype="multipart/form-data" id="choice_form">
             <div class="row gutters-5">
@@ -405,7 +418,7 @@
             </div>
         </form>
     </div>
-
+</div>
 @endsection
 
 @section('script')
@@ -439,5 +452,7 @@
 
     });
 </script>
+
+@include('partials.product.product_temp_data')
 
 @endsection

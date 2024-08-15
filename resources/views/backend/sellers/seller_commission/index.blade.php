@@ -109,15 +109,21 @@
 @section('script')
     <script type="text/javascript">
         function updateSettings(el, type){
+
+            if('{{env('DEMO_MODE')}}' == 'On'){
+                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
+                return;
+            }
+
             if($(el).is(':checked')){
                 var value = 1;
             }
             else{
                 var value = 0;
             }
-            
+
             $.post('{{ route('business_settings.update.activation') }}', {_token:'{{ csrf_token() }}', type:type, value:value}, function(data){
-                if(data == '1'){
+                if(data == 1){
                     AIZ.plugins.notify('success', '{{ translate('Settings updated successfully') }}');
                 }
                 else{
