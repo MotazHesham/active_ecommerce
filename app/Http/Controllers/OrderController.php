@@ -23,6 +23,8 @@ use CoreComponentRepository;
 use App\Utility\SmsUtility;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\OrderNotification;
 
 class OrderController extends Controller
 {
@@ -30,7 +32,7 @@ class OrderController extends Controller
     public function __construct()
     {
         // Staff Permission Check
-        $this->middleware(['permission:view_all_orders|view_inhouse_orders|view_seller_orders|view_pickup_point_orders'])->only('all_orders');
+        $this->middleware(['permission:view_all_orders|view_inhouse_orders|view_seller_orders|view_pickup_point_orders|view_all_offline_payment_orders'])->only('all_orders');
         $this->middleware(['permission:view_order_details'])->only('show');
         $this->middleware(['permission:delete_order'])->only('destroy','bulk_order_delete');
     }
@@ -44,25 +46,18 @@ class OrderController extends Controller
         $sort_search = null;
         $delivery_status = null;
         $payment_status = '';
+        $order_type = '';
 
         $orders = Order::orderBy('id', 'desc');
         $admin_user_id = User::where('user_type', 'admin')->first()->id;
 
-
-        if (
-            Route::currentRouteName() == 'inhouse_orders.index' &&
-            Auth::user()->can('view_inhouse_orders')
-        ) {
+        if (Route::currentRouteName() == 'inhouse_orders.index' && Auth::user()->can('view_inhouse_orders')) {
             $orders = $orders->where('orders.seller_id', '=', $admin_user_id);
-        } else if (
-            Route::currentRouteName() == 'seller_orders.index' &&
-            Auth::user()->can('view_seller_orders')
-        ) {
+        }
+        elseif (Route::currentRouteName() == 'seller_orders.index' && Auth::user()->can('view_seller_orders')) {
             $orders = $orders->where('orders.seller_id', '!=', $admin_user_id);
-        } else if (
-            Route::currentRouteName() == 'pick_up_point.index' &&
-            Auth::user()->can('view_pickup_point_orders')
-        ) {
+        }
+        elseif (Route::currentRouteName() == 'pick_up_point.index' && Auth::user()->can('view_pickup_point_orders')) {
             if (get_setting('vendor_system_activation') != 1) {
                 $orders = $orders->where('orders.seller_id', '=', $admin_user_id);
             }
@@ -74,14 +69,25 @@ class OrderController extends Controller
                 $orders->where('shipping_type', 'pickup_point')
                     ->where('pickup_point_id', Auth::user()->staff->pick_up_point->id);
             }
-        } else if (
-            Route::currentRouteName() == 'all_orders.index' &&
-            Auth::user()->can('view_all_orders')
-        ) {
+        }
+        elseif (Route::currentRouteName() == 'all_orders.index' && Auth::user()->can('view_all_orders')) {
             if (get_setting('vendor_system_activation') != 1) {
                 $orders = $orders->where('orders.seller_id', '=', $admin_user_id);
             }
-        } else {
+        }
+        elseif (Route::currentRouteName() == 'offline_payment_orders.index' && Auth::user()->can('view_all_offline_payment_orders')) {
+            $orders = $orders->where('orders.manual_payment', 1);
+            if($request->order_type != null){
+                $order_type = $request->order_type;
+                $orders = $order_type =='inhouse_orders' ? 
+                            $orders->where('orders.seller_id', '=', $admin_user_id) : 
+                            $orders->where('orders.seller_id', '!=', $admin_user_id);
+            }
+        }
+        elseif (Route::currentRouteName() == 'unpaid_orders.index' && Auth::user()->can('view_all_unpaid_orders')) {
+            $orders = $orders->where('orders.payment_status', 'unpaid');
+        }
+        else {
             abort(403);
         }
 
@@ -102,7 +108,8 @@ class OrderController extends Controller
                 ->where('created_at', '<=', date('Y-m-d', strtotime(explode(" to ", $date)[1])) . '  23:59:59');
         }
         $orders = $orders->paginate(15);
-        return view('backend.sales.index', compact('orders', 'sort_search', 'payment_status', 'delivery_status', 'date'));
+        $unpaid_order_payment_notification = get_notification_type('complete_unpaid_order_payment', 'type');
+        return view('backend.sales.index', compact('orders', 'sort_search', 'order_type', 'payment_status', 'delivery_status', 'date', 'unpaid_order_payment_notification'));
     }
 
     public function show($id)
@@ -114,7 +121,7 @@ class OrderController extends Controller
                 ->where('user_type', 'delivery_boy')
                 ->get();
                 
-        if(env('DEMO_MODE') == 'On') {
+        if(env('DEMO_MODE') != 'On') {
             $order->viewed = 1;
             $order->save();
         }
@@ -583,6 +590,30 @@ class OrderController extends Controller
     {
         if($request->id){
           return Excel::download(new OrdersExport($request->id), 'orders.xlsx');
+        }
+        return back();
+    }
+
+    public function unpaid_order_payment_notification_send(Request $request){
+        if($request->order_ids != null){
+            $notificationType = get_notification_type('complete_unpaid_order_payment', 'type');
+            foreach (explode(",",$request->order_ids) as $order_id) {
+                $order = Order::where('id', $order_id)->first();
+                $user = $order->user;
+                if($notificationType->status == 1 && $order->payment_status == 'unpaid'){
+                    $order_notification['order_id']     = $order->id;
+                    $order_notification['order_code']   = $order->code;
+                    $order_notification['user_id']      = $order->user_id;
+                    $order_notification['seller_id']    = $order->seller_id;
+                    $order_notification['status']       = $order->payment_status;
+                    $order_notification['notification_type_id'] = $notificationType->id;
+                    Notification::send($user, new OrderNotification($order_notification));
+                }
+            }
+            flash(translate('Notification Sent Successfully.'))->success();
+        }
+        else{
+            flash(translate('Something went wrong!.'))->warning();
         }
         return back();
     }

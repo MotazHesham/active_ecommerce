@@ -1,6 +1,7 @@
 @extends('backend.layouts.app')
 
 @section('content')
+
     <div class="card">
         <form class="" action="" id="sort_orders" method="GET">
             <div class="card-header row gutters-5">
@@ -20,9 +21,21 @@
                             @can('export_order')
                                 <a class="dropdown-item" href="javascript:void(0)" onclick="order_bulk_export()">{{ translate('Export') }}</a>
                             @endcan
+                            @if(auth()->user()->can('unpaid_order_payment_notification_send') && $unpaid_order_payment_notification->status == 1 && Route::currentRouteName() == 'unpaid_orders.index')
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="bulk_unpaid_order_payment_notification()">{{ translate('Unpaid Order Payment Notification') }}</a>
+                            @endif
                         </div>
                     </div>
                 @endcan
+                @if(Route::currentRouteName() == 'offline_payment_orders.index')
+                    <div class="col-lg-2 ml-auto">
+                        <select class="form-control aiz-selectpicker" name="order_type" id="order_type">
+                            <option value="">{{ translate('Filter by Order Type') }}</option>
+                            <option value="inhouse_orders" @if ($order_type == 'inhouse_orders') selected @endif>{{ translate('Inhouse Orders') }}</option>
+                            <option value="seller_orders" @if ($order_type == 'seller_orders') selected @endif>{{ translate('Seller Orders') }}</option>
+                        </select>
+                    </div>
+                @endif
 
                 <div class="col-lg-2 ml-auto">
                     <select class="form-control aiz-selectpicker" name="delivery_status" id="delivery_status">
@@ -41,18 +54,20 @@
                             {{ translate('Cancel') }}</option>
                     </select>
                 </div>
-                <div class="col-lg-2 ml-auto">
-                    <select class="form-control aiz-selectpicker" name="payment_status" id="payment_status">
-                        <option value="">{{ translate('Filter by Payment Status') }}</option>
-                        <option value="paid"
-                            @isset($payment_status) @if ($payment_status == 'paid') selected @endif @endisset>
-                            {{ translate('Paid') }}</option>
-                        <option value="unpaid"
-                            @isset($payment_status) @if ($payment_status == 'unpaid') selected @endif @endisset>
-                            {{ translate('Unpaid') }}</option>
-                    </select>
-                </div>
-                <div class="col-lg-2">
+                @if(Route::currentRouteName() != 'unpaid_orders.index')
+                    <div class="col-lg-2 ml-auto">
+                        <select class="form-control aiz-selectpicker" name="payment_status" id="payment_status">
+                            <option value="">{{ translate('Filter by Payment Status') }}</option>
+                            <option value="paid"
+                                @isset($payment_status) @if ($payment_status == 'paid') selected @endif @endisset>
+                                {{ translate('Paid') }}</option>
+                            <option value="unpaid"
+                                @isset($payment_status) @if ($payment_status == 'unpaid') selected @endif @endisset>
+                                {{ translate('Unpaid') }}</option>
+                        </select>
+                    </div>
+                @endif
+                <div class="col-lg-1">
                     <div class="form-group mb-0">
                         <input type="text" class="aiz-date-range form-control" value="{{ $date }}"
                             name="date" placeholder="{{ translate('Filter by date') }}" data-format="DD-MM-Y"
@@ -205,6 +220,13 @@
                                         title="{{ translate('Download Invoice') }}">
                                         <i class="las la-download"></i>
                                     </a>
+                                    @if(auth()->user()->can('unpaid_order_payment_notification_send') && $order->payment_status == 'unpaid' && $unpaid_order_payment_notification->status == 1)
+                                        <a class="btn btn-soft-warning btn-icon btn-circle btn-sm"
+                                            href="javascript:void();" onclick="unpaid_order_payment_notification('{{ $order->id }}');"
+                                            title="{{ translate('Unpaid Order Payment Notification') }}">
+                                            <i class="las la-bell"></i>
+                                        </a>
+                                    @endif
                                     @can('delete_order')
                                         <a href="#"
                                             class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete"
@@ -231,8 +253,29 @@
 @section('modal')
     <!-- Delete modal -->
     @include('modals.delete_modal')
+
     <!-- Bulk Delete modal -->
     @include('modals.bulk_delete_modal')
+
+    {{-- Bulk Unpaid Order Payment Notification --}}
+    <div id="complete_unpaid_order_payment" class="modal fade">
+        <div class="modal-dialog modal-md modal-dialog-centered" style="max-width: 540px;">
+            <div class="modal-content pb-2rem px-2rem">
+                <div class="modal-header border-0">
+                    <button type="button" class="close" data-dismiss="modal"></button>
+                </div>
+                <form class="form-horizontal" action="{{ route('unpaid_order_payment_notification') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body text-center">
+                        <input type="hidden" name="order_ids" value="" id="order_ids">
+                        <p class="mt-2 mb-2 fs-16 fw-700">{{ translate('Are you sure to send notification for the selected orders?') }}</p>
+                        <button type="submit" class="btn btn-warning rounded-2 mt-2 fs-13 fw-700 w-250px">{{ translate('Send Notification') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('script')
@@ -277,5 +320,28 @@
             $('#sort_orders').submit();
             $("#sort_orders").attr("action", '');
         }
+
+        // Set Commission
+        function unpaid_order_payment_notification(shop_id){
+            var orderIds = [];
+            orderIds.push(shop_id);
+            $('#order_ids').val(orderIds);
+            $('#complete_unpaid_order_payment').modal('show', {backdrop: 'static'});
+        }
+
+        // Set seller bulk commission
+         function bulk_unpaid_order_payment_notification(){
+            var orderIds = [];
+            $(".check-one[name='id[]']:checked").each(function() {
+                orderIds.push($(this).val());
+            });
+            if(orderIds.length > 0){
+                $('#order_ids').val(orderIds);
+                $('#complete_unpaid_order_payment').modal('show', {backdrop: 'static'});
+            }
+            else{
+                AIZ.plugins.notify('danger', '{{ translate('Please Select Order first.') }}');
+            }
+         }
     </script>
 @endsection

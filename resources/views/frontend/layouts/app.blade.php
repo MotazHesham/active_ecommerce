@@ -234,8 +234,10 @@
 
     </div>
 
-    <!-- Floating Buttons -->
-    @include('frontend.inc.floating_buttons')
+    @if(get_setting('use_floating_buttons') == 1)
+        <!-- Floating Buttons -->
+        @include('frontend.inc.floating_buttons')
+    @endif
 
     <div class="aiz-refresh">
         <div class="aiz-refresh-content"><div></div><div></div><div></div></div>

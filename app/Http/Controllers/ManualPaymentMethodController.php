@@ -145,20 +145,6 @@ class ManualPaymentMethodController extends Controller
         return redirect()->route('manual_payment_methods.index');
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function show_payment_modal(Request $request)
-    {
-        $order = Order::find($request->order_id);
-        if($order != null){
-            return view('frontend.user.payment_modal', compact('order'));
-        }
-    }
-
 
     /**
      * Update the specified resource in storage.
@@ -207,5 +193,11 @@ class ManualPaymentMethodController extends Controller
     {
         $package_id =  $request->package_id;
         return view('manual_payment_methods.frontend.offline_seller_package_purchase_modal', compact('package_id'));
+    }
+
+    public function offline_order_re_payment_modal(Request $request)
+    {
+        $order_id =  $request->order_id;
+        return view('manual_payment_methods.frontend.offline_order_re_payment_modal', compact('order_id'));
     }
 }

@@ -10,7 +10,6 @@ class OTPController extends Controller
     public function __construct() {
         // Staff Permission Check
         $this->middleware(['permission:otp_configurations'])->only('configure_index');
-        $this->middleware(['permission:sms_providers_configurations'])->only('credentials_index');
     }
 
     /**
@@ -19,17 +18,6 @@ class OTPController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function configure_index()
-    {
-        $otp_configurations = OtpConfiguration::all();
-        return view('backend.otp_systems.configurations.activation', compact('otp_configurations'));
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function credentials_index()
     {
         $otp_configurations = OtpConfiguration::all();
         return view('backend.otp_systems.configurations.index', compact('otp_configurations'));
@@ -43,16 +31,21 @@ class OTPController extends Controller
      */
     public function updateActivationSettings(Request $request)
     {
-        $business_settings = OtpConfiguration::where('type', $request->type)->first();
-        if($business_settings!=null){
-            $business_settings->value = $request->value;
-            $business_settings->save();
+        $otp_configuration = OtpConfiguration::where('type', $request->type)->first();
+        if($otp_configuration!=null){
+            $otp_configuration->value = $request->value;
+            $otp_configuration->save();
         }
         else{
-            $business_settings = new OtpConfiguration;
-            $business_settings->type = $request->type;
-            $business_settings->value = $request->value;
-            $business_settings->save();
+            $otp_configuration = new OtpConfiguration;
+            $otp_configuration->type = $request->type;
+            $otp_configuration->value = $request->value;
+            $otp_configuration->save();
+        }
+        if($request->value == 1){
+            OtpConfiguration::where('id','!=', $otp_configuration->id)
+                        ->where('value', 1)
+                        ->update(['value' => 0 ]);
         }
         return '1';
     }

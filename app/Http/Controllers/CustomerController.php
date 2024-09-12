@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AccountOpeningByAdminEmailManager;
 use Illuminate\Http\Request;
-use App\Models\Customer;
 use App\Models\User;
+use Hash;
+use Mail;
 
 class CustomerController extends Controller
 {
     public function __construct() {
         // Staff Permission Check
         $this->middleware(['permission:view_all_customers'])->only('index');
+        $this->middleware(['permission:add_customer'])->only('create');
         $this->middleware(['permission:login_as_customer'])->only('login');
         $this->middleware(['permission:ban_customer'])->only('ban');
         $this->middleware(['permission:delete_customer'])->only('destroy');
@@ -24,7 +27,11 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         $sort_search = null;
-        $users = User::where('user_type', 'customer')->where('email_verified_at', '!=', null)->orderBy('created_at', 'desc');
+        $verification_status =  $request->verification_status ?? null;
+        $users = User::where('user_type', 'customer')->orderBy('created_at', 'desc');
+        if($verification_status != null){
+            $users = $verification_status == 'verified' ? $users->where('email_verified_at', '!=', null) : $users->where('email_verified_at', null);
+        }
         if ($request->has('search')){
             $sort_search = $request->search;
             $users->where(function ($q) use ($sort_search){
@@ -32,7 +39,7 @@ class CustomerController extends Controller
             });
         }
         $users = $users->paginate(15);
-        return view('backend.customer.customers.index', compact('users', 'sort_search'));
+        return view('backend.customer.customers.index', compact('users', 'sort_search', 'verification_status'));
     }
 
     /**
@@ -42,7 +49,7 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        //
+        return view('backend.customer.customers.create');
     }
 
     /**
@@ -53,39 +60,83 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name'          => 'required',
-            'email'         => 'required|unique:users|email',
-            'phone'         => 'required|unique:users',
-        ]);
-        
-        $response['status'] = 'Error';
-        
-        $user = User::create($request->all());
-        
-        $customer = new Customer;
-        
-        $customer->user_id = $user->id;
-        $customer->save();
-        
-        if (isset($user->id)) {
-            $html = '';
-            $html .= '<option value="">
-                        '. translate("Walk In Customer") .'
-                    </option>';
-            foreach(Customer::all() as $key => $customer){
-                if ($customer->user) {
-                    $html .= '<option value="'.$customer->user->id.'" data-contact="'.$customer->user->email.'">
-                                '.$customer->user->name.'
-                            </option>';
-                }
-            }
-            
-            $response['status'] = 'Success';
-            $response['html'] = $html;
+        $request->validate(
+            ['name' => 'required|max:255',],
+            ['name.required' => translate('Name is required'),'name.max' => translate('Max 255 Character'),]
+        );
+
+        // Phone & email both can't be null
+        if($request->email == null && $request->phone == null){
+            flash(translate('Email and phone number both can not be null.'))->error();
+                return back();
         }
+
+        if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
+            if(User::where('email', $request->email)->first() != null){
+                flash(translate('Email already exists.'))->error();
+                return back();
+            }
+        }
+        elseif (User::where('phone', '+'.$request->country_code.$request->phone)->first() != null) {
+            flash(translate('Phone already exists.'))->error();
+            return back();
+        }
+
+        $password = substr(hash('sha512', rand()), 0, 8);
+        $email = null;
+        $phone = null;
         
-        echo json_encode($response);
+        // Register By email
+        if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
+            $email = $request->email;
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $email,
+                'password' => Hash::make($password),
+            ]);
+
+            // Account Opening Email
+            $array['user_type'] = 'customer';
+            $array['password'] = $password;
+            $array['subject'] = translate('Account Opening Email');
+            $array['from'] = env('MAIL_FROM_ADDRESS');
+            try {
+                Mail::to($user->email)->queue(new AccountOpeningByAdminEmailManager($array));
+            } catch (\Exception $e) {
+                $user->delete();
+                flash(translate('Registration failed. Please try again later.'))->error();
+                return back();
+            }
+
+            // Email verification 
+            if(get_setting('email_verification') != 1){
+                $user->email_verified_at = date('Y-m-d H:m:s');
+                $user->save();
+                offerUserWelcomeCoupon();
+            }
+            else {
+                $user->sendEmailVerificationNotification();
+            }
+            flash(translate('Registration successful.'))->success();
+
+        }
+        // Register by phone
+        else {
+            if (addon_is_activated('otp_system')){
+                $phone = '+'.$request->country_code.$request->phone;
+                $user = User::create([
+                    'name' => $request->name,
+                    'phone' => $phone,
+                    'password' => Hash::make($password),
+                    'verification_code' => rand(100000, 999999)
+                ]);
+
+                $otpController = new OTPVerificationController;
+                $otpController->account_opening($user, $password);
+                flash(translate('Registration successful.'))->success();
+            }
+        }
+        return back();
     }
 
     /**

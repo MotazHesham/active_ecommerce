@@ -100,8 +100,11 @@
 	    @foreach (session('flash_notification', collect())->toArray() as $message)
 	        AIZ.plugins.notify('{{ $message['level'] }}', '{{ $message['message'] }}');
             @if ($message['message'] == translate('Product has been inserted successfully'))
-                localStorage.setItem('tempdataproduct', '{}');
-                localStorage.setItem('tempload', 'no');
+                var data_type = ['digital', 'physical', 'auction', 'wholesale'];
+                data_type.forEach(element => {
+                    localStorage.setItem('tempdataproduct_'+element, '{}');
+                    localStorage.setItem('tempload_'+element, 'no');
+                });
             @endif
 	    @endforeach
 
@@ -109,7 +112,7 @@
             e.stopPropagation()
             $(this).tab('show')
         })
-        
+
         if ($('#lang-change').length > 0) {
             $('#lang-change .dropdown-menu a').each(function() {
                 $(this).on('click', function(e){

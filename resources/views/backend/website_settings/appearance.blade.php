@@ -247,6 +247,7 @@
         							<input type="hidden" name="watermark_image" value="{{ get_setting('watermark_image') }}" class="selected-files">
         						</div>
         						<div class="file-preview box"></div>
+                                <small class="text-muted">{{ translate('Do not use "svg" image.') }}</small>
                             </div>
     					</div>
     	                <div class="@if (in_array(get_setting('image_watermark_type'), ["image", null])) d-none @endif" id="watermark_text">

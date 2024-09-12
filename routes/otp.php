@@ -31,7 +31,6 @@ Route::controller(OTPVerificationController::class)->group(function () {
 Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function(){
     Route::controller(OTPController::class)->group(function () {
         Route::get('/otp-configuration', 'configure_index')->name('otp.configconfiguration');
-        Route::get('/otp-credentials-configuration', 'credentials_index')->name('otp_credentials.index');
         Route::post('/otp-configuration/update/activation', 'updateActivationSettings')->name('otp_configurations.update.activation');
         Route::post('/otp-credentials-update', 'update_credentials')->name('update_credentials');
     });

@@ -19,12 +19,13 @@
                         </div>
                         <div class="col-9">
                             <div class="tab-content" id="v-pills-tabContent">
+                                @php $mustSendSmsTemplates =  ['phone_number_verification', 'password_reset', 'account_opening']; @endphp
                                 @foreach ($sms_templates as $key => $sms_template)
                                     <div class="tab-pane fade show @if($sms_template->id == 1) active @endif" id="v-pills-{{ $sms_template->id }}" role="tabpanel" aria-labelledby="v-pills-tab-1">
                                         <form action="{{ route('sms-templates.update', $sms_template->id) }}" method="POST">
                                             <input name="_method" type="hidden" value="PATCH">
                                             @csrf
-                                            @if($sms_template->identifier != 'phone_number_verification' && $sms_template->identifier != 'password_reset')
+                                            @if(!in_array($sms_template->identifier, $mustSendSmsTemplates))
                                                 <div class="form-group row">
                                                     <div class="col-md-2">
                                                         <label class="col-from-label">{{translate('Activation')}}</label>

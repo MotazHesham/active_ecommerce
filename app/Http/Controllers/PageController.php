@@ -95,6 +95,9 @@ class PageController extends Controller
             if ($page_name == 'home') {
                 return view('backend.website_settings.pages.'.get_setting('homepage_select').'.home_page_edit', compact('page','lang'));
             }
+            if ($id == 'contact-us') {
+                return view('backend.website_settings.pages.contact_us_page_edit', compact('page','lang'));
+            }
             return view('backend.website_settings.pages.edit', compact('page','lang'));
         }
         abort(404);
@@ -110,13 +113,21 @@ class PageController extends Controller
     public function update(Request $request, $id)
     {
         $page = Page::findOrFail($id);
+        $content = $request->content;
+        if($page->type == 'contact_us_page'){
+            $data['description'] = $request->description;
+            $data['address'] = $request->address;
+            $data['phone'] = $request->phone;
+            $data['email'] = $request->email;
+            $content = json_encode($data);
+        }
         if (Page::where('id','!=', $id)->where('slug', preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->slug)))->first() == null) {
             if($page->type == 'custom_page'){
               $page->slug           = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->slug));
             }
             if($request->lang == env("DEFAULT_LANGUAGE")){
               $page->title          = $request->title;
-              $page->content        = $request->content;
+              $page->content        = $content;
             }
             $page->meta_title       = $request->meta_title;
             $page->meta_description = $request->meta_description;
@@ -126,7 +137,7 @@ class PageController extends Controller
 
             $page_translation           = PageTranslation::firstOrNew(['lang' => $request->lang, 'page_id' => $page->id]);
             $page_translation->title    = $request->title;
-            $page_translation->content  = $request->content;
+            $page_translation->content  = $content;
             $page_translation->save();
 
             flash(translate('Page has been updated successfully'))->success();
@@ -159,6 +170,9 @@ class PageController extends Controller
     public function show_custom_page($slug){
         $page = Page::where('slug', $slug)->first();
         if($page != null){
+            if($page->type == 'contact_us_page'){
+                return view('frontend.contact_us_page', compact('page'));
+            }
             return view('frontend.custom_page', compact('page'));
         }
         abort(404);

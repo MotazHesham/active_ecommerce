@@ -132,7 +132,16 @@
                     </div>
                     <p class="demo-title">{{ translate('Megamart') }}</p>
                 </div>
-                <!-- Demo content -->
+                <!-- Beauty Store -->
+                <div class="col-md-6 my-3">
+                    <div class="demo-img-content">
+                        <a href="https://demo.activeitzone.com/ecommerce-beauty-store/" target="_blank" class="h-100 w-100">
+                            <img src="{{ static_asset('assets/img/demo/demo_thumb_beauty.png') }}">
+                        </a>
+                    </div>
+                    <p class="demo-title">{{ translate('Beauty Store') }}</p>
+                </div>
+                <!-- Coming Soon -->
                 <div class="col-md-6 my-3">
                     <div class="demo-img-content">
                         <div class="h-100 w-100 d-flex justify-content-center align-items-center">

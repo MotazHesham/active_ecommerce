@@ -221,7 +221,38 @@
                 </div>
             </div>
         </div>
-
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0 h6 text-center">{{ translate('Product External Link for Seller') }}</h3>
+                </div>
+                <div class="card-body text-center">
+                    <label class="aiz-switch aiz-switch-success mb-0">
+                        <input type="checkbox" onchange="updateSettings(this, 'product_external_link_for_seller')"
+                            <?php if (get_setting('product_external_link_for_seller') == 1) {
+                                echo 'checked';
+                            } ?>>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0 h6 text-center">{{ translate('Use Floating Buttons In Website') }}</h3>
+                </div>
+                <div class="card-body text-center">
+                    <label class="aiz-switch aiz-switch-success mb-0">
+                        <input type="checkbox" onchange="updateSettings(this, 'use_floating_buttons')"
+                            <?php if (get_setting('use_floating_buttons') == 1) {
+                                echo 'checked';
+                            } ?>>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
@@ -238,7 +269,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">

@@ -506,27 +506,6 @@ class BusinessSettingsController extends Controller
         return view('backend.sellers.seller_commission.index');
     }
 
-    public function vendor_commission_update(Request $request)
-    {
-        foreach ($request->types as $key => $type) {
-            $business_settings = BusinessSetting::where('type', $type)->first();
-            if ($business_settings != null) {
-                $business_settings->value = $request[$type];
-                $business_settings->save();
-            } else {
-                $business_settings = new BusinessSetting;
-                $business_settings->type = $type;
-                $business_settings->value = $request[$type];
-                $business_settings->save();
-            }
-        }
-
-        Artisan::call('cache:clear');
-
-        flash(translate('Seller Commission updated successfully'))->success();
-        return back();
-    }
-
     public function shipping_configuration(Request $request)
     {
         return view('backend.setup_configurations.shipping_configuration.index');

@@ -240,7 +240,7 @@ class CheckoutController extends Controller
         $user->email_verified_at = $isEmailVerificationEnabled != 1 ? date('Y-m-d H:m:s') : null;
         $user->save();
 
-        // Account Opening and verification(if activated) eamil send
+        // Guest Account Opening and verification(if activated) eamil send
         $array['email'] = $user->email;
         $array['password'] = $password;
         $array['subject'] = translate('Account Opening Email');
@@ -248,9 +248,6 @@ class CheckoutController extends Controller
 
         try {
             Mail::to($user->email)->queue(new GuestAccountOpeningMailManager($array));
-            if($isEmailVerificationEnabled == 1){
-                $user->sendEmailVerificationNotification();
-            }
         } catch (\Exception $e) {
             $success = 0;
             $user->delete();
@@ -258,6 +255,11 @@ class CheckoutController extends Controller
 
         if($success == 0){
             return $success;
+        }
+
+        // sending email verification Notification
+        if($isEmailVerificationEnabled == 1){
+            $user->sendEmailVerificationNotification();
         }
 
         // User Address Create

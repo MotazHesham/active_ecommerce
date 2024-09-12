@@ -47,7 +47,7 @@ class TapController extends Controller
             'amount' => $amount,
             'currency' => $currency_code,
             'threeDSecure' => true,
-            "save_card" => true,
+            "save_card" => false,
             "customer_initiated" => true,
             'description' => str_replace("_", " ", $paymentType),
             'customer' => [

@@ -3,10 +3,10 @@
     <input type="hidden" name="package_id" value="{{$package_id}}">
     <div class="modal-body gry-bg px-3 pt-3 mx-auto">
         <div class="align-items-center gutters-5 row">
-            @foreach(\App\Models\ManualPaymentMethod::all() as $method)
+            @foreach(get_all_manual_payment_methods() as $method)
                 <div class="col-6 col-md-4">
                     <label class="aiz-megabox d-block mb-3">
-                        <input value="{{ $method->heading }}" id="payment_option" type="radio" name="payment_option" onchange="toggleManualPaymentData({{ $method->id }})" checked>
+                        <input value="{{ $method->heading }}" id="payment_option" type="radio" name="payment_option" onchange="toggleManualPaymentData({{ $method->id }})" data-id="{{ $method->id }}" checked>
                         <span class="d-block p-3 aiz-megabox-elem">
                             <img src="{{ uploaded_asset($method->photo) }}" class="img-fluid mb-2">
                             <span class="d-block text-center">
@@ -56,7 +56,7 @@
     </div>
 </form>
 
-@foreach(\App\Models\ManualPaymentMethod::all() as $method)
+@foreach(get_all_manual_payment_methods() as $method)
   <div id="manual_payment_info_{{ $method->id }}" class="d-none">
       <div>@php echo $method->description @endphp</div>
       @if ($method->bank_info != null)
@@ -70,6 +70,10 @@
 @endforeach
 
 <script type="text/javascript">
+    $(document).ready(function(){
+        toggleManualPaymentData($('input[name=payment_option]:checked').data('id'));
+    });
+    
     function toggleManualPaymentData(id){
         $('#manual_payment_description').parent().removeClass('d-none');
         $('#manual_payment_description').html($('#manual_payment_info_'+id).html());

@@ -6,6 +6,13 @@
     <div class="align-items-center">
         <h1 class="h3">{{translate('All Customers')}}</h1>
     </div>
+    @can('add_customer')
+        <div class="col text-right">
+            <a href="{{ route('customers.create') }}" class="btn btn-circle btn-info">
+                <span>{{translate('Add New Customer')}}</span>
+            </a>
+        </div>
+    @endcan
 </div>
 
 
@@ -24,7 +31,13 @@
                     <a class="dropdown-item confirm-alert" href="javascript:void(0)"  data-target="#bulk-delete-modal">{{translate('Delete selection')}}</a>
                 </div>
             </div>
-
+            <div class="col-lg-2 ml-auto">
+                <select class="form-control aiz-selectpicker" name="verification_status" onchange="sort_customers()" data-selected="{{ $verification_status }}">
+                    <option value="">{{ translate('Filter by Verification Status') }}</option>
+                    <option value="verified">{{ translate('Verified') }}</option>
+                    <option value="un_verified">{{ translate('Unverified') }}</option>
+                </select>
+            </div>
             <div class="col-md-3">
                 <div class="form-group mb-0">
                     <input type="text" class="form-control" id="search" name="search"@isset($sort_search) value="{{ $sort_search }}" @endisset placeholder="{{ translate('Type email or name & Enter') }}">
@@ -52,6 +65,7 @@
                         <th data-breakpoints="lg">{{translate('Phone')}}</th>
                         <th data-breakpoints="lg">{{translate('Package')}}</th>
                         <th data-breakpoints="lg">{{translate('Wallet Balance')}}</th>
+                        <th data-breakpoints="lg">{{translate('Verification Status')}}</th>
                         <th class="text-right">{{translate('Options')}}</th>
                     </tr>
                 </thead>
@@ -75,16 +89,23 @@
                                 <td>{{$user->phone}}</td>
                                 <td>
                                     @if ($user->customer_package != null)
-                                    {{$user->customer_package->getTranslation('name')}}
+                                        {{$user->customer_package->getTranslation('name')}}
                                     @endif
                                 </td>
                                 <td>{{single_price($user->balance)}}</td>
+                                <td>
+                                    @if($user->email_verified_at != null)
+                                        <span class="badge badge-inline badge-success">{{translate('Verified')}}</span>
+                                    @else
+                                        <span class="badge badge-inline badge-warning">{{translate('Unverified')}}</span>
+                                    @endif
+                                </td>
                                 <td class="text-right">
-                                    @can('login_as_customer')
+                                    @if($user->email_verified_at != null && auth()->user()->can('login_as_customer'))
                                         <a href="{{route('customers.login', encrypt($user->id))}}" class="btn btn-soft-primary btn-icon btn-circle btn-sm" title="{{ translate('Log in as this Customer') }}">
                                             <i class="las la-edit"></i>
                                         </a>
-                                    @endcan
+                                    @endif
                                     @can('ban_customer')
                                         @if($user->banned != 1)
                                             <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm" onclick="confirm_ban('{{route('customers.ban', encrypt($user->id))}}');" title="{{ translate('Ban this Customer') }}">

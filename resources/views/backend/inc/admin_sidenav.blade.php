@@ -407,7 +407,14 @@
                             @can('view_pickup_point_orders')
                                 <li class="aiz-side-nav-item">
                                     <a href="{{ route('pick_up_point.index') }}" class="aiz-side-nav-link {{ areActiveRoutes(['pick_up_point.index','pick_up_point.order_show'])}}">
-                                        <span class="aiz-side-nav-text">{{translate('Pick-up Point Order')}}</span>
+                                        <span class="aiz-side-nav-text">{{translate('Pick-up Point Orders')}}</span>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('view_all_unpaid_orders')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{ route('unpaid_orders.index') }}" class="aiz-side-nav-link {{ areActiveRoutes(['unpaid_orders.index'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Unpaid Orders')}}</span>
                                     </a>
                                 </li>
                             @endcan
@@ -549,7 +556,7 @@
                         <ul class="aiz-side-nav-list level-2">
                             @can('view_all_customers')
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{ route('customers.index') }}" class="aiz-side-nav-link">
+                                    <a href="{{ route('customers.index') }}" class="aiz-side-nav-link {{ areActiveRoutes(['customers.create'])}}">
                                         <span class="aiz-side-nav-text">{{ translate('Customer list') }}</span>
                                     </a>
                                 </li>
@@ -946,6 +953,14 @@
                                     </li>
                                 @endcan
                             @endif
+                            @can('view_all_contacts')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{ route('contacts') }}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['contacts']) }}">
+                                        <span class="aiz-side-nav-text">{{ translate('Contacts') }}</span>
+                                    </a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
                 @endcanany
@@ -1024,7 +1039,7 @@
 
                 <!-- Offline Payment Addon-->
                 @if (addon_is_activated('offline_payment'))
-                    @canany(['view_all_manual_payment_methods','view_all_offline_wallet_recharges','view_all_offline_customer_package_payments','view_all_offline_seller_package_payments'])
+                    @canany(['view_all_manual_payment_methods','view_all_offline_payment_orders', 'view_all_offline_wallet_recharges','view_all_offline_customer_package_payments','view_all_offline_seller_package_payments'])
                         <li class="aiz-side-nav-item">
                             <a href="#" class="aiz-side-nav-link">
                                 <div class="aiz-side-nav-icon">
@@ -1056,6 +1071,13 @@
                                     <li class="aiz-side-nav-item">
                                         <a href="{{ route('manual_payment_methods.index') }}" class="aiz-side-nav-link {{ areActiveRoutes(['manual_payment_methods.index', 'manual_payment_methods.create', 'manual_payment_methods.edit'])}}">
                                             <span class="aiz-side-nav-text">{{translate('Manual Payment Methods')}}</span>
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('view_all_offline_payment_orders')
+                                    <li class="aiz-side-nav-item">
+                                        <a href="{{ route('offline_payment_orders.index') }}" class="aiz-side-nav-link">
+                                            <span class="aiz-side-nav-text">{{translate('Offline Payment Orders')}}</span>
                                         </a>
                                     </li>
                                 @endcan
@@ -1201,13 +1223,6 @@
                                     <li class="aiz-side-nav-item">
                                         <a href="{{route('sms-templates.index')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('SMS Templates')}}</span>
-                                        </a>
-                                    </li>
-                                @endcan
-                                @can('sms_providers_configurations')
-                                    <li class="aiz-side-nav-item">
-                                        <a href="{{route('otp_credentials.index')}}" class="aiz-side-nav-link">
-                                            <span class="aiz-side-nav-text">{{translate('Set OTP Credentials')}}</span>
                                         </a>
                                     </li>
                                 @endcan

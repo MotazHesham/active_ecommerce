@@ -8,6 +8,13 @@
             <h1 class="h3">{{translate('All Sellers')}}</h1>
         </div>
     </div>
+    @can('add_seller')
+        <div class="col text-right">
+            <a href="{{ route('sellers.create') }}" class="btn btn-circle btn-info">
+                <span>{{translate('Add New Seller')}}</span>
+            </a>
+        </div>
+    @endcan
 </div>
 
 <div class="card">
@@ -17,18 +24,27 @@
                 <h5 class="mb-md-0 h6">{{ translate('Sellers') }}</h5>
             </div>
 
-            @can('delete_seller')
-                <div class="dropdown mb-2 mb-md-0">
-                    <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
-                        {{translate('Bulk Action')}}
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right">
+            <div class="dropdown mb-2 mb-md-0">
+                <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
+                    {{translate('Bulk Action')}}
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    @can('delete_seller')
                         <a class="dropdown-item confirm-alert" href="javascript:void(0)"  data-target="#bulk-delete-modal">{{translate('Delete selection')}}</a>
-                    </div>
+                    @endcan
+                    @can('seller_commission_configuration')
+                        <a class="dropdown-item confirm-alert" onclick="set_bulk_commission()">{{translate('Set Bulk Commission')}}</a>
+                    @endcan
                 </div>
-            @endcan
-
-            <div class="col-md-3 ml-auto">
+            </div>
+            <div class="col-lg-2 ml-auto">
+                <select class="form-control aiz-selectpicker" name="verification_status" onchange="sort_sellers()" data-selected="{{ $verification_status }}">
+                    <option value="">{{ translate('Filter by Verification Status') }}</option>
+                    <option value="verified">{{ translate('Verified') }}</option>
+                    <option value="un_verified">{{ translate('Unverified') }}</option>
+                </select>
+            </div>
+            <div class="col-md-2 ml-auto">
                 <select class="form-control aiz-selectpicker" name="approved_status" id="approved_status" onchange="sort_sellers()">
                     <option value="">{{translate('Filter by Approval')}}</option>
                     <option value="1"  @isset($approved) @if($approved == '1') selected @endif @endisset>{{translate('Approved')}}</option>
@@ -68,6 +84,10 @@
                     <th data-breakpoints="lg">{{translate('Approval')}}</th>
                     <th data-breakpoints="lg">{{ translate('Num. of Products') }}</th>
                     <th data-breakpoints="lg">{{ translate('Due to seller') }}</th>
+                    @if(get_setting('seller_commission_type') == 'seller_based')
+                        <th data-breakpoints="lg">{{ translate('Commission') }}</th>
+                    @endif
+                    <th data-breakpoints="lg">{{translate('Email Verification')}}</th>
                     <th data-breakpoints="lg">{{ translate('Status') }}</th>
                     <th width="10%">{{translate('Options')}}</th>
                 </tr>
@@ -118,6 +138,16 @@
                                 {{ single_price(abs($shop->admin_to_pay)) }} ({{ translate('Due to Admin') }})
                             @endif
                         </td>
+                        @if(get_setting('seller_commission_type') == 'seller_based')
+                            <td>{{ $shop->commission_percentage }}%</td>
+                        @endif
+                        <td>
+                            @if($shop->user->email_verified_at != null)
+                                <span class="badge badge-inline badge-success">{{translate('Verified')}}</span>
+                            @else
+                                <span class="badge badge-inline badge-warning">{{translate('Unverified')}}</span>
+                            @endif
+                        </td>
                         <td>
                             @if($shop->user->banned)
                                 <span class="badge badge-inline badge-danger">{{ translate('Ban') }}</span>
@@ -149,6 +179,11 @@
                                     @can('seller_payment_history')
                                         <a href="{{route('sellers.payment_history', encrypt($shop->user_id))}}" class="dropdown-item">
                                             {{translate('Payment History')}}
+                                        </a>
+                                    @endcan
+                                    @can('seller_commission_configuration')
+                                        <a href="javascript:void();" onclick="set_commission('{{ $shop->id }}');" class="dropdown-item">
+                                            {{translate('Set Commission')}}
                                         </a>
                                     @endcan
                                     @can('edit_seller')
@@ -236,23 +271,57 @@
 
 	<!-- Unban Seller Modal -->
 	<div class="modal fade" id="confirm-unban">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title h6">{{translate('Confirmation')}}</h5>
-						<button type="button" class="close" data-dismiss="modal">
-						</button>
-					</div>
-					<div class="modal-body">
-							<p>{{translate('Do you really want to unban this seller?')}}</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-light" data-dismiss="modal">{{translate('Cancel')}}</button>
-						<a class="btn btn-primary" id="confirmationunban">{{translate('Proceed!')}}</a>
-					</div>
-				</div>
-			</div>
-		</div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title h6">{{translate('Confirmation')}}</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                    </button>
+                </div>
+                <div class="modal-body">
+                        <p>{{translate('Do you really want to unban this seller?')}}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">{{translate('Cancel')}}</button>
+                    <a class="btn btn-primary" id="confirmationunban">{{translate('Proceed!')}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Set Selelr Commission --}}
+    <div class="modal fade" id="set_seller_commission">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title h6">{{translate('Set Seller Commission')}}</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                    </button>
+                </div>
+                <form class="form-horizontal" action="{{ route('set_seller_based_commission') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <input type="hidden" name="seller_ids" value="" id="seller_ids">
+                        <div class="form-group row">
+                            <label class="col-md-3 col-from-label">{{translate('Selle Commission')}}</label>
+                            <div class="col-md-9">
+                                <div class="input-group">
+                                    <input type="number" lang="en" min="0" max="100" step="0.01" placeholder="{{translate('Commission Percentage')}}" name="commission_percentage" class="form-control" required>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btn-sm text-white">{{translate('save!')}}</button>
+                        <button type="button" class="btn btn-sm btn-light" data-dismiss="modal">{{translate('Cancel')}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
@@ -352,6 +421,29 @@
                     }
                 }
             });
+        }
+
+        // Set Commission
+        function set_commission(shop_id){
+            var sellerIds = [];
+            sellerIds.push(shop_id);
+            $('#seller_ids').val(sellerIds);
+            $('#set_seller_commission').modal('show', {backdrop: 'static'});
+        }
+
+        // Set seller bulk commission
+        function set_bulk_commission(){
+            var sellerIds = [];
+            $(".check-one[name='id[]']:checked").each(function() {
+                sellerIds.push($(this).val());
+            });
+            if(sellerIds.length > 0){
+                $('#seller_ids').val(sellerIds);
+                $('#set_seller_commission').modal('show', {backdrop: 'static'});
+            }
+            else{
+                AIZ.plugins.notify('danger', '{{ translate('Please Select Seller first.') }}');
+            }
         }
 
     </script>

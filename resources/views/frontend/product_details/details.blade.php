@@ -476,7 +476,8 @@
         <!-- Add to cart & Buy now Buttons -->
         <div class="mt-3">
             @if ($detailedProduct->digital == 0)
-                @if ($detailedProduct->external_link != null)
+                @if (((get_setting('product_external_link_for_seller') == 1) && ($detailedProduct->added_by == "seller") && ($detailedProduct->external_link != null)) ||
+                    (($detailedProduct->added_by != "seller") && ($detailedProduct->external_link != null)))
                     <a type="button" class="btn btn-primary buy-now fw-600 add-to-cart px-4 rounded-0"
                         href="{{ $detailedProduct->external_link }}">
                         <i class="la la-share"></i> {{ translate($detailedProduct->external_link_btn) }}

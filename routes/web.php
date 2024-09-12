@@ -8,6 +8,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CompareController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CustomerPackageController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\OdooController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Payment\AamarpayController;
 use App\Http\Controllers\Payment\AuthorizenetController;
@@ -59,6 +61,11 @@ use App\Http\Controllers\SizeChartController;
   | contains the "web" middleware group. Now create something great!
   |
  */
+Route::get('/odoo/list', [OdooController::class, 'listRecords']);
+Route::post('/odoo/create', [OdooController::class, 'createRecord']);
+Route::post('/odoo/update/{id}', [OdooController::class, 'updateRecord']);
+Route::get('/odoo/show/{id}', [OdooController::class, 'showRecord']);
+Route::get('/odoo/delete/{id}', [OdooController::class, 'deleteRecord']);
 
 Route::controller(DemoController::class)->group(function () {
     Route::get('/demo/cron_1', 'cron_1');
@@ -473,4 +480,7 @@ Route::controller(PageController::class)->group(function () {
 
     //Custom page
     Route::get('/{slug}', 'show_custom_page')->name('custom-pages.show_custom_page');
+});
+Route::controller(ContactController::class)->group(function () {
+    Route::post('/contact', 'contact')->name('contact');
 });

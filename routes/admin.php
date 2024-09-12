@@ -14,6 +14,7 @@ use App\Http\Controllers\CarrierController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CommissionController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\CouponController;
@@ -171,6 +172,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/sellers/payment_modal', 'payment_modal')->name('sellers.payment_modal');
         Route::post('/sellers/profile_modal', 'profile_modal')->name('sellers.profile_modal');
         Route::post('/sellers/approved', 'updateApproved')->name('sellers.approved');
+        Route::post('/sellers/set-commission', 'setSellerBasedCommission')->name('set_seller_based_commission');
     });
 
     // Seller Payment
@@ -219,6 +221,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/custom-alerts-update-status', 'update_status')->name('custom-alerts.update-status');
     });
 
+    //Contacts
+    Route::controller(ContactController::class)->group(function () {
+        Route::get('/contacts', 'index')->name('contacts');
+        Route::post('/contact/query_modal', 'query_modal')->name('contact.query_modal');
+        Route::post('/contact/reply_modal', 'reply_modal')->name('contact.reply_modal');
+        Route::post('/contact/reply', 'reply')->name('contact.reply');
+    });
+
     Route::resource('profile', ProfileController::class);
 
     // Business Settings
@@ -254,7 +264,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/verification/form', 'seller_verification_form')->name('seller_verification_form.index');
         Route::post('/verification/form', 'seller_verification_form_update')->name('seller_verification_form.update');
         Route::get('/vendor_commission', 'vendor_commission')->name('business_settings.vendor_commission');
-        Route::post('/vendor_commission_update', 'vendor_commission_update')->name('business_settings.vendor_commission.update');
 
         //Shipping Configuration
         Route::get('/shipping_configuration', 'shipping_configuration')->name('shipping_configuration.index');
@@ -358,7 +367,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/all_orders', 'all_orders')->name('all_orders.index');
         Route::get('/inhouse-orders', 'all_orders')->name('inhouse_orders.index');
         Route::get('/seller_orders', 'all_orders')->name('seller_orders.index');
-        Route::get('orders_by_pickup_point', 'all_orders')->name('pick_up_point.index');
+        Route::get('/orders_by_pickup_point', 'all_orders')->name('pick_up_point.index');
+        Route::get('/unpaid_orders', 'all_orders')->name('unpaid_orders.index');
 
         Route::get('/orders/{id}/show', 'show')->name('all_orders.show');
         Route::get('/inhouse-orders/{id}/show', 'show')->name('inhouse_orders.show');
@@ -381,6 +391,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
 
         // Order bulk export
         Route::get('/order-bulk-export', 'orderBulkExport')->name('order-bulk-export');
+
+        // 
+        Route::post('order-payment-notification', 'unpaid_order_payment_notification_send')->name('unpaid_order_payment_notification');
     });
 
     Route::post('/pay_to_seller', [CommissionController::class, 'pay_to_seller'])->name('commissions.pay_to_seller');
@@ -564,7 +577,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/custom-notifications.delete/{identifier}', 'customNotificationSingleDelete')->name('custom-notifications.delete');
         Route::post('/custom-notifications.bulk_delete', 'customNotificationBulkDelete')->name('custom-notifications.bulk_delete');
         Route::post('/custom-notified-customers-list', 'customNotifiedCustomersList')->name('custom_notified_customers_list');
-        
+
     });
 
     Route::resource('notification-type', NotificationTypeController::class);

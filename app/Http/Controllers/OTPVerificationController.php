@@ -140,4 +140,10 @@ class OTPVerificationController extends Controller
             SmsUtility::payment_status_change($phone, $order);
         }
     }
+
+    public function account_opening($user, $password){
+        if($user->phone != null){
+            SmsUtility::account_opening($user, $password);
+        }
+    }
 }
