@@ -238,7 +238,7 @@
                             @endcan
                             @can('view_product_reviews')
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{route('reviews.index')}}" class="aiz-side-nav-link">
+                                    <a href="{{route('reviews.index')}}" class="aiz-side-nav-link {{ areActiveRoutes(['detail-reviews', 'custom-review.edit']) }}">
                                         <span class="aiz-side-nav-text">{{translate('Product Reviews')}}</span>
                                     </a>
                                 </li>
@@ -606,6 +606,13 @@
                                         </a>
                                     </li>
                                 @endcan
+                                @can('view_all_seller_rating_and_followers')
+                                    <li class="aiz-side-nav-item">
+                                        <a href="{{ route('sellers.rating_followers') }}" class="aiz-side-nav-link">
+                                            <span class="aiz-side-nav-text">{{ translate('Seller Rating & Followers') }}</span>
+                                        </a>
+                                    </li>
+                                @endcan
                                 @can('seller_payment_history')
                                     <li class="aiz-side-nav-item">
                                         <a href="{{ route('sellers.payment_histories') }}" class="aiz-side-nav-link">
@@ -779,14 +786,15 @@
                 @canany(['view_all_flash_deals',
                             'view_all_dynamic_popups',
                                 'view_all_custom_alerts',
-                                    'send_newsletter',
-                                        'notification_settings',
-                                            'view_all_notification_types',
-                                                'send_custom_notification',
-                                                    'view_custom_notification_history',
-                                                        'send_bulk_sms',
-                                                            'view_all_subscribers',
-                                                                'view_all_coupons'])
+                                    'manage_email_templates',
+                                        'send_newsletter',
+                                            'notification_settings',
+                                                'view_all_notification_types',
+                                                    'send_custom_notification',
+                                                        'view_custom_notification_history',
+                                                            'send_bulk_sms',
+                                                                'view_all_subscribers',
+                                                                    'view_all_coupons'])
                     <li class="aiz-side-nav-item">
                         <a href="#" class="aiz-side-nav-link">
                             <div class="aiz-side-nav-icon">
@@ -823,6 +831,43 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('manage_email_templates')
+                                <li class="aiz-side-nav-item">
+                                    <a href="javascript:void(0);" class="aiz-side-nav-link">
+                                        <span class="aiz-side-nav-text">{{translate('Email Templates')}}</span>
+                                        <span class="aiz-side-nav-arrow"></span>
+                                    </a>
+                                    <ul class="aiz-side-nav-list level-3">
+                                        <li class="aiz-side-nav-item">
+                                            <a href="{{ route('email-templates.index', 'admin') }}" class="aiz-side-nav-link">
+                                                <span class="aiz-side-nav-text">{{translate('Admin Templates')}}</span>
+                                            </a>
+                                        </li>
+                                        <li class="aiz-side-nav-item">
+                                            <a href="{{ route('email-templates.index', 'seller') }}" class="aiz-side-nav-link">
+                                                <span class="aiz-side-nav-text">{{translate('Seller Templates')}}</span>
+                                            </a>
+                                        </li>
+                                        <li class="aiz-side-nav-item">
+                                            <a href="{{ route('email-templates.index', 'customer') }}" class="aiz-side-nav-link">
+                                                <span class="aiz-side-nav-text">{{translate('Customer Templates')}}</span>
+                                            </a>
+                                        </li>
+                                        <li class="aiz-side-nav-item">
+                                            <a href="{{ route('email-templates.index', 'all') }}" class="aiz-side-nav-link">
+                                                <span class="aiz-side-nav-text">{{translate('Common Templates')}}</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            @endcan
+                            {{-- @can('manage_email_templates')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{ route('email-templates.index') }}" class="aiz-side-nav-link {{ areActiveRoutes(['email-templates.edit'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Email Templates')}}</span>
+                                    </a>
+                                </li>
+                            @endcan --}}
                             @can('send_newsletter')
                                 <li class="aiz-side-nav-item">
                                     <a href="{{route('newsletters.index')}}" class="aiz-side-nav-link">
@@ -1351,13 +1396,6 @@
                             <span class="aiz-side-nav-arrow"></span>
                         </a>
                         <ul class="aiz-side-nav-list level-2">
-                            {{-- @can('general_settings')
-                                <li class="aiz-side-nav-item">
-                                    <a href="{{route('general_setting.index')}}" class="aiz-side-nav-link">
-                                        <span class="aiz-side-nav-text">{{translate('General Settings')}}</span>
-                                    </a>
-                                </li>
-                            @endcan --}}
                             @can('features_activation')
                                 <li class="aiz-side-nav-item">
                                     <a href="{{route('activation.index')}}" class="aiz-side-nav-link">

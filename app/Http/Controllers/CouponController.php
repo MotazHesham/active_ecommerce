@@ -24,7 +24,7 @@ class CouponController extends Controller
      */
     public function index()
     {
-        $coupons = Coupon::where('user_id', User::where('user_type', 'admin')->first()->id)->orderBy('id','desc')->get();
+        $coupons = Coupon::where('user_id', get_admin()->id)->orderBy('id','desc')->get();
         return view('backend.marketing.coupons.index', compact('coupons'));
     }
 
@@ -46,7 +46,7 @@ class CouponController extends Controller
      */
     public function store(CouponRequest $request)
     {
-        $user_id = User::where('user_type', 'admin')->first()->id;
+        $user_id = get_admin()->id;
         $status = $request->type == 'welcome_base' ? 0 : 1;
         Coupon::create($request->validated() + [
             'user_id' => $user_id,
@@ -109,7 +109,7 @@ class CouponController extends Controller
     public function get_coupon_form(Request $request)
     {
         if($request->coupon_type == "product_base") {
-            $admin_id = \App\Models\User::where('user_type', 'admin')->first()->id;
+            $admin_id = get_admin()->id;
             $products = filter_products(\App\Models\Product::where('user_id', $admin_id))->get();
             return view('partials.coupons.product_base_coupon', compact('products'));
         }
@@ -125,7 +125,7 @@ class CouponController extends Controller
     {
         if($request->coupon_type == "product_base") {
             $coupon = Coupon::findOrFail($request->id);
-            $admin_id = \App\Models\User::where('user_type', 'admin')->first()->id;
+            $admin_id = get_admin()->id;
             $products = filter_products(\App\Models\Product::where('user_id', $admin_id))->get();
             return view('partials.coupons.product_base_coupon_edit',compact('coupon', 'products'));
         }

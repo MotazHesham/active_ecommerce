@@ -11,6 +11,7 @@ use App\Models\User;
 use Session;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\PayoutNotification;
+use App\Utility\EmailUtility;
 
 class CommissionController extends Controller
 {
@@ -88,6 +89,10 @@ class CommissionController extends Controller
         $data['status'] = 'paid';
         $data['notification_type_id'] = get_notification_type('seller_payout', 'type')->id;
         Notification::send($users, new PayoutNotification($data));
+
+        // Seller payout request email to admin & seller
+        $emailIdentifiers = ['seller_payout_email_to_admin','seller_payout_email_to_seller'];
+        EmailUtility::seller_payout($emailIdentifiers, $shop->user, $payment_data['amount'], ucwords(str_replace('_', ' ',$payment_data['payment_method'])));
 
         Session::forget('payment_data');
         Session::forget('payment_type');

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\GuestAccountOpeningMailManager;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Cart;
@@ -15,6 +14,7 @@ use App\Models\CombinedOrder;
 use App\Models\Country;
 use App\Models\Product;
 use App\Models\User;
+use App\Utility\EmailUtility;
 use App\Utility\NotificationUtility;
 use Session;
 use Auth;
@@ -241,13 +241,8 @@ class CheckoutController extends Controller
         $user->save();
 
         // Guest Account Opening and verification(if activated) eamil send
-        $array['email'] = $user->email;
-        $array['password'] = $password;
-        $array['subject'] = translate('Account Opening Email');
-        $array['from'] = env('MAIL_FROM_ADDRESS');
-
         try {
-            Mail::to($user->email)->queue(new GuestAccountOpeningMailManager($array));
+            EmailUtility::customer_registration_email('registration_from_system_email_to_customer', $user, $password);
         } catch (\Exception $e) {
             $success = 0;
             $user->delete();
@@ -257,9 +252,16 @@ class CheckoutController extends Controller
             return $success;
         }
 
-        // sending email verification Notification
+        // Sending email verification Notification
         if($isEmailVerificationEnabled == 1){
-            $user->sendEmailVerificationNotification();
+            EmailUtility::email_verification($user, 'customer');
+        }
+
+        // Customer Account Opening Email to Admin
+        if ((get_email_template_data('customer_reg_email_to_admin', 'status') == 1)) {
+            try {
+                EmailUtility::customer_registration_email('customer_reg_email_to_admin', $user, null);
+            } catch (\Exception $e) {}
         }
 
         // User Address Create
@@ -303,6 +305,10 @@ class CheckoutController extends Controller
             $order->payment_details = $payment;
             $order->save();
 
+            // Order paid notification to Customer, Seller, & Admin
+            EmailUtility::order_email($order, 'paid'); 
+            
+            // Calculate Commission from seller, Customer Affiliate earning and Customers Club Point
             calculateCommissionAffilationClubPoint($order);
         }
         Session::put('combined_order_id', $combined_order_id);

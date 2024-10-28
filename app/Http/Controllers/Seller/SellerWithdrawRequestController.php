@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\PayoutNotification;
 use App\Models\SellerWithdrawRequest;
 use App\Models\User;
+use App\Utility\EmailUtility;
 use Auth;
 
 class SellerWithdrawRequestController extends Controller
@@ -31,22 +32,27 @@ class SellerWithdrawRequestController extends Controller
      */
     public function store(Request $request)
     {
+        $seller = auth()->user();
         $seller_withdraw_request = new SellerWithdrawRequest;
-        $seller_withdraw_request->user_id = Auth::user()->id;
+        $seller_withdraw_request->user_id = $seller->id;
         $seller_withdraw_request->amount = $request->amount;
         $seller_withdraw_request->message = $request->message;
         $seller_withdraw_request->status = '0';
         $seller_withdraw_request->viewed = '0';
         if ($seller_withdraw_request->save()) {
 
-            // Seller payout request notification to admin
+            // Seller payout request web notification to admin
             $users = User::findMany(User::where('user_type', 'admin')->first()->id);
             $data = array();
-            $data['user'] = auth()->user();
+            $data['user'] = $seller;
             $data['amount'] = $request->amount;
             $data['status'] = 'pending';
             $data['notification_type_id'] = get_notification_type('seller_payout_request', 'type')->id;
             Notification::send($users, new PayoutNotification($data));
+
+            // Seller payout request email to admin & seller
+            $emailIdentifiers = ['seller_payout_request_email_to_admin','seller_payout_request_email_to_seller'];
+            EmailUtility::seller_payout($emailIdentifiers, $seller, $request->amount,  null);
 
             flash(translate('Request has been sent successfully'))->success();
             return redirect()->route('seller.money_withdraw_requests.index');

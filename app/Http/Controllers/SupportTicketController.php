@@ -86,7 +86,7 @@ class SupportTicketController extends Controller
         $array['sender'] = $ticket->user->name;
         $array['details'] = $ticket->details;
         try {
-            Mail::to(User::where('user_type', 'admin')->first()->email)->queue(new SupportMailManager($array));
+            Mail::to(get_admin()->email)->queue(new SupportMailManager($array));
         } catch (\Exception $e) {}
     }
 

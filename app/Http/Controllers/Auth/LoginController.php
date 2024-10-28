@@ -10,13 +10,12 @@ use App\Models\User;
 use App\Models\Customer;
 use App\Models\Cart;
 use App\Services\SocialRevoke;
+use App\Utility\EmailUtility;
 use Session;
 use Illuminate\Http\Request;
 use CoreComponentRepository;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 use GuzzleHttp\Client;
-use Auth;
 use Storage;
 
 class LoginController extends Controller
@@ -177,6 +176,13 @@ class LoginController extends Controller
                 $newUser->save();
                 //proceed to login
                 auth()->login($newUser, true);
+
+                // customer Account Opening Email to Admin
+                if ((get_email_template_data('customer_reg_email_to_admin', 'status') == 1)) {
+                    try {
+                        EmailUtility::customer_registration_email('customer_reg_email_to_admin', $newUser, null);
+                    } catch (\Exception $e) {}
+                }
             }
         }
 

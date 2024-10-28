@@ -21,7 +21,7 @@ class ProductQueryController extends Controller
      */
     public function index()
     {
-        $admin_id = User::where('user_type', 'admin')->first()->id;
+        $admin_id = get_admin()->id;
         $queries = ProductQuery::where('seller_id', $admin_id)->latest()->paginate(20);
         return view('backend.support.product_query.index', compact('queries'));
     }

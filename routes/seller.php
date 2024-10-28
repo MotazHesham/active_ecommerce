@@ -86,7 +86,9 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     // Route::get('invoice/{order_id}',[InvoiceController::class, 'invoice_download'])->name('invoice.download');
     //Review
     Route::controller(ReviewController::class)->group(function () {
-        Route::get('/reviews', 'index')->name('reviews');
+        Route::get('/product-reviews', 'index')->name('product-reviews');
+        Route::get('/product/detail-reviews/{id}', 'detailReviews')->name('detail-reviews');
+        
     });
     // Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews');
 

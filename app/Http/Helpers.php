@@ -51,11 +51,13 @@ use App\Http\Controllers\ClubPointController;
 use App\Http\Controllers\CommissionController;
 use AizPackages\ColorCodeConverter\Services\ColorCodeConverter;
 use App\Models\CustomerPackagePayment;
+use App\Models\EmailTemplate;
 use App\Models\FlashDealProduct;
 use App\Models\LastViewedProduct;
 use App\Models\PaymentMethod;
 use App\Models\UserCoupon;
 use App\Models\NotificationType;
+use App\Utility\EmailUtility;
 
 //sensSMS function for OTP
 if (!function_exists('sendSMS')) {
@@ -1354,6 +1356,9 @@ if (!function_exists('checkout_done')) {
             $order->payment_details = $payment;
             $order->save();
 
+            // Order paid notification to Customer, Seller, & Admin
+            EmailUtility::order_email($order, 'paid'); 
+            
             try {
                 NotificationUtility::sendOrderPlacedNotification($order);
                 calculateCommissionAffilationClubPoint($order);
@@ -1752,15 +1757,6 @@ if (!function_exists('get_best_selling_products')) {
             $product_query = $product_query->where('user_id', $user_id);
         }
         return filter_products($product_query->orderBy('num_of_sale', 'desc'))->limit($limit)->get();
-    }
-}
-
-// Get Seller Products
-if (!function_exists('get_all_sellers')) {
-    function get_all_sellers()
-    {
-        $seller_query = Seller::query();
-        return $seller_query->get();
     }
 }
 
@@ -2400,7 +2396,7 @@ if (!function_exists('get_pos_user_cart')) {
     {
         $cart               = [];
         $authUser           = auth()->user();
-        $owner_id           = in_array($authUser->user_type, ['admin','staff']) ? User::where('user_type', 'admin')->first()->id : $authUser->id;
+        $owner_id           = in_array($authUser->user_type, ['admin','staff']) ? get_admin()->id : $authUser->id;
 
         if ($sessionUserID == null) {
             $sessionUserID = Session::has('pos.user_id') ? Session::get('pos.user_id') : null;
@@ -2534,6 +2530,32 @@ if (!function_exists('get_wishlists')) {
                     })
                     ->latest();
         return $wishlists;
+    }
+}
+
+// email template data
+if (!function_exists('get_email_template_data')) {
+    function get_email_template_data($identifier, $colmn_name = null)
+    {
+        $value = EmailTemplate::where('identifier', $identifier)->first()->$colmn_name;
+        return $value;
+    }
+}
+
+// Delete Product Reviews
+if (!function_exists('deleteProductReview')) {
+    function deleteProductReview($product)
+    {
+        if($product->added_by == 'seller' ){
+            $seller = $product->user->shop;
+            foreach($product->reviews as $review){
+                $seller = $seller->fresh();
+                $seller->rating = (($seller->rating * $seller->num_of_reviews) - $product->rating) / max(1, $seller->num_of_reviews - 1);
+                $seller->num_of_reviews -= 1;
+                $seller->save();
+            }
+        }
+        $product->reviews()->delete();
     }
 }
 

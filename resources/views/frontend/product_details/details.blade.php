@@ -10,7 +10,7 @@
             <div class="col-12">
                 @php
                     $total = 0;
-                    $total += $detailedProduct->reviews->count();
+                    $total += $detailedProduct->reviews->where('status', 1)->count();
                 @endphp
                 <span class="rating rating-mr-2">
                     {{ renderStarRating($detailedProduct->rating) }}

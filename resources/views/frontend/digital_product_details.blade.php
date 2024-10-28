@@ -90,7 +90,7 @@
                                         <div class="col-12">
                                             @php
                                                 $total = 0;
-                                                $total += $detailedProduct->reviews->count();
+                                                $total += $detailedProduct->reviews->where('status', 1)->count();
                                             @endphp
                                             <span class="rating rating-mr-2">
                                                 {{ renderStarRating($detailedProduct->rating) }}
@@ -588,7 +588,7 @@
                             <div class="tab-pane fade" id="tab_default_4">
                                 <div class="py-5">
                                     <ul class="list-group list-group-flush">
-                                        @foreach ($detailedProduct->reviews as $key => $review)
+                                        @foreach ($detailedProduct->reviews->where('status', 1) as $key => $review)
                                             @if ($review->user != null)
                                                 <li class="media list-group-item d-flex">
                                                     <span class="avatar avatar-md mr-3">
@@ -623,7 +623,7 @@
                                         @endforeach
                                     </ul>
 
-                                    @if (count($detailedProduct->reviews) <= 0)
+                                    @if (count($detailedProduct->reviews->where('status', 1)) <= 0)
                                         <div class="text-center fs-18 opacity-70">
                                             {{ translate('There have been no reviews for this product yet.') }}
                                         </div>

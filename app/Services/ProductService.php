@@ -332,6 +332,7 @@ class ProductService
         $product->frequently_bought_products()->delete();
         $product->last_viewed_products()->delete();
         $product->flash_deal_products()->delete();
+        deleteProductReview($product);
         Product::destroy($id);
     }
 

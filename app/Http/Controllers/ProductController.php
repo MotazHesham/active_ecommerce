@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\AttributeValue;
 use App\Models\Cart;
 use App\Models\ProductCategory;
+use App\Models\Review;
 use App\Models\Wishlist;
 use App\Models\User;
 use App\Notifications\ShopProductNotification;
@@ -393,7 +394,7 @@ class ProductController extends Controller
         $product->frequently_bought_products()->delete();
         $product->last_viewed_products()->delete();
         $product->flash_deal_products()->delete();
-
+        deleteProductReview($product);
         if (Product::destroy($id)) {
             Cart::where('product_id', $id)->delete();
             Wishlist::where('product_id', $id)->delete();

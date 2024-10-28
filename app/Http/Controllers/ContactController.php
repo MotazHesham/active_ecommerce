@@ -38,7 +38,7 @@ class ContactController extends Controller
     public function reply(Request $request)
     {
         $contact = Contact::findOrFail($request->contact_id);
-        $admin = User::where('user_type', 'admin')->first();
+        $admin = get_admin();
 
         $array['name'] = $admin->name;
         $array['email'] = $admin->email;
@@ -62,7 +62,7 @@ class ContactController extends Controller
 
     public function contact(Request $request)
     {
-        $admin = User::where('user_type', 'admin')->first();
+        $admin = get_admin();
 
         $array['name'] = $request->name;
         $array['email'] = $request->email;

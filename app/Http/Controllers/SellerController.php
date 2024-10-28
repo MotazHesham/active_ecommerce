@@ -2,28 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\AccountOpeningByAdminEmailManager;
 use App\Models\Cart;
 use Illuminate\Http\Request;
-use App\Models\Seller;
 use App\Models\User;
 use App\Models\Shop;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Wishlist;
 use Illuminate\Support\Facades\Hash;
-use App\Notifications\EmailVerificationNotification;
 use App\Notifications\ShopVerificationNotification;
+use App\Utility\EmailUtility;
 use Cache;
 use Illuminate\Support\Facades\Notification;
-use Mail;
 
 class SellerController extends Controller
 {
     public function __construct()
     {
         // Staff Permission Check
-        $this->middleware(['permission:view_all_seller'])->only('index');
+        $this->middleware(['permission:view_all_seller|view_all_seller_rating_and_followers'])->only('index');
         $this->middleware(['permission:add_seller'])->only('create');
         $this->middleware(['permission:view_seller_profile'])->only('profile_modal');
         $this->middleware(['permission:login_as_seller'])->only('login');
@@ -31,6 +28,7 @@ class SellerController extends Controller
         $this->middleware(['permission:edit_seller'])->only('edit');
         $this->middleware(['permission:delete_seller'])->only('destroy');
         $this->middleware(['permission:ban_seller'])->only('ban');
+        $this->middleware(['permission:edit_seller_custom_followers'])->only('editSellerCustomFollowers');
     }
 
     /**
@@ -120,31 +118,36 @@ class SellerController extends Controller
         $user->password = Hash::make($password);
 
         if ($user->save()) {
-            $array['user_type'] = 'seller';
-            $array['password']  = $password;
-            $array['subject']   = translate('Account Opening Email');
-            $array['from']      = env('MAIL_FROM_ADDRESS');
-            try {
-                Mail::to($user->email)->queue(new AccountOpeningByAdminEmailManager($array));
-            } catch (\Exception $e) {
-                $user->delete();
-                flash(translate('Registration failed. Please try again later.'))->error();
-                return back();
-            }
-            
-            if (get_setting('email_verification') != 1) {
-                $user->email_verified_at = date('Y-m-d H:m:s');
-                $user->save();
-            } else {
-                $user->sendEmailVerificationNotification();
-            }
-            
             $shop           = new Shop;
             $shop->user_id  = $user->id;
             $shop->name     = $request->shop_name;
             $shop->address  = $request->address;
             $shop->slug     = 'demo-shop-' . $user->id;
             $shop->save();
+
+            try {
+                EmailUtility::selelr_registration_email('registration_from_system_email_to_seller', $user, $password);
+            } catch (\Exception $e) {
+                $shop->delete();
+                $user->delete();
+                flash(translate('Registration failed. Please try again later.'))->error();
+                return back();
+            }
+
+            // Verification email send
+            if (get_setting('email_verification') != 1) {
+                $user->email_verified_at = date('Y-m-d H:m:s');
+                $user->save();
+            } else {
+                EmailUtility::email_verification($user, 'seller');
+            }
+
+            // Seller Account Opening Email to Admin
+            if ((get_email_template_data('seller_reg_email_to_admin', 'status') == 1)) {
+                try {
+                    EmailUtility::selelr_registration_email('seller_reg_email_to_admin', $user, null);
+                } catch (\Exception $e) {}
+            }
 
             flash(translate('Seller has been added successfully'))->success();
             return back();
@@ -378,6 +381,15 @@ class SellerController extends Controller
         else{
             flash(translate('Something went wrong!.'))->warning();
         }
+        return back();
+    }
+
+    // Edit Seller Custom Followers
+    public function editSellerCustomFollowers(Request $request) {
+        $shop = Shop::where('id', $request->shop_id)->first();
+        $shop->custom_followers = $request->custom_followers;
+        $shop->save();
+        flash(translate('Seller custom follower has been updated successfully.'))->success();
         return back();
     }
 }

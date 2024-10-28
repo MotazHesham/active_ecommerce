@@ -10,6 +10,7 @@ use App\Utility\NotificationUtility;
 use App\Utility\SmsUtility;
 use Illuminate\Http\Request;
 use App\Models\OrdersExport;
+use App\Utility\EmailUtility;
 use Maatwebsite\Excel\Facades\Excel;
 use Auth;
 use DB;
@@ -100,17 +101,23 @@ class OrderController extends Controller
                 product_restock($orderDetail);
             }
         }
+        
+        // Delivery Status change email notification to Admin, seller, Customer
+        EmailUtility::order_email($order, $request->status); 
 
+
+        // Delivery Status change SMS notification
         if (addon_is_activated('otp_system') && SmsTemplate::where('identifier', 'delivery_status_change')->first()->status == 1) {
             try {
                 SmsUtility::delivery_status_change(json_decode($order->shipping_address)->phone, $order);
-            } catch (\Exception $e) {
-
-            }
+            } catch (\Exception $e) {}
         }
 
-        //sends Notifications to user
+        //Sends Web Notifications to user
         NotificationUtility::sendNotification($order, $request->status);
+
+        //Sends Firebase Notifications to user
+
         if (get_setting('google_firebase') == 1 && $order->user->device_token != null) {
             $request->device_token = $order->user->device_token;
             $request->title = "Order updated !";
@@ -161,7 +168,12 @@ class OrderController extends Controller
             calculateCommissionAffilationClubPoint($order);
         }
 
-        //sends Notifications to user
+        // Payment Status change email notification to Admin, seller, Customer
+        if($request->status == 'paid'){
+            EmailUtility::order_email($order, $request->status);  
+        }
+
+        //Sends Firebase Notifications to Admin, seller, Customer
         NotificationUtility::sendNotification($order, $request->status);
         if (get_setting('google_firebase') == 1 && $order->user->device_token != null) {
             $request->device_token = $order->user->device_token;

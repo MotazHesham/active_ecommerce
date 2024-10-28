@@ -2,27 +2,20 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Nexmo;
 use Cookie;
 use Session;
 use App\Models\Cart;
 use App\Models\User;
-use Twilio\Rest\Client;
-
 use App\Rules\Recaptcha;
 use Illuminate\Validation\Rule;
-
-use App\Models\Customer;
-use App\OtpConfiguration;
 use Illuminate\Http\Request;
 use App\Models\BusinessSetting;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use App\Http\Controllers\OTPVerificationController;
-use App\Notifications\EmailVerificationNotification;
+use App\Utility\EmailUtility;
 
 class RegisterController extends Controller
 {
@@ -158,13 +151,28 @@ class RegisterController extends Controller
             }
             else {
                 try {
-                    $user->sendEmailVerificationNotification();
+                    EmailUtility::email_verification($user, 'customer');
                     flash(translate('Registration successful. Please verify your email.'))->success();
-                } catch (\Throwable $th) {
+                } catch (\Throwable $e) {
+                    dd($e);
                     $user->delete();
                     flash(translate('Registration failed. Please try again later.'))->error();
                 }
             }
+
+            // Account Opening Email to customer
+            if ( $user != null && (get_email_template_data('registration_email_to_customer', 'status') == 1)) {
+                try {
+                    EmailUtility::customer_registration_email('registration_email_to_customer', $user, null);
+                } catch (\Exception $e) {}
+            }
+        }
+
+        // customer Account Opening Email to Admin
+        if ( $user != null && (get_email_template_data('customer_reg_email_to_admin', 'status') == 1)) {
+            try {
+                EmailUtility::customer_registration_email('customer_reg_email_to_admin', $user, null);
+            } catch (\Exception $e) {}
         }
 
         return $this->registered($request, $user)

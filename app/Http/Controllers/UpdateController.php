@@ -98,7 +98,8 @@ class UpdateController extends Controller
                     '7.6.0'=>'v760.sql', '7.7.0'=>'v770.sql', '7.8.0'=>'v780.sql', '7.9.0'=>'v790.sql', '7.9.1'=>'v791.sql',
                     '7.9.2'=>'v792.sql', '7.9.3'=>'v793.sql', '8'=>'v800.sql', '8.1'=>'v810.sql', '8.2'=>'v820.sql',
                     '8.3'=>'v830.sql', '8.4'=>'v840.sql', '8.5'=>'v850.sql', '8.6'=>'v860.sql', '8.7'=>'v870.sql',
-                    '8.8'=>'v880.sql', '8.9'=>'v890.sql', '9.0'=>'v900.sql', '9.1'=>'v910.sql', '9.2'=>'v920.sql', '9.2.1'=>'v921.sql'];
+                    '8.8'=>'v880.sql', '8.9'=>'v890.sql', '9.0'=>'v900.sql', '9.1'=>'v910.sql', '9.2'=>'v920.sql', 
+                    '9.2.1'=>'v921.sql', '9.3'=>'v930.sql', '9.4'=>'v940.sql' ];
 
         $keys = array_keys($versions);
         $current_version = (get_setting('current_version') != null) ? get_setting('current_version') : '7.1.0';
@@ -333,8 +334,8 @@ class UpdateController extends Controller
             $num_of_sale = 0;
             try {
                 foreach ($seller->user->products as $seller_product) {
-                    $total += $seller_product->reviews->count();
-                    $rating += $seller_product->reviews->sum('rating');
+                    $total += $seller_product->reviews->where('status', 1)->count();
+                    $rating += $seller_product->reviews->where('status', 1)->sum('rating');
                     $num_of_sale += $seller_product->num_of_sale;
                 }
                 if ($total > 0) {

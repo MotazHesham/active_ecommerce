@@ -82,7 +82,7 @@
                                 @foreach ($admin_products as $key => $product_id)
                                     @php
                                         $product = get_single_product($product_id);
-                                        $cartItem = $carts->toQuery()->where('product_id', $product_id)->first();
+                                        $cartItem = $carts->toQuery()->where('product_id', $product_id)->where('variation', $admin_product_variation[$key])->first();
                                         $product_stock = $product->stocks->where('variant', $cartItem->variation)->first();
                                         $total = $total + cart_product_price($cartItem, $product, false) * $cartItem->quantity;
                                     @endphp
@@ -192,7 +192,7 @@
                                     @foreach ($seller_product as $key2 => $product_id)
                                         @php
                                             $product = get_single_product($product_id);
-                                            $cartItem = $carts->toQuery()->where('product_id', $product_id)->first();
+                                            $cartItem = $carts->toQuery()->where('product_id', $product_id)->where('variation', $seller_product_variation[$key2])->first();
                                             $product_stock = $product->stocks->where('variant', $cartItem->variation)->first();
                                             $total = $total + cart_product_price($cartItem, $product, false) * $cartItem->quantity;
                                         @endphp

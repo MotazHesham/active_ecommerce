@@ -6,6 +6,7 @@ use App\Mail\InvoiceEmailManager;
 use App\Models\User;
 use App\Models\SmsTemplate;
 use App\Http\Controllers\OTPVerificationController;
+use App\Models\EmailTemplate;
 use Mail;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\OrderNotification;
@@ -15,18 +16,33 @@ class NotificationUtility
 {
     public static function sendOrderPlacedNotification($order, $request = null)
     {       
-        //sends email to customer with the invoice pdf attached
-        $array['view'] = 'emails.invoice';
-        $array['subject'] = translate('A new order has been placed') . ' - ' . $order->code;
-        $array['from'] = env('MAIL_FROM_ADDRESS');
-        $array['order'] = $order;
-        try {
-            if ($order->user->email != null) {
-                Mail::to($order->user->email)->queue(new InvoiceEmailManager($array));
-            }
-            Mail::to($order->orderDetails->first()->product->user->email)->queue(new InvoiceEmailManager($array));
-        } catch (\Exception $e) {
+        //sends email to Customer, Seller and Admin with the invoice pdf attached
+        $adminId = get_admin()->id;
+        $userIds = array($order->seller_id);
+        if($order->user->email != null){
+            array_push($userIds, $order->user_id);
+        }
+        if ($order->seller_id != $adminId) {
+            array_push($userIds, $adminId);
+        }
+        $users = User::findMany($userIds);
+        foreach($users as $user){
+            $emailIdentifier = 'order_placed_email_to_'.$user->user_type;
+            $emailTemplate = EmailTemplate::whereIdentifier($emailIdentifier)->first();
 
+            if($emailTemplate != null && $emailTemplate->status == 1){
+                $emailSubject = $emailTemplate->subject;
+                $emailSubject = str_replace('[[order_code]]', $order->code, $emailSubject);
+
+                $array['view']      = 'emails.invoice';
+                $array['subject']   = $emailSubject;
+                $array['order']     = $order;
+                if($emailTemplate->status == 1){
+                    try {
+                        Mail::to($user->email)->queue(new InvoiceEmailManager($array));
+                    } catch (\Exception $e) {}
+                }
+            }   
         }
 
         if (addon_is_activated('otp_system') && SmsTemplate::where('identifier', 'order_placement')->first()->status == 1) {
@@ -55,7 +71,7 @@ class NotificationUtility
 
     public static function sendNotification($order, $order_status)
     {     
-        $adminId = \App\Models\User::where('user_type', 'admin')->first()->id;
+        $adminId = get_admin()->id;
         $userIds = array($order->user->id, $order->seller_id);
         if ($order->seller_id != $adminId) {
             array_push($userIds, $adminId);

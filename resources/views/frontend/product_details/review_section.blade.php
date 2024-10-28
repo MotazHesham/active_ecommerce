@@ -17,7 +17,7 @@
                         <div class="mt-sm-3 w-100 w-sm-auto d-flex flex-wrap justify-content-end justify-content-md-start">
                             @php
                                 $total = 0;
-                                $total += $detailedProduct->reviews->count();
+                                $total += $detailedProduct->reviews->where('status', 1)->count();
                             @endphp
                             <span class="rating rating-mr-2">
                                 {{ renderStarRating($detailedProduct->rating) }}

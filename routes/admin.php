@@ -25,6 +25,7 @@ use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\CustomerProductController;
 use App\Http\Controllers\DigitalProductController;
 use App\Http\Controllers\DynamicPopupController;
+use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\FlashDealController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MeasurementPointsController;
@@ -162,6 +163,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     // Seller
     Route::resource('sellers', SellerController::class);
     Route::controller(SellerController::class)->group(function () {
+        Route::get('/seller/rating-followers', 'index')->name('sellers.rating_followers');
         Route::get('sellers_ban/{id}', 'ban')->name('sellers.ban');
         Route::get('/sellers/destroy/{id}', 'destroy')->name('sellers.destroy');
         Route::post('/bulk-seller-delete', 'bulk_seller_delete')->name('bulk-seller-delete');
@@ -173,6 +175,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/sellers/profile_modal', 'profile_modal')->name('sellers.profile_modal');
         Route::post('/sellers/approved', 'updateApproved')->name('sellers.approved');
         Route::post('/sellers/set-commission', 'setSellerBasedCommission')->name('set_seller_based_commission');
+        Route::post('/sellers/edit-custom-followers', 'editSellerCustomFollowers')->name('edit_Seller_custom_followers');
     });
 
     // Seller Payment
@@ -445,6 +448,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     Route::controller(ReviewController::class)->group(function () {
         Route::get('/reviews', 'index')->name('reviews.index');
         Route::post('/reviews/published', 'updatePublished')->name('reviews.published');
+        Route::get('/reviews/detail-reviews/{id}', 'detailReviews')->name('detail-reviews');
+        Route::get('/reviews/destroy', 'destroy')->name('reviews.destroy');
+
+        Route::get('/custom-review/create/{productId?}', 'customReviewCreate')->name('custom-review.create');
+        Route::get('/custom-review/edit/{id}', 'customReviewEdit')->name('custom-review.edit');
+        Route::post('/custom-review/update', 'customReviewUpdate')->name('custom-review.update');
+        Route::post('/custom-review/get-products', 'getProductByCategory')->name('get-custom-review-product-by-category');
     });
 
     //Support_Ticket
@@ -452,6 +462,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('support_ticket/', 'admin_index')->name('support_ticket.admin_index');
         Route::get('support_ticket/{id}/show', 'admin_show')->name('support_ticket.admin_show');
         Route::post('support_ticket/reply', 'admin_store')->name('support_ticket.admin_store');
+    });
+
+    // Email Template
+    Route::resource('email-templates', EmailTemplateController::class);
+    Route::controller(EmailTemplateController::class)->group(function() {
+        Route::get('/email-template/{id}', 'index')->name('email-templates.index');
+        Route::post('/email-template/update-status', 'updateStatus')->name('email-template.update-status');
     });
 
     //Pickup_Points

@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\OrderNotification;
+use App\Utility\EmailUtility;
 
 class OrderController extends Controller
 {
@@ -49,7 +50,7 @@ class OrderController extends Controller
         $order_type = '';
 
         $orders = Order::orderBy('id', 'desc');
-        $admin_user_id = User::where('user_type', 'admin')->first()->id;
+        $admin_user_id = get_admin()->id;
 
         if (Route::currentRouteName() == 'inhouse_orders.index' && Auth::user()->can('view_inhouse_orders')) {
             $orders = $orders->where('orders.seller_id', '=', $admin_user_id);
@@ -437,15 +438,20 @@ class OrderController extends Controller
                 }
             }
         }
+        // Delivery Status change email notification to Admin, seller, Customer
+        EmailUtility::order_email($order, $request->status);  
+
+        // Delivery Status change SMS notification
         if (addon_is_activated('otp_system') && SmsTemplate::where('identifier', 'delivery_status_change')->first()->status == 1) {
             try {
                 SmsUtility::delivery_status_change(json_decode($order->shipping_address)->phone, $order);
-            } catch (\Exception $e) {
-            }
+            } catch (\Exception $e) {}
         }
 
-        //sends Notifications to user
+        //Send web Notifications to user
         NotificationUtility::sendNotification($order, $request->status);
+
+        //Sends Firebase Notifications to user
         if (get_setting('google_firebase') == 1 && $order->user->device_token != null) {
             $request->device_token = $order->user->device_token;
             $request->title = "Order updated !";
@@ -514,8 +520,15 @@ class OrderController extends Controller
             calculateCommissionAffilationClubPoint($order);
         }
 
-        //sends Notifications to user
+        // Payment Status change email notification to Admin, seller, Customer
+        if($request->status == 'paid'){
+            EmailUtility::order_email($order, $request->status);  
+        }
+
+        //Sends Web Notifications to Admin, seller, Customer
         NotificationUtility::sendNotification($order, $request->status);
+
+        //Sends Firebase Notifications to Admin, seller, Customer
         if (get_setting('google_firebase') == 1 && $order->user->device_token != null) {
             $request->device_token = $order->user->device_token;
             $request->title = "Order updated !";

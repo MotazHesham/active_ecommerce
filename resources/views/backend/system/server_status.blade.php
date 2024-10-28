@@ -21,9 +21,9 @@
                         <tr>
                             <td>Php versions</td>
                             <td>{{ phpversion() }}</td>
-                            <td>8.0</td>
+                            <td>8.1</td>
                             <td>
-                                @if (floatval(phpversion()) >= 8.0)
+                                @if (floatval(phpversion()) >= 8.1)
                                 <i class="las la-check text-success"></i>
                                 @else
                                 <i class="las la-times text-danger"></i>

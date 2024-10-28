@@ -40,43 +40,43 @@ class RouteServiceProvider extends ServiceProvider
    */
   public function map()
   {
-     $this->mapApiRoutes();
+    $this->mapApiRoutes();
 
-     $this->mapApiSellerRoutes();
-    
-     $this->mapAdminRoutes();
+    $this->mapApiSellerRoutes();
 
-     $this->mapSellerRoutes();
-    
-     $this->mapAffiliateRoutes();
-    
-     $this->mapRefundRoutes();
-    
-     $this->mapClubPointsRoutes();
-    
-     $this->mapOtpRoutes();
-    
-     $this->mapOfflinePaymentRoutes();
-    
-     $this->mapAfricanPaymentGatewayRoutes();
-    
-     $this->mapPaytmRoutes();
-    
-     $this->mapPosRoutes();
-    
-     $this->mapSellerPackageRoutes();
-    
-     $this->mapDeliveryBoyRoutes();
-    
-     $this->mapAuctionRoutes();
+    $this->mapAdminRoutes();
 
-     $this->mapWholesaleRoutes();
-    
-     $this->mapWebRoutes();
+    $this->mapSellerRoutes();
 
-    // $this->mapInstallRoutes();
+    $this->mapAffiliateRoutes();
 
-    //$this->mapUpdateRoutes();
+    $this->mapRefundRoutes();
+
+    $this->mapClubPointsRoutes();
+
+    $this->mapOtpRoutes();
+
+    $this->mapOfflinePaymentRoutes();
+
+    $this->mapAfricanPaymentGatewayRoutes();
+
+    $this->mapPaytmRoutes();
+
+    $this->mapPosRoutes();
+
+    $this->mapSellerPackageRoutes();
+
+    $this->mapDeliveryBoyRoutes();
+
+    $this->mapAuctionRoutes();
+
+    $this->mapWholesaleRoutes();
+
+    $this->mapWebRoutes();
+
+  // $this->mapInstallRoutes();
+
+  //$this->mapUpdateRoutes();
   }
 
   /**

@@ -33,8 +33,8 @@
         $total = 0;
         $rating = 0;
         foreach ($shop->user->products as $key => $seller_product) {
-            $total += $seller_product->reviews->count();
-            $rating += $seller_product->reviews->sum('rating');
+            $total += $seller_product->reviews->where('status', 1)->count();
+            $rating += $seller_product->reviews->where('status', 1)->sum('rating');
         }
     @endphp
 

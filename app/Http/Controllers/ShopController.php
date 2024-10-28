@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SellerRegistrationRequest;
-use Illuminate\Http\Request;
 use App\Models\Shop;
 use App\Models\User;
 use App\Models\BusinessSetting;
 use Auth;
 use Hash;
-use App\Notifications\EmailVerificationNotification;
+use App\Utility\EmailUtility;
 use Illuminate\Support\Facades\Notification;
 
 class ShopController extends Controller
@@ -80,13 +79,27 @@ class ShopController extends Controller
                 $user->save();
             } else {
                 try {
-                    $user->notify(new EmailVerificationNotification());
+                    EmailUtility::email_verification($user, 'seller');
                 } catch (\Throwable $th) {
                     $shop->delete();
                     $user->delete();
                     flash(translate('Seller registration failed. Please try again later.'))->error();
                     return back();
                 }
+            }
+
+            // Account Opening Email to Seller
+            if ((get_email_template_data('registration_email_to_seller', 'status') == 1)) {
+                try {
+                    EmailUtility::selelr_registration_email('registration_email_to_seller', $user, null);
+                } catch (\Exception $e) {}
+            }
+
+            // Seller Account Opening Email to Admin
+            if ((get_email_template_data('seller_reg_email_to_admin', 'status') == 1)) {
+                try {
+                    EmailUtility::selelr_registration_email('seller_reg_email_to_admin', $user, null);
+                } catch (\Exception $e) {}
             }
 
             flash(translate('Your Shop has been created successfully!'))->success();

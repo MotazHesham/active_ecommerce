@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Mail\MailManager;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use App\Models\User;
-use App\Mail\SecondEmailVerifyMailManager;
+use App\Models\EmailTemplate;
 use App\Utility\SmsUtility;
 use Mail;
 
@@ -52,13 +53,19 @@ class ForgotPasswordController extends Controller
             if ($user != null) {
                 $user->verification_code = rand(100000,999999);
                 $user->save();
+                
+                $emailTemplate = EmailTemplate::whereIdentifier('password_reset_email_to_all')->first();
+                $emailSubject = $emailTemplate->subject;
+                $emailSubject = str_replace('[[store_name]]', get_setting('site_name'), $emailSubject);
 
-                $array['view'] = 'emails.verification';
-                $array['from'] = env('MAIL_FROM_ADDRESS');
-                $array['subject'] = translate('Password Reset');
-                $array['content'] = translate('Verification Code is').': '. $user->verification_code;
-
-                Mail::to($user->email)->queue(new SecondEmailVerifyMailManager($array));
+                $email_body = $emailTemplate->default_text;
+                $email_body = str_replace('[[user_email]]', $user->email, $email_body);
+                $email_body = str_replace('[[code]]', $user->verification_code, $email_body);
+                $email_body = str_replace('[[store_name]]', get_setting('site_name'), $email_body);
+                
+                $array['subject'] = $emailSubject;
+                $array['content'] = $email_body;
+                Mail::to($user->email)->queue(new MailManager($array));
 
                 return view('auth.'.get_setting('authentication_layout_select').'.reset_password');
             }

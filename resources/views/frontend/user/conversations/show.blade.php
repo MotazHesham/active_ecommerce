@@ -36,39 +36,6 @@
 
         <div class="card-body">
             <!-- Conversations -->
-            {{-- <ul class="list-group list-group-flush">
-                @foreach($conversation->messages as $message)
-                    <li class="list-group-item px-0">
-                        <div class="media mb-2">
-                            @if (Auth::user()->id != $message->user_id && $message->user->shop != null)
-                                <a href="{{ route('shop.visit', $message->user->shop->slug) }}" class="">
-                                    <img  class="avatar avatar-sm mr-3" src="{{ uploaded_asset($message->user->shop->logo) }}"
-                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
-                                </a>
-                            @else
-                                <img class="avatar avatar-sm mr-3" @if($message->user != null) src="{{ uploaded_asset($message->user->avatar_original) }}" @endif
-                                    onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
-                            @endif
-                            <div class="media-body">
-                                <h6 class="mb-0 fw-600 mb-2">
-                                    @if (Auth::user()->id != $message->user_id && $message->user->shop != null)
-                                        <a href="{{ route('shop.visit', $message->user->shop->slug) }}" class="text-reset hov-text-primary">{{ $message->user->shop->name }}</a>
-                                    @else
-                                        {{ $message->user ? $message->user->name : '' }}
-                                    @endif
-                                </h6>
-                                <p class="fs-12 text-secondary">
-                                    {{ date('d.m.Y h:i:m', strtotime($message->created_at)) }}
-                                </p>
-                            </div>
-                        </div>
-                        <p class="fs-14 fw-400">
-                            {{ $message->message }}
-                        </p>
-                    </li>
-                @endforeach
-            </ul> --}}
-            <!-- Conversations -->
             <div id="messages">
                 @include('frontend.partials.messages', ['conversation', $conversation])
             </div>

@@ -8,7 +8,7 @@
             </div>
         </div>
     </div>
-
+    @php $authUser = auth()->user(); @endphp
     <div class="row">
         <div class="col-sm-6 col-md-6 col-xxl-3">
             <div class="card shadow-none mb-4 bg-primary py-4">
@@ -20,7 +20,7 @@
                                 <span class="fs-14 text-light">{{ translate('Products') }}</span>
                             </p>
                             <h3 class="mb-0 text-white fs-30">
-                                {{ \App\Models\Product::where('user_id', Auth::user()->id)->count() }}
+                                {{ \App\Models\Product::where('user_id', $authUser->id)->count() }}
                             </h3>
 
                         </div>
@@ -36,7 +36,7 @@
             </div>
         </div>
         <div class="col-sm-6 col-md-6 col-xxl-3">
-            <div class="card shadow-none mb-4 bg-primary py-4">
+            <div class="card shadow-none mb-4 bg-primary">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col">
@@ -45,9 +45,8 @@
                                 <span class="fs-14 text-light">{{ translate('Rating') }}</span>
                             </p>
                             <h3 class="mb-0 text-white fs-30">
-                                {{ Auth::user()->shop->rating }}
+                                {{ $authUser->shop->rating }}
                             </h3>
-
                         </div>
                         <div class="col-auto text-right">
                             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="61.143" viewBox="0 0 64 61.143">
@@ -55,6 +54,38 @@
                                     d="M63.286,22.145a2.821,2.821,0,0,0-1.816-.926L43.958,19.455a2.816,2.816,0,0,1-2.294-1.666L34.574,1.68a2.813,2.813,0,0,0-5.148,0l-7.09,16.11a2.813,2.813,0,0,1-2.292,1.666L2.53,21.219a2.813,2.813,0,0,0-1.59,4.9l13.13,11.72a2.818,2.818,0,0,1,.876,2.7l-3.734,17.2a2.812,2.812,0,0,0,4.166,3.026L30.584,51.9a2.8,2.8,0,0,1,2.832,0l15.206,8.864a2.813,2.813,0,0,0,4.166-3.026l-3.734-17.2a2.818,2.818,0,0,1,.876-2.7l13.13-11.72a2.813,2.813,0,0,0,.226-3.972m-1.5,2.546L48.658,36.413a4.717,4.717,0,0,0-1.47,4.524l3.732,17.2a.9.9,0,0,1-1.336.97l-15.2-8.866a4.729,4.729,0,0,0-4.758,0L14.416,59.109a.9.9,0,0,1-1.336-.97l3.732-17.2a4.717,4.717,0,0,0-1.47-4.524L2.212,24.691a.9.9,0,0,1,.51-1.57l17.512-1.766a4.721,4.721,0,0,0,3.85-2.8l7.09-16.11a.9.9,0,0,1,1.652,0l7.09,16.11a4.721,4.721,0,0,0,3.85,2.8l17.512,1.766a.9.9,0,0,1,.51,1.57"
                                     transform="translate(0 0)" fill="#FFFFFF" />
                             </svg>
+                        </div> 
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <div class="d-flex align-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                <g id="Group_38928" data-name="Group 38928" transform="translate(-9435 -1195)">
+                                    <g id="Layer_2" data-name="Layer 2" transform="translate(9435 1195)">
+                                        <g id="people">
+                                            <rect id="Rectangle_23088" data-name="Rectangle 23088" width="16" height="16" fill="#fff" opacity="0"/>
+                                            <path id="Path_45108" data-name="Path 45108" d="M6.667,8.333A2.667,2.667,0,1,0,4,5.667,2.667,2.667,0,0,0,6.667,8.333Zm0-4A1.333,1.333,0,1,1,5.333,5.667,1.333,1.333,0,0,1,6.667,4.333ZM12,9.667a2,2,0,1,0-2-2A2,2,0,0,0,12,9.667ZM12,7a.667.667,0,1,1-.667.667A.667.667,0,0,1,12,7Zm0,3.333a3.333,3.333,0,0,0-2.04.7A4.667,4.667,0,0,0,2,14.333a.667.667,0,1,0,1.333,0,3.333,3.333,0,0,1,6.667,0,.667.667,0,0,0,1.333,0A4.6,4.6,0,0,0,10.76,12.1,2,2,0,0,1,14,13.667a.667.667,0,1,0,1.333,0A3.333,3.333,0,0,0,12,10.333Z" transform="translate(-0.667 -1)" fill="#fff"/>
+                                        </g>
+                                    </g>
+                                </g>
+                            </svg>
+                            <p class="fs-12 text-light my-2 ml-1">{{ translate('Followers').' '.$authUser->shop->followers()->count() }}</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16.5" height="16.5" viewBox="0 0 16.5 16.5">
+                                <g id="Group_38929" data-name="Group 38929" transform="translate(-10183 -1360.5)">
+                                    <g id="Layer_2" data-name="Layer 2" transform="translate(10183 1361)">
+                                        <g id="people">
+                                            <rect id="Rectangle_23088" data-name="Rectangle 23088" width="16" height="16" fill="#fff" opacity="0"/>
+                                            <path id="Path_45108" data-name="Path 45108" d="M6.667,8.333A2.667,2.667,0,1,0,4,5.667,2.667,2.667,0,0,0,6.667,8.333Zm0-4A1.333,1.333,0,1,1,5.333,5.667,1.333,1.333,0,0,1,6.667,4.333ZM12,9.667a2,2,0,1,0-2-2A2,2,0,0,0,12,9.667ZM12,7a.667.667,0,1,1-.667.667A.667.667,0,0,1,12,7Zm0,3.333a3.333,3.333,0,0,0-2.04.7A4.667,4.667,0,0,0,2,14.333a.667.667,0,1,0,1.333,0,3.333,3.333,0,0,1,6.667,0,.667.667,0,0,0,1.333,0A4.6,4.6,0,0,0,10.76,12.1,2,2,0,0,1,14,13.667a.667.667,0,1,0,1.333,0A3.333,3.333,0,0,0,12,10.333Z" transform="translate(-0.667 -1)" fill="#fff"/>
+                                        </g>
+                                    </g>
+                                    <g id="Group_38926" data-name="Group 38926" transform="translate(10117.9 1317.63)">
+                                        <line id="Line_315" data-name="Line 315" x2="4" transform="translate(77.1 45.37)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1"/>
+                                        <line id="Line_316" data-name="Line 316" y1="4" transform="translate(79.099 43.37)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1"/>
+                                    </g>
+                                </g>
+                            </svg>
+                            <p class="fs-12 text-light my-2 ml-1">{{ translate('Custom Followers').' '.$authUser->shop->custom_followers }}</p>
                         </div>
                     </div>
                 </div>
@@ -70,7 +101,7 @@
                                 <span class="fs-14 text-light">{{ translate('Total Order') }}</span>
                             </p>
                             <h3 class="mb-0 text-white fs-30">
-                                {{ \App\Models\Order::where('seller_id', Auth::user()->id)->where('delivery_status', 'delivered')->count() }}
+                                {{ \App\Models\Order::where('seller_id', $authUser->id)->where('delivery_status', 'delivered')->count() }}
                             </h3>
                         </div>
                         <div class="col-auto text-right">
@@ -127,7 +158,7 @@
                             </p>
                             <h3 class="mb-0 text-white fs-30">
                                 @php
-                                    $orderDetails = \App\Models\OrderDetail::where('seller_id', Auth::user()->id)->get();
+                                    $orderDetails = \App\Models\OrderDetail::where('seller_id', $authUser->id)->get();
                                     $total = 0;
                                     foreach ($orderDetails as $key => $orderDetail) {
                                         if ($orderDetail->order != null && $orderDetail->order->payment_status == 'paid') {
@@ -174,35 +205,16 @@
                 </div>
             </div>
             <div class="card shadow-none bg-soft-primary mb-0">
-
-                @php
-                    $date = date('Y-m-d');
-                    $days_ago_30 = date('Y-m-d', strtotime('-30 days', strtotime($date)));
-                    $days_ago_60 = date('Y-m-d', strtotime('-60 days', strtotime($date)));
-                    
-                    $orderTotal = \App\Models\Order::where('seller_id', Auth::user()->id)
-                        ->where('payment_status', 'paid')
-                        ->where('created_at', '>=', $days_ago_30)
-                        ->sum('grand_total');
-                @endphp
-
                 <div class="card-body">
                     <div class="card-title text-primary fs-16 fw-600">
                         {{ translate('Sold Amount') }}
                     </div>
                     <p>{{ translate('Your Sold Amount (Current month)') }}</p>
                     <h3 class="text-primary fw-600 fs-30">
-                        {{ single_price($orderTotal) }}
+                        {{ single_price($this_month_sold_amount) }}
                     </h3>
                     <p class="mt-4">
-                        @php
-                            $orderTotal = \App\Models\Order::where('seller_id', Auth::user()->id)
-                                ->where('payment_status', 'paid')
-                                ->where('created_at', '>=', $days_ago_60)
-                                ->where('created_at', '<=', $days_ago_30)
-                                ->sum('grand_total');
-                        @endphp
-                        {{ translate('Last Month') }}: {{ single_price($orderTotal) }}
+                        {{ translate('Last Month') }}: {{ single_price($previous_month_sold_amount) }}
                     </p>
                 </div>
             </div>
@@ -217,7 +229,7 @@
                     <ul class="list-group">
                         @foreach (\App\Models\Category::all() as $key => $category)
                             @php
-                                $cat_products = \App\Models\Product::where('user_id', Auth::user()->id)->where('category_id',$category->id)->count();
+                                $cat_products = \App\Models\Product::where('user_id', $authUser->id)->where('category_id',$category->id)->count();
                             @endphp
                             @if ($cat_products > 0)
                                 <li class="d-flex justify-content-between align-items-center my-2 text-primary fs-13">
@@ -264,7 +276,7 @@
                                 <span class="fs-13 text-primary fw-600">{{ translate('New Order') }}</span>
                             </p>
                             <h3 class="mb-0" style="color: #A9A3CC">
-                                {{ \App\Models\OrderDetail::where('seller_id', Auth::user()->id)->where('delivery_status', 'pending')->count() }}
+                                {{ $this_month_pending_orders }}
                             </h3>
                         </div>
                     </div>
@@ -303,7 +315,7 @@
                                 <span class="fs-13 text-primary fw-600">{{ translate('Cancelled') }}</span>
                             </p>
                             <h3 class="mb-0" style="color: #A9A3CC">
-                                {{ \App\Models\OrderDetail::where('seller_id', Auth::user()->id)->where('delivery_status', 'cancelled')->count() }}
+                                {{ $this_month_cancelled_orders }}
                             </h3>
                         </div>
                     </div>
@@ -345,7 +357,7 @@
                                 <span class="fs-13 text-primary fw-600">{{ translate('On Delivery') }}</span>
                             </p>
                             <h3 class="mb-0" style="color: #A9A3CC">
-                                {{ \App\Models\OrderDetail::where('seller_id', Auth::user()->id)->where('delivery_status', 'on_the_way')->count() }}
+                                {{ $this_month_on_the_way_orders }}
                             </h3>
                         </div>
                     </div>
@@ -375,7 +387,7 @@
                                 <span class="fs-13 text-primary fw-600">{{ translate('Delivered') }}</span>
                             </p>
                             <h3 class="mb-0" style="color: #A9A3CC">
-                                {{ \App\Models\OrderDetail::where('seller_id', Auth::user()->id)->where('delivery_status', 'delivered')->count() }}
+                                {{ $this_month_delivered_orders }}
                             </h3>
                         </div>
                     </div>
@@ -390,22 +402,22 @@
                         <div class="card-title">
                             <h6 class="mb-0">{{ translate('Purchased Package') }}</h6>
                         </div>
-                        @if (Auth::user()->shop->seller_package)
+                        @if ($authUser->shop->seller_package)
                             <div class="d-flex">
                                 <div class="col-3">
-                                    <img src="{{ uploaded_asset(Auth::user()->shop->seller_package->logo) }}"
+                                    <img src="{{ uploaded_asset($authUser->shop->seller_package->logo) }}"
                                         class="img-fluid mb-4 w-64px">
                                 </div>
                                 <div class="col-9">
                                     <a class="fw-600 mb-3 text-primary">{{ translate('Current Package') }}:</a>
                                     <h6 class="text-primary">
-                                        {{ Auth::user()->shop->seller_package->name }}
+                                        {{ $authUser->shop->seller_package->name }}
                                         </h3>
                                         <p class="mb-1 text-muted">{{ translate('Product Upload Limit') }}:
-                                            {{ Auth::user()->shop->product_upload_limit }} {{ translate('Times') }}
+                                            {{ $authUser->shop->product_upload_limit }} {{ translate('Times') }}
                                         </p>
                                         <p class="text-muted mb-4">{{ translate('Package Expires at') }}:
-                                            {{ Auth::user()->shop->package_invalid_at }}
+                                            {{ $authUser->shop->package_invalid_at }}
                                         </p>
                                         <div class="">
                                             <a href="{{ route('seller.seller_packages_list') }}"
@@ -422,7 +434,7 @@
             @endif
             <div
                 class="card mb-0 @if (addon_is_activated('seller_subscription')) px-4 py-5 @else p-5 h-100 @endif d-flex align-items-center justify-content-center">
-                @if (Auth::user()->shop->verification_status == 0)
+                @if ($authUser->shop->verification_status == 0)
                     <div class="my-n4 py-1 text-center">
                         <img src="{{ static_asset('assets/img/non_verified.png') }}" alt=""
                             class="w-xxl-130px w-90px d-block">

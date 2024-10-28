@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Upload;
 use App\Models\Product;
 use App\Utility\CartUtility;
+use App\Utility\EmailUtility;
 use Cookie;
 use Illuminate\Http\Request;
 
@@ -94,6 +95,9 @@ class PurchaseHistoryController extends Controller
                 $orderDetail->save();
                 product_restock($orderDetail);
             }
+
+            // Order paid notification to Customer, Seller, & Admin
+            EmailUtility::order_email($order, 'cancelled'); 
 
             flash(translate('Order has been canceled successfully'))->success();
         } else {

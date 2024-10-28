@@ -21,7 +21,6 @@ Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function()
         Route::get('/refund-request-config', 'refund_config')->name('refund_time_config');
         Route::get('/paid-refund', 'paid_index')->name('paid_refund');
         Route::get('/rejected-refund', 'rejected_index')->name('rejected_refund');
-        Route::post('admin/refund-approval', 'request_approval_vendor')->name('admin.refund_approval');
         Route::get('/admin/refund-request-reason/{id}', 'reason_view')->name('admin.reason_show');
         Route::post('/admin/reject-refund-request','reject_refund_request')->name('admin.reject_refund_request');
         Route::get('/admin/refund-request-reject-reason/{id}', 'reject_reason_view')->name('admin.reject_reason_show');

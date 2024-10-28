@@ -62,8 +62,8 @@
                             </a>
                         </li>
                         <li class="aiz-side-nav-item">
-                            <a href="{{ route('seller.reviews') }}"
-                                class="aiz-side-nav-link {{ areActiveRoutes(['seller.reviews']) }}">
+                            <a href="{{ route('seller.product-reviews') }}"
+                                class="aiz-side-nav-link {{ areActiveRoutes(['seller.product-reviews', 'seller.detail-reviews']) }}">
                                 <span class="aiz-side-nav-text">{{ translate('Product Reviews') }}</span>
                             </a>
                         </li>

@@ -472,54 +472,6 @@
                 </div>
             </div>
 
-            <!-- Top Category & Products -->
-            {{-- <div class="col-lg-6">
-                <div class="dashboard-box bg-white mb-2rem overflow-hidden p-2rem" style="height: 474px;">
-                    <!-- Header -->
-                    <div class="d-sm-flex align-items-center justify-content-between mb-3">
-                        <div class="mb-3 mb-sm-0">
-                            <h2 class="fs-16 fw-600 text-soft-dark mb-2">{{ translate('Top Category & Products') }}</h2>
-                            <h4 class="fs-13 fw-600 text-secondary mb-0">{{ translate('By Sales') }}</h4>
-                        </div>
-                        <!-- nav -->
-                        <ul class="nav nav-tabs dashboard-tab dashboard-tab-warning border-0" role="tablist"
-                            aria-orientation="vertical">
-                            <li class="nav-item">
-                                <a class="nav-link top_category_products_tab active" id="all-tab" href="#all"
-                                    data-toggle="tab" data-target="all" type="button" role="tab" aria-controls="all"
-                                    aria-selected="true">
-                                    {{ translate('All') }}
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link top_category_products_tab" id="today-tab" href="#today"
-                                    data-toggle="tab" data-target="DAY" type="button" role="tab" aria-controls="today"
-                                    aria-selected="true">
-                                    {{ translate('Today') }}
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link top_category_products_tab" id="week-tab" href="#week"
-                                    data-toggle="tab" data-target="WEEK" type="button" role="tab" aria-controls="week"
-                                    aria-selected="true">
-                                    {{ translate('Week') }}
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link top_category_products_tab" id="month-tab" href="#month"
-                                    data-toggle="tab" data-target="MONTH" type="button" role="tab"
-                                    aria-controls="month" aria-selected="true">
-                                    {{ translate('Month') }}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div id="top-category-products-section">
-
-                    </div>
-                </div>
-            </div> --}}
-
             <!-- Top Category & Top Brands -->
             <div class="col-lg-6">
                 <div class="row gutters-16">
@@ -720,55 +672,6 @@
                     </div>
                 </div>
             @endif
-
-            <!-- Top Brands & Products -->
-            {{-- <div class="@if (get_setting('vendor_system_activation') == 1) col-lg-6 @else col-lg-12 @endif">
-                <div class="dashboard-box bg-white mb-2rem overflow-hidden p-2rem" style="height: 474px;">
-                    <!-- Header -->
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div>
-                            <h2 class="fs-16 fw-600 text-soft-dark mb-2">{{ translate('Top Brands & Products') }}</h2>
-                            <h4 class="fs-13 fw-600 text-secondary mb-0">{{ translate('By Sales') }}</h4>
-                        </div>
-                        <!-- nav -->
-                        <ul class="nav nav-tabs dashboard-tab dashboard-tab-warning border-0" role="tablist"
-                            aria-orientation="vertical">
-                            <li class="nav-item">
-                                <a class="nav-link top_brands_products_tab active" id="all-tab" href="#all"
-                                    data-toggle="tab" data-target="all" type="button" role="tab" aria-controls="all"
-                                    aria-selected="true">
-                                    {{ translate('All') }}
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link top_brands_products_tab" id="today-tab" href="#today" data-toggle="tab"
-                                    data-target="DAY" type="button" role="tab" aria-controls="today"
-                                    aria-selected="true">
-                                    {{ translate('Today') }}
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link top_brands_products_tab" id="week-tab" href="#week" data-toggle="tab"
-                                    data-target="WEEK" type="button" role="tab" aria-controls="week"
-                                    aria-selected="true">
-                                    {{ translate('Week') }}
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link top_brands_products_tab" id="month-tab" href="#month" data-toggle="tab"
-                                    data-target="MONTH" type="button" role="tab" aria-controls="month"
-                                    aria-selected="true">
-                                    {{ translate('Month') }}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div id="top-brands-products-section">
-
-                    </div>
-                </div>
-            </div> --}}
-
         </div>
     @endcan
     

@@ -15,6 +15,7 @@ use Hash;
 use Socialite;
 use App\Models\Cart;
 use App\Rules\Recaptcha;
+use App\Utility\EmailUtility;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -334,16 +335,8 @@ class AuthController extends Controller
         $user->save();
 
         // Account Opening and verification(if activated) eamil send
-        $array['email'] = $user->email;
-        $array['password'] = $password;
-        $array['subject'] = translate('Account Opening Email');
-        $array['from'] = env('MAIL_FROM_ADDRESS');
-
         try {
-            Mail::to($user->email)->queue(new GuestAccountOpeningMailManager($array));
-            if($isEmailVerificationEnabled == 1){
-                $user->notify(new AppEmailVerificationNotification());
-            }
+            EmailUtility::customer_registration_email('registration_from_system_email_to_customer', $user, $password);
         } catch (\Exception $e) {
             $success = 0;
             $user->delete();
@@ -356,6 +349,10 @@ class AuthController extends Controller
             ]);
         }
 
+        if($isEmailVerificationEnabled == 1){
+            $user->notify(new AppEmailVerificationNotification());
+        }
+        
         // User Address Create
         $address = new Address();
         $address->user_id       = $user->id;
