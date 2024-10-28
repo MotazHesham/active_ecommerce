@@ -11,6 +11,7 @@ use App\Models\DeliveryHistory;
 use App\Models\Order;
 use App\Models\State;
 use App\Models\User;
+use App\Utility\EmailUtility;
 use Auth;
 use Hash;
 use Illuminate\Http\Request;
@@ -86,6 +87,7 @@ class DeliveryBoyController extends Controller
             'city_id'       => 'required',
         ]);
 
+        $password = $request->password;
         $country = Country::where('id', $request->country_id)->first();
         $state = State::where('id', $request->state_id)->first();
         $city = City::where('id', $request->city_id)->first();
@@ -96,18 +98,22 @@ class DeliveryBoyController extends Controller
         $user->email                = $request->email;
         $user->phone                = $request->phone;
         $user->country              = $country->name;
-        $user->state                  = $state->name;
+        $user->state                = $state->name;
         $user->city                 = $city->name;
         $user->avatar_original      = $request->avatar_original;
         $user->address              = $request->address;
         $user->email_verified_at    = date("Y-m-d H:i:s");
-        $user->password             = Hash::make($request->password);
+        $user->password             = Hash::make($password);
         $user->save();
 
         $delivery_boy = new DeliveryBoy;
 
         $delivery_boy->user_id = $user->id;
         $delivery_boy->save();
+
+        // delivery boy register emai to admin and deliver boy
+        $emailIdentifiers = ['deliveryboy_reg_email_to_admin','registration_from_system_email_to_deliveryboy'];
+        EmailUtility::deliveryBoyRegEmail($emailIdentifiers, $user, $password);
 
         flash(translate('Delivery Boy has been created successfully'))->success();
         return redirect()->route('delivery-boys.index');

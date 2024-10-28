@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\BusinessSetting;
 use App\Models\ClubPoint;
+use App\Models\EmailTemplate;
 use App\Models\RefundRequest;
 use App\Models\OrderDetail;
 use App\Models\Shop;
 use App\Models\Wallet;
 use App\Models\User;
+use App\Utility\EmailUtility;
 use Artisan;
 use Auth;
 
@@ -32,9 +34,10 @@ class RefundRequestController extends Controller
     //Store Customer Refund Request
     public function request_store(Request $request, $id)
     {
+        $user = auth()->user();
         $order_detail = OrderDetail::where('id', $id)->first();
         $refund = new RefundRequest;
-        $refund->user_id = Auth::user()->id;
+        $refund->user_id = $user->id;
         $refund->order_id = $order_detail->order_id;
         $refund->order_detail_id = $order_detail->id;
         $refund->seller_id = $order_detail->seller_id;
@@ -45,6 +48,19 @@ class RefundRequestController extends Controller
         $refund->refund_amount = $order_detail->price + $order_detail->tax;
         $refund->refund_status = 0;
         if ($refund->save()) {
+
+            // Refund Request email to admin, Seller, customer
+            $admin = get_admin();
+            $emailIdentifiers = array('refund_request_email_to_admin');
+            if($order_detail->order->user->email != null){
+                array_push($emailIdentifiers, 'refund_request_email_to_customer');
+            }
+            if ($order_detail->order->seller_id != $admin->id) {
+                array_push($emailIdentifiers, 'refund_request_email_to_seller');
+            }
+
+            EmailUtility::refundEmail($emailIdentifiers, $refund);
+            
             flash( translate("Refund Request has been sent successfully") )->success();
             return redirect()->route('purchase_history.index');
         }
@@ -62,9 +78,7 @@ class RefundRequestController extends Controller
     public function vendor_index()
     {
         $refunds = RefundRequest::where('seller_id', Auth::user()->id)->latest()->paginate(10);
-        
         return view('refund_request.frontend.recieved_refund_request.index', compact('refunds'));
-        
     }
 
     /**
@@ -169,16 +183,15 @@ class RefundRequestController extends Controller
      */
     public function request_approval_vendor(Request $request)
     {
+        $authUser = auth()->user();
         $refund = RefundRequest::findOrFail($request->el);
-        if (Auth::user()->user_type == 'admin' || Auth::user()->user_type == 'staff') {
-            $refund->seller_approval = 1;
-            $refund->admin_approval = 1;
-        }
-        else {
-            $refund->seller_approval = 1;
-        }
+        $refund->seller_approval = 1;
 
         if ($refund->save()) {
+            // Refund Request Approval mail to admin and seller
+            $emailIdentifiers = array('refund_accepted_by_seller_email_to_admin', 'refund_accepted_by_seller_email_to_seller');
+            EmailUtility::refundEmail($emailIdentifiers, $refund);
+
             return 1;
         }
         else {
@@ -193,6 +206,7 @@ class RefundRequestController extends Controller
     public function refund_pay(Request $request)
     {
         $refund = RefundRequest::findOrFail($request->refund_id);
+
         if ($refund->seller_approval == 1) {
             $seller = Shop::where('user_id', $refund->seller_id)->first();
             if ($seller != null) {
@@ -225,6 +239,7 @@ class RefundRequestController extends Controller
         $wallet->payment_method = 'Refund';
         $wallet->payment_details = 'Product Money Refund';
         $wallet->save();
+
         $user = User::findOrFail($refund->user_id);
         $user->balance += $refund_amount;
         $user->save();
@@ -234,6 +249,20 @@ class RefundRequestController extends Controller
         }
 
         if ($refund->save()) {
+
+            // Refund request approved email send to admin, seller and Customer
+            $admin = get_admin();
+            $order_detail =  $refund->orderDetail;
+            $emailIdentifiers = array('refund_accepted_by_admin_email_to_admin');
+            if($order_detail->order->user->email != null){
+                array_push($emailIdentifiers, 'refund_request_accepted_email_to_customer');
+            }
+            if ($order_detail->order->seller_id != $admin->id) {
+                array_push($emailIdentifiers, 'refund_accepted_by_admin_email_to_seller');
+            }
+
+            EmailUtility::refundEmail($emailIdentifiers, $refund);
+
             flash(translate('Refund has been sent successfully.'))->success();
         }
         else {
@@ -243,24 +272,42 @@ class RefundRequestController extends Controller
     }
 
     public function reject_refund_request(Request $request){
-      $refund = RefundRequest::findOrFail($request->refund_id);
-      if (Auth::user()->user_type == 'admin' || Auth::user()->user_type == 'staff') {
-          $refund->admin_approval = 2;
-          $refund->refund_status  = 2;
-          $refund->reject_reason  = $request->reject_reason;
-      }
-      else{
-          $refund->seller_approval = 2;
-          $refund->reject_reason  = $request->reject_reason;
-      }
-      
-      if ($refund->save()) {
-          flash(translate('Refund request rejected successfully.'))->success();
-          return back();
-      }
-      else {
-          return back();
-      }
+        $authUserType = auth()->user()->user_type;
+        $refund = RefundRequest::findOrFail($request->refund_id);
+        if ($authUserType == 'admin' ||  $authUserType == 'staff') {
+            $refund->admin_approval = 2;
+            $refund->refund_status  = 2;
+            $refund->reject_reason  = $request->reject_reason;
+        }
+        else{
+            $refund->seller_approval = 2;
+            $refund->reject_reason  = $request->reject_reason;
+        }
+        
+        if ($refund->save()) {
+            // Refund request denied email send to admin, seller and Customer
+            $admin = get_admin();
+            $order_detail =  $refund->orderDetail;
+            if ($authUserType == 'admin' ||  $authUserType == 'staff') {
+                $emailIdentifiers = array('refund_denied_by_admin_email_to_admin');
+                if($order_detail->order->user->email != null){
+                    array_push($emailIdentifiers, 'refund_request_denied_email_to_customer');
+                }
+                if ($order_detail->order->seller_id != $admin->id) {
+                    array_push($emailIdentifiers, 'refund_denied_by_admin_email_to_seller');
+                }
+            }
+            else{
+                $emailIdentifiers = array('refund_denied_by_seller_email_to_admin', 'refund_denied_by_seller_email_to_seller');
+            }
+            EmailUtility::refundEmail($emailIdentifiers, $refund);
+            
+            flash(translate('Refund request rejected successfully.'))->success();
+            return back();
+        }
+        else {
+            return back();
+        }
     }
 
     /**

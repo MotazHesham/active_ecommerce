@@ -56,10 +56,14 @@
                             @endif
                         </td>
                         <td>
-                            @if ($refund->seller_approval == 1)
-                              <span class="badge badge-inline badge-success">{{translate('Approved')}}</span>
+                            @if ($refund->orderDetail != null && $refund->orderDetail->product != null && $refund->orderDetail->product->added_by == 'admin')
+                                <span class="badge badge-inline badge-warning">{{translate('Inhouse Product')}}</span>
                             @else
-                              <span class="badge badge-inline badge-warning">{{translate('Pending')}}</span>
+                                @if ($refund->seller_approval == 1)
+                                    <span class="badge badge-inline badge-success">{{translate('Approved')}}</span>
+                                @else
+                                    <span class="badge badge-inline badge-primary">{{translate('Pending')}}</span>
+                                @endif
                             @endif
                         </td>
                         <td>

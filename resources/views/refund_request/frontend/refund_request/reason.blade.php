@@ -5,7 +5,7 @@
 	<div class="aiz-titlebar mt-2 mb-4">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <h1 class="h3">{{ translate('Reason of Refund Request') }}</h1>
+                <h3 class="h3">{{ translate('Reason of Refund Request') }}</h3>
             </div>
         </div>
     </div>

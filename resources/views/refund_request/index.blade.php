@@ -59,7 +59,7 @@
                         </td>
                         <td>
                             @if ($refund->orderDetail != null && $refund->orderDetail->product != null && $refund->orderDetail->product->added_by == 'admin')
-                                <span class="badge badge-inline badge-warning">{{translate('Own Product')}}</span>
+                                <span class="badge badge-inline badge-warning">{{translate('Inhouse Product')}}</span>
                             @else
                                 @if ($refund->seller_approval == 1)
                                     <span class="badge badge-inline badge-success">{{translate('Approved')}}</span>
@@ -165,16 +165,6 @@
 
 @section('script')
     <script type="text/javascript">
-        function update_refund_approval(el){
-            $.post('{{ route('admin.refund_approval') }}',{_token:'{{ @csrf_token() }}', el:el}, function(data){
-                if (data == 1) {
-                    AIZ.plugins.notify('success', '{{ translate('Approval has been done successfully') }}');
-                }
-                else {
-                    AIZ.plugins.notify('danger', '{{ translate('Something went wrong') }}');
-                }
-            });
-        }
 
         function refund_request_money(refund_id){
             $('.approve_refund_request').modal('show');

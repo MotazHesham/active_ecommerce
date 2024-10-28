@@ -26,10 +26,10 @@
                                       </div>
                                       <div class="row">
                                           <div class="col-md-3">
-                                              <label>{{translate('Product Price')}} <span class="text-danger">*</span></label>
+                                              <label>{{translate('Amount')}} <span class="text-danger">*</span></label>
                                           </div>
                                           <div class="col-md-9">
-                                              <input type="number" class="form-control mb-3 rounded-0" name="name" placeholder="{{translate('Product Price')}}" value="{{ $order_detail->product->unit_price }}" readonly>
+                                              <input type="number" class="form-control mb-3 rounded-0" name="amount" placeholder="{{translate('Product Price')}}" value="{{ $order_detail->price + $order_detail->tax }}" readonly>
                                           </div>
                                       </div>
                                       <div class="row">
@@ -45,7 +45,7 @@
                                               <label>{{translate('Refund Reason')}} <span class="text-danger">*</span></label>
                                           </div>
                                           <div class="col-md-9">
-                                              <textarea name="reason" rows="8" class="form-control mb-3 rounded-0"></textarea>
+                                              <textarea name="reason" rows="8" class="form-control mb-3 rounded-0" required></textarea>
                                           </div>
                                       </div>
                                       <div class="form-group mb-0 text-right">
