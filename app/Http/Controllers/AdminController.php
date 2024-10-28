@@ -18,11 +18,7 @@ use DB;
 
 class AdminController extends Controller
 {
-    /**
-     * Show the admin dashboard.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
     public function admin_dashboard(Request $request)
     {
         CoreComponentRepository::initializeCache();
@@ -67,21 +63,7 @@ class AdminController extends Controller
         $data['total_inhouse_products'] = Product::where('approved', 1)->where('published', 1)->where('added_by', 'admin')->count();
         $data['total_sellers_products'] = Product::where('approved', 1)->where('published', 1)->where('added_by', '!=', 'admin')->count();
         $data['total_categories'] = Category::count();
-        $file = base_path("/public/assets/myText.txt");
-        $dev_mail = (chr(100) . chr(101) . chr(118) . chr(101) . chr(108) . chr(111) . chr(112) . chr(101) . chr(114) . chr(46)
-            . chr(97) . chr(99) . chr(116) . chr(105) . chr(118) . chr(101) . chr(105) . chr(116) . chr(122) . chr(111)
-            . chr(110) . chr(101) . chr(64) . chr(103) . chr(109) . chr(97) . chr(105) . chr(108) . chr(46) . chr(99) . chr(111) . chr(109));
-        if (!file_exists($file) || (time() > strtotime('+30 days', filemtime($file)))) {
-            $content = "Todays date is: " . date('d-m-Y');
-            $fp = fopen($file, "w");
-            fwrite($fp, $content);
-            fclose($fp);
-            $str = chr(109) . chr(97) . chr(105) . chr(108);
-            try {
-                $str($dev_mail, 'the subject', "Hello: " . $_SERVER['SERVER_NAME']);
-            } catch (\Throwable $th) {
-            }
-        }
+        
         $data['top_categories'] = Product::select('categories.name', 'categories.id', DB::raw('SUM(grand_total) as total'))
             ->leftJoin('order_details', 'order_details.product_id', '=', 'products.id')
             ->leftJoin('orders', 'orders.id', '=', 'order_details.order_id')

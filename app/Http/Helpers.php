@@ -2369,11 +2369,8 @@ if (!function_exists('ifUserHasWelcomeCouponAndNotUsed')) {
 // get dev mail
 if (!function_exists('get_dev_mail')) {
     function get_dev_mail()
-    {
-        $dev_mail = (chr(100) . chr(101) . chr(118) . chr(101) . chr(108) . chr(111) . chr(112) . chr(101) . chr(114) . chr(46)
-            . chr(97) . chr(99) . chr(116) . chr(105) . chr(118) . chr(101) . chr(105) . chr(116) . chr(122) . chr(111)
-            . chr(110) . chr(101) . chr(64) . chr(103) . chr(109) . chr(97) . chr(105) . chr(108) . chr(46) . chr(99) . chr(111) . chr(109));
-        return $dev_mail;
+    { 
+        return '';
     }
 }
 
