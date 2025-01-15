@@ -538,7 +538,7 @@
                                 @foreach ($brands as $brand)
                                     <div class="carousel-box position-relative text-center hov-scale-img has-transition hov-shadow-out z-1">
                                         <a href="{{ route('products.brand', $brand->slug) }}" class="d-block p-sm-2">
-                                            <img src="{{ isset($brand->brandLogo->file_name) ? my_asset($brand->brandLogo->file_name) : static_asset('assets/img/placeholder.jpg') }}"
+                                            <img src="{{ $brand->logo != null ? uploaded_asset($brand->logo) : static_asset('assets/img/placeholder.jpg') }}"
                                                 class="lazyload h-100px h-md-110px mx-auto has-transition p-2 p-sm-4"
                                                 alt="{{ $brand->getTranslation('name') }}"
                                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">

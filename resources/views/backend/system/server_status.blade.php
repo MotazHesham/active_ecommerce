@@ -21,9 +21,9 @@
                         <tr>
                             <td>Php versions</td>
                             <td>{{ phpversion() }}</td>
-                            <td>8.1</td>
+                            <td>8.2</td>
                             <td>
-                                @if (floatval(phpversion()) >= 8.1)
+                                @if (floatval(phpversion()) >= 8.2)
                                 <i class="las la-check text-success"></i>
                                 @else
                                 <i class="las la-times text-danger"></i>
@@ -34,7 +34,7 @@
                             <td>MySQL</td>
                             <td>
                                 @php
-                                    $results = DB::select( DB::raw("select version()") );
+                                    $results = DB::select( "select version()" );
                                     $mysql_version =  $results[0]->{'version()'};
                                     $version_explode = explode("-",$mysql_version);
                                     $mysql_required_version = '8.0';

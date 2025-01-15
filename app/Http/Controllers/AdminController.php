@@ -18,7 +18,11 @@ use DB;
 
 class AdminController extends Controller
 {
-    
+    /**
+     * Show the admin dashboard.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function admin_dashboard(Request $request)
     {
         CoreComponentRepository::initializeCache();
@@ -62,8 +66,7 @@ class AdminController extends Controller
         $data['total_products'] = Product::where('approved', 1)->where('published', 1)->count();
         $data['total_inhouse_products'] = Product::where('approved', 1)->where('published', 1)->where('added_by', 'admin')->count();
         $data['total_sellers_products'] = Product::where('approved', 1)->where('published', 1)->where('added_by', '!=', 'admin')->count();
-        $data['total_categories'] = Category::count();
-        
+        $data['total_categories'] = Category::count(); 
         $data['top_categories'] = Product::select('categories.name', 'categories.id', DB::raw('SUM(grand_total) as total'))
             ->leftJoin('order_details', 'order_details.product_id', '=', 'products.id')
             ->leftJoin('orders', 'orders.id', '=', 'order_details.order_id')

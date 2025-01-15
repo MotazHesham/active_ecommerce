@@ -231,7 +231,7 @@
                                                 @php
                                                     $product_stock = $orderDetail->product->stocks->where('variant', $orderDetail->variation)->first();
                                                 @endphp
-                                                {{translate('SKU')}}: {{ $product_stock['sku'] }}
+                                                {{translate('SKU')}}: {{ $product_stock['sku'] ?? '' }}
                                             </small>
                                         @elseif ($orderDetail->product != null && $orderDetail->product->auction_product == 1)
                                             <strong>
@@ -380,6 +380,7 @@
                 status: status
             }, function(data) {
                 AIZ.plugins.notify('success', '{{ translate('Delivery status has been updated') }}');
+                location.reload();
             });
         });
 
@@ -399,6 +400,7 @@
                 $('#update_payment_status').prop('disabled', true);
                 AIZ.plugins.bootstrapSelect('refresh');
                 AIZ.plugins.notify('success', '{{ translate('Payment status has been updated') }}');
+                location.reload();
             });
         }
 

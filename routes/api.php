@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\V2;
 use App\Http\Middleware\EnsureSystemKey;
 use Illuminate\Support\Facades\Route;
 
+
+
 Route::group(['prefix' => 'v2/auth', 'middleware' => ['app_language']], function () {
-    
+
     Route::post('info', [AuthController::class, 'getUserInfoByAccessToken']);
     Route::controller(AuthController::class)->group(function () {
         Route::post('login', 'login');
@@ -29,7 +31,11 @@ Route::group(['prefix' => 'v2/auth', 'middleware' => ['app_language']], function
         Route::post('password/resend_code', 'resendCode');
     });
 });
+
+
+
 Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
+
 
     //auth controller
     Route::post('guest-user-account-create', [AuthController::class, 'guestUserAccountCreate']);
@@ -58,7 +64,7 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
             Route::post('change-delivery-status', 'change_delivery_status')->middleware('auth:sanctum');
             Route::get('deliveries/on_the_way/{id}', 'on_the_way_delivery')->middleware('auth:sanctum');
             //Delivery Boy Order
-            Route::get('purchase-history-details/{id}',[DeliveryBoyController::class, 'details'])->middleware('auth:sanctum');
+            Route::get('purchase-history-details/{id}', [DeliveryBoyController::class, 'details'])->middleware('auth:sanctum');
             Route::get('purchase-history-items/{id}', [DeliveryBoyController::class, 'items'])->middleware('auth:sanctum');
         });
     });
@@ -73,7 +79,6 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
         Route::post('carts', 'getList');
         Route::post('guest-customer-info-check', 'guestCustomerInfoCheck');
         Route::post('updateCartStatus', 'updateCartStatus');
-
     });
 
     Route::controller(CheckoutController::class)->group(function () {
@@ -97,7 +102,7 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
         Route::post('update-address-in-cart', 'updateAddressInCart');
         Route::post('update-shipping-type-in-cart', 'updateShippingTypeInCart');
     });
-    
+
     Route::get('payment-types', [PaymentTypesController::class, 'getList']);
 
 
@@ -142,7 +147,7 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
         // review
         Route::post('reviews/submit', [ReviewController::class, 'submit'])->name('api.reviews.submit')->middleware('auth:sanctum');
         Route::get('shop/user/{id}', [ShopController::class, 'shopOfUser'])->middleware('auth:sanctum');
-        
+
         //Follow
         Route::controller(FollowSellerController::class)->group(function () {
             Route::get('/followed-seller', 'index')->middleware('auth:sanctum');
@@ -204,6 +209,8 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
 
 
 
+
+
         Route::controller(CustomerPackageController::class)->group(function () {
             Route::post('offline/packages-payment', 'purchase_package_offline')->middleware('auth:sanctum');
             Route::post('free/packages-payment', 'purchase_package_free')->middleware('auth:sanctum');
@@ -216,8 +223,8 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
             Route::post('notifications/bulk-delete', 'bulkDelete')->middleware('auth:sanctum');
             Route::get('notifications/mark-as-read', 'notificationMarkAsRead')->middleware('auth:sanctum');
         });
-        
-        Route::get('products/last-viewed',[ProductController::class, 'lastViewedProducts'])->middleware('auth:sanctum');
+
+        Route::get('products/last-viewed', [ProductController::class, 'lastViewedProducts'])->middleware('auth:sanctum');
     });
 
     //end user bann
@@ -228,8 +235,8 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
         Route::get('online-pay/failed', 'paymentFailed');
     });
 
-    Route::get('get-search-suggestions',[SearchSuggestionController::class, 'getList'] );
-    Route::get('languages',[LanguageController::class, 'getList']);
+    Route::get('get-search-suggestions', [SearchSuggestionController::class, 'getList']);
+    Route::get('languages', [LanguageController::class, 'getList']);
 
     Route::controller(CustomerProductController::class)->group(function () {
         Route::get('classified/all', 'all');
@@ -237,7 +244,8 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
         Route::get('classified/product-details/{slug}', 'productDetails');
     });
 
-    
+
+
     Route::get('seller/top', 'App\Http\Controllers\Api\V2\SellerController@topSellers');
 
     Route::apiResource('banners', 'App\Http\Controllers\Api\V2\BannerController')->only('index');
@@ -371,6 +379,15 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
     Route::post('offline/payment/submit', 'App\Http\Controllers\Api\V2\OfflinePaymentController@submit')->name('api.offline.payment.submit');
 
 
+    Route::controller(BlogController::class)->group(function () {
+        Route::get('blog-list', 'blog_list');
+        Route::get('blog-details/{slug}', 'blog_details');
+    });
+
+    // Route::controller(WholesaleProductController::class)->group(function () {
+    //     Route::get('/wholesale/all-products', 'all_wholesale_products')->name('wholesale_products.all');
+    // });
+
     Route::get('flash-deals', 'App\Http\Controllers\Api\V2\FlashDealController@index');
     Route::get('flash-deals/info/{slug}', 'App\Http\Controllers\Api\V2\FlashDealController@info');
     Route::get('flash-deal-products/{id}', 'App\Http\Controllers\Api\V2\FlashDealController@products');
@@ -387,6 +404,11 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
 
 
     Route::withoutMiddleware([EnsureSystemKey::class])->group(function () {
+        Route::controller(WholesaleProductController::class)->group(function () {
+            Route::get('/wholesale/all-products', 'all_wholesale_products')->name('wholesale_products.all');
+            Route::get('/wholesale/product-details/{id}', 'wholesale_product_details')->name('wholesale_products.show');
+        });
+
         Route::get('google-recaptcha', function () {
             return view("frontend.google_recaptcha.app_recaptcha");
         });
@@ -430,11 +452,10 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
 
         Route::any('/phonepe/redirecturl', 'App\Http\Controllers\Api\V2\PhonepeController@phonepe_redirecturl')->name('api.phonepe.redirecturl');
         Route::any('/phonepe/callbackUrl', 'App\Http\Controllers\Api\V2\PhonepeController@phonepe_callbackUrl')->name('api.phonepe.callbackUrl');
-
     });
 
-      // customer file upload
-      Route::controller(CustomerFileUploadController::class)->middleware('auth:sanctum')->group(function () {
+    // customer file upload
+    Route::controller(CustomerFileUploadController::class)->middleware('auth:sanctum')->group(function () {
         Route::post('file/upload', 'upload');
         Route::get('file/all', 'index');
         Route::get('file/delete/{id}', 'destroy');

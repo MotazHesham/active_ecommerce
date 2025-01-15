@@ -24,6 +24,7 @@ class CategoryCollection extends ResourceCollection
                     'slug' => $data->slug,
                     'name' => $data->getTranslation('name'),
                     'banner' => $banner,
+                    'cover_image' => uploaded_asset($data->cover_image),
                     'icon' => $icon,
                     'number_of_children' => CategoryUtility::get_immediate_children_count($data->id),
                     'links' => [

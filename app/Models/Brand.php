@@ -25,9 +25,4 @@ class Brand extends Model
     {
         return $this->hasMany(BrandTranslation::class);
     }
-
-    public function brandLogo()
-    {
-        return $this->belongsTo(Upload::class, 'logo');
-    }
 }

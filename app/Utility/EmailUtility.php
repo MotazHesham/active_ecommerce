@@ -211,7 +211,7 @@ class EmailUtility
         $customer = $refundReqest->user;
         $seller = $refundReqest->seller;
         $productName = $refundReqest->orderDetail->product->getTranslation('name');
-        $shopName = $refundReqest->order->shop->user->user_type == 'seller' ? $refundReqest->order->shop->name : null;
+        $shopName = $refundReqest?->order?->shop?->user->user_type == 'seller' ? $refundReqest?->order?->shop->name : null;
 
         $admin = get_admin();
         foreach($emailIdentifiers as $emailIdentifier){

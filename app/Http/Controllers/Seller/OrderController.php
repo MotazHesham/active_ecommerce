@@ -79,6 +79,11 @@ class OrderController extends Controller
         $order->delivery_status = $request->status;
         $order->save();
 
+        if($request->status == 'delivered'){
+            $order->delivered_date = date("Y-m-d H:i:s");
+            $order->save();
+        }
+
         if ($request->status == 'cancelled' && $order->payment_type == 'wallet') {
             $user = User::where('id', $order->user_id)->first();
             $user->balance += $order->grand_total;

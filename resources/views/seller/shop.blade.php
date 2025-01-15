@@ -156,86 +156,407 @@
             <h5 class="mb-0 h6">{{ translate('Banner Settings') }}</h5>
         </div>
         <div class="card-body">
-            <form class="" action="{{ route('seller.shop.update') }}" method="POST" enctype="multipart/form-data">
+            <form class="" action="{{ route('seller.shop.banner.update') }}" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="shop_id" value="{{ $shop->id }}">
                 @csrf
                 <!-- Top Banner -->
                 <div class="row mb-3">
                     <label class="col-md-2 col-form-label">{{ translate('Top Banner') }} (1920x360)</label>
                     <div class="col-md-10">
-                        <div class="input-group" data-toggle="aizuploader" data-type="image">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                        <div class="row p-3 p-md-4 mb-3 mb-md-2rem mx-0" style="border: 1px dashed #e4e5eb;">
+                            <div class="col-md-6">
+                                <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                                    </div>
+                                    <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                    <input type="hidden" name="top_banner_image" value="{{ $shop->top_banner_image }}" class="selected-files">
+                                </div>
+                                <div class="file-preview box sm">
+                                </div>
+                                <small class="text-muted">{{ translate('We had to limit height to maintian consistancy. In some device both side of the banner might be cropped for height limitation.') }}</small>
                             </div>
-                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                            <input type="hidden" name="top_banner" value="{{ $shop->top_banner }}" class="selected-files">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control mb-3" placeholder="{{ translate('Top banner Link')}}" name="top_banner_link" value="{{ $shop->top_banner_link }}">
+                            </div>
                         </div>
-                        <div class="file-preview box sm">
-                        </div>
-                        <small class="text-muted">{{ translate('We had to limit height to maintian consistancy. In some device both side of the banner might be cropped for height limitation.') }}</small>
                     </div>
                 </div>
+
                 <!-- Slider Banners -->
                 <div class="row mb-3">
                     <label class="col-md-2 col-form-label">{{ translate('Slider Banners') }} (1500x450)</label>
                     <div class="col-md-10">
-                        <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
-                            </div>
-                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                            <input type="hidden" name="sliders" value="{{ $shop->sliders }}" class="selected-files">
+                        <div class="shop-slider-target">
+                            @php $slider_images = $shop->slider_images; @endphp
+                            @if ($slider_images != null)
+                                @foreach (json_decode($slider_images, true) as $key => $value)
+                                    <div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
+                                        <div class="row gutters-5">
+                                            <!-- Image -->
+                                            <div class="col-md-5">
+                                                <div class="form-group mb-md-0">
+                                                    <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                                        <div class="input-group-prepend">
+                                                            <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                                                        </div>
+                                                        <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                                        <input type="hidden" name="slider_images[]" class="selected-files" value="{{ json_decode($slider_images, true)[$key] }}">
+                                                    </div>
+                                                    <div class="file-preview box sm">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- link -->
+                                            <div class="col-md">
+                                                <div class="form-group mb-md-0">
+                                                    <input type="text" class="form-control" placeholder="http://" name="slider_links[]" value="{{ isset(json_decode($shop->slider_links, true)[$key]) ? json_decode($shop->slider_links, true)[$key] : '' }}">
+                                                </div>
+                                            </div>
+                                            <!-- remove parent button -->
+                                            <div class="col-md-auto">
+                                                <div class="form-group mb-md-0">
+                                                    <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".remove-parent">
+                                                        <i class="las la-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
-                        <div class="file-preview box sm">
+                        
+                        <!-- Add button -->
+                        <div class="">
+                            <button
+                                type="button"
+                                class="btn btn-block border hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center" style="background: #fcfcfc;"
+                                data-toggle="add-more"
+                                data-content='
+                                <div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
+                                    <div class="row gutters-5">
+                                        <!-- Image -->
+                                        <div class="col-md-5">
+                                            <div class="form-group mb-md-0">
+                                                <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                                    <div class="input-group-prepend">
+                                                        <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                                                    </div>
+                                                    <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                                    <input type="hidden" name="slider_images[]" class="selected-files" value="">
+                                                </div>
+                                                <div class="file-preview box sm">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- link -->
+                                        <div class="col-md">
+                                            <div class="form-group mb-md-0">
+                                                <input type="text" class="form-control" placeholder="http://" name="slider_links[]" value="">
+                                            </div>
+                                        </div>
+                                        <!-- remove parent button -->
+                                        <div class="col-md-auto">
+                                            <div class="form-group mb-md-0">
+                                                <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".remove-parent">
+                                                    <i class="las la-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>'
+                                data-target=".shop-slider-target">
+                                <i class="las la-2x text-success la-plus-circle"></i>
+                                <span class="ml-2">{{ translate('Add New') }}</span>
+                            </button>
                         </div>
-                        <small class="text-muted">{{ translate('We had to limit height to maintian consistancy. In some device both side of the banner might be cropped for height limitation.') }}</small>
                     </div>
                 </div>
+
                 <!-- Banner Full width 1 -->
                 <div class="row mb-3">
                     <label class="col-md-2 col-form-label">{{ translate('Banner Full width 1') }}</label>
                     <div class="col-md-10">
-                        <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
-                            </div>
-                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                            <input type="hidden" name="banner_full_width_1" value="{{ $shop->banner_full_width_1 }}" class="selected-files">
+                        <div class="shop-banner-full-width-1">
+                            @php $banner_full_width_1_images =  $shop->banner_full_width_1_images; @endphp
+                            @if ($banner_full_width_1_images != null)
+                                @foreach (json_decode($banner_full_width_1_images, true) as $key => $value)
+                                    <div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
+                                        <div class="row gutters-5">
+                                            <!-- Image -->
+                                            <div class="col-md-5">
+                                                <div class="form-group mb-md-0">
+                                                    <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                                        <div class="input-group-prepend">
+                                                            <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                                                        </div>
+                                                        <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                                        <input type="hidden" name="banner_full_width_1_images[]" class="selected-files" value="{{ json_decode($banner_full_width_1_images, true)[$key] }}">
+                                                    </div>
+                                                    <div class="file-preview box sm">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- link -->
+                                            <div class="col-md">
+                                                <div class="form-group mb-md-0">
+                                                    <input type="text" class="form-control" placeholder="http://" name="banner_full_width_1_links[]" value="{{ isset(json_decode($shop->banner_full_width_1_links, true)[$key]) ? json_decode($shop->banner_full_width_1_links, true)[$key] : '' }}">
+                                                </div>
+                                            </div>
+                                            <!-- remove parent button -->
+                                            <div class="col-md-auto">
+                                                <div class="form-group mb-md-0">
+                                                    <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".remove-parent">
+                                                        <i class="las la-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
-                        <div class="file-preview box sm">
+                        
+                        <!-- Add button -->
+                        <div class="">
+                            <button
+                                type="button"
+                                class="btn btn-block border hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center" style="background: #fcfcfc;"
+                                data-toggle="add-more"
+                                data-content='
+                                <div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
+                                    <div class="row gutters-5">
+                                        <!-- Image -->
+                                        <div class="col-md-5">
+                                            <div class="form-group mb-md-0">
+                                                <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                                    <div class="input-group-prepend">
+                                                        <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                                                    </div>
+                                                    <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                                    <input type="hidden" name="banner_full_width_1_images[]" class="selected-files" value="">
+                                                </div>
+                                                <div class="file-preview box sm">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- link -->
+                                        <div class="col-md">
+                                            <div class="form-group mb-md-0">
+                                                <input type="text" class="form-control" placeholder="http://" name="banner_full_width_1_links[]" value="">
+                                            </div>
+                                        </div>
+                                        <!-- remove parent button -->
+                                        <div class="col-md-auto">
+                                            <div class="form-group mb-md-0">
+                                                <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".remove-parent">
+                                                    <i class="las la-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>'
+                                data-target=".shop-banner-full-width-1">
+                                <i class="las la-2x text-success la-plus-circle"></i>
+                                <span class="ml-2">{{ translate('Add New') }}</span>
+                            </button>
                         </div>
                     </div>
                 </div>
+
                 <!-- Banners half width -->
+                @php $banners_half_width_images = $shop->banners_half_width_images; @endphp
                 <div class="row mb-3">
                     <label class="col-md-2 col-form-label">{{ translate('Banners half width') }} ({{ translate('2 Equal Banners') }})</label>
                     <div class="col-md-10">
-                        <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
-                            </div>
-                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                            <input type="hidden" name="banners_half_width" value="{{ $shop->banners_half_width }}" class="selected-files">
+                        <div class="shop-banners-half-width">
+                            @php $banner_full_width_1_images =  $shop->banner_full_width_1_images; @endphp
+                            @if ($banners_half_width_images != null)
+                                @foreach (json_decode($banners_half_width_images, true) as $key => $value)
+                                    <div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
+                                        <div class="row gutters-5">
+                                            <!-- Image -->
+                                            <div class="col-md-5">
+                                                <div class="form-group mb-md-0">
+                                                    <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                                        <div class="input-group-prepend">
+                                                            <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                                                        </div>
+                                                        <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                                        <input type="hidden" name="banners_half_width_images[]" class="selected-files" value="{{ json_decode($banners_half_width_images, true)[$key] }}">
+                                                    </div>
+                                                    <div class="file-preview box sm">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- link -->
+                                            <div class="col-md">
+                                                <div class="form-group mb-md-0">
+                                                    <input type="text" 
+                                                        class="form-control" 
+                                                        placeholder="http://" 
+                                                        name="banners_half_width_links[]" 
+                                                        value="{{ isset(json_decode($shop->banners_half_width_links, true)[$key]) ? json_decode($shop->banners_half_width_links, true)[$key] : '' }}">
+                                                </div>
+                                            </div>
+                                            <!-- remove parent button -->
+                                            <div class="col-md-auto">
+                                                <div class="form-group mb-md-0">
+                                                    <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".remove-parent">
+                                                        <i class="las la-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
-                        <div class="file-preview box sm">
+                        
+                        <!-- Add button -->
+                        <div class="">
+                            <button
+                                type="button"
+                                class="btn btn-block border hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center" style="background: #fcfcfc;"
+                                data-toggle="add-more"
+                                data-content='
+                                <div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
+                                    <div class="row gutters-5">
+                                        <!-- Image -->
+                                        <div class="col-md-5">
+                                            <div class="form-group mb-md-0">
+                                                <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                                    <div class="input-group-prepend">
+                                                        <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                                                    </div>
+                                                    <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                                    <input type="hidden" name="banners_half_width_images[]" class="selected-files" value="">
+                                                </div>
+                                                <div class="file-preview box sm">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- link -->
+                                        <div class="col-md">
+                                            <div class="form-group mb-md-0">
+                                                <input type="text" class="form-control" placeholder="http://" name="banners_half_width_links[]" value="">
+                                            </div>
+                                        </div>
+                                        <!-- remove parent button -->
+                                        <div class="col-md-auto">
+                                            <div class="form-group mb-md-0">
+                                                <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".remove-parent">
+                                                    <i class="las la-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>'
+                                data-target=".shop-banners-half-width">
+                                <i class="las la-2x text-success la-plus-circle"></i>
+                                <span class="ml-2">{{ translate('Add New') }}</span>
+                            </button>
                         </div>
                     </div>
                 </div>
+
                 <!-- Banner Full width 2 -->
+                @php $banner_full_width_2_images = $shop->banner_full_width_2_images; @endphp
                 <div class="row mb-3">
                     <label class="col-md-2 col-form-label">{{ translate('Banner Full width 2') }}</label>
                     <div class="col-md-10">
-                        <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
-                            </div>
-                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                            <input type="hidden" name="banner_full_width_2" value="{{ $shop->banner_full_width_2 }}" class="selected-files">
+                        <div class="shop-banner-full-width-2">
+                            @php $banner_full_width_1_images =  $shop->banner_full_width_1_images; @endphp
+                            @if ($banner_full_width_2_images != null)
+                                @foreach (json_decode($banner_full_width_2_images, true) as $key => $value)
+                                    <div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
+                                        <div class="row gutters-5">
+                                            <!-- Image -->
+                                            <div class="col-md-5">
+                                                <div class="form-group mb-md-0">
+                                                    <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                                        <div class="input-group-prepend">
+                                                            <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                                                        </div>
+                                                        <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                                        <input type="hidden" name="banner_full_width_2_images[]" class="selected-files" value="{{ json_decode($banner_full_width_2_images, true)[$key] }}">
+                                                    </div>
+                                                    <div class="file-preview box sm">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- link -->
+                                            <div class="col-md">
+                                                <div class="form-group mb-md-0">
+                                                    <input type="text" 
+                                                        class="form-control" 
+                                                        placeholder="http://" 
+                                                        name="banner_full_width_2_links[]" 
+                                                        value="{{ isset(json_decode($shop->banner_full_width_2_links, true)[$key]) ? json_decode($shop->banner_full_width_2_links, true)[$key] : '' }}">
+                                                </div>
+                                            </div>
+                                            <!-- remove parent button -->
+                                            <div class="col-md-auto">
+                                                <div class="form-group mb-md-0">
+                                                    <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".remove-parent">
+                                                        <i class="las la-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
-                        <div class="file-preview box sm">
+                        
+                        <!-- Add button -->
+                        <div class="">
+                            <button
+                                type="button"
+                                class="btn btn-block border hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center" style="background: #fcfcfc;"
+                                data-toggle="add-more"
+                                data-content='
+                                <div class="p-3 p-md-4 mb-3 mb-md-2rem remove-parent" style="border: 1px dashed #e4e5eb;">
+                                    <div class="row gutters-5">
+                                        <!-- Image -->
+                                        <div class="col-md-5">
+                                            <div class="form-group mb-md-0">
+                                                <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                                    <div class="input-group-prepend">
+                                                        <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                                                    </div>
+                                                    <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                                    <input type="hidden" name="banner_full_width_2_images[]" class="selected-files" value="">
+                                                </div>
+                                                <div class="file-preview box sm">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- link -->
+                                        <div class="col-md">
+                                            <div class="form-group mb-md-0">
+                                                <input type="text" class="form-control" placeholder="http://" name="banner_full_width_2_links[]" value="">
+                                            </div>
+                                        </div>
+                                        <!-- remove parent button -->
+                                        <div class="col-md-auto">
+                                            <div class="form-group mb-md-0">
+                                                <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".remove-parent">
+                                                    <i class="las la-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>'
+                                data-target=".shop-banner-full-width-2">
+                                <i class="las la-2x text-success la-plus-circle"></i>
+                                <span class="ml-2">{{ translate('Add New') }}</span>
+                            </button>
                         </div>
                     </div>
                 </div>
+
                 <!-- Save Button -->
                 <div class="form-group mb-0 text-right">
                     <button type="submit" class="btn btn-sm btn-primary">{{translate('Save')}}</button>

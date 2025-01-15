@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\BusinessSetting;
 use App\Models\ClubPoint;
-use App\Models\EmailTemplate;
 use App\Models\RefundRequest;
 use App\Models\OrderDetail;
 use App\Models\Shop;
@@ -43,6 +42,7 @@ class RefundRequestController extends Controller
         $refund->seller_id = $order_detail->seller_id;
         $refund->seller_approval = 0;
         $refund->reason = $request->reason;
+        $refund->images = $request->images;
         $refund->admin_approval = 0;
         $refund->admin_seen = 0;
         $refund->refund_amount = $order_detail->price + $order_detail->tax;
@@ -336,8 +336,9 @@ class RefundRequestController extends Controller
     //Shows the refund reason
     public function reason_view($id)
     {
+        $user = auth()->user();
         $refund = RefundRequest::findOrFail($id);
-        if (Auth::user()->user_type == 'admin' || Auth::user()->user_type == 'staff') {
+        if ($user->user_type == 'admin' || $user->user_type == 'staff') {
             if ($refund->orderDetail != null) {
                 $refund->admin_seen = 1;
                 $refund->save();

@@ -58,6 +58,14 @@
                     </a>
                 </li>
 
+                <!-- Warranty -->
+                <li class="nav-item">
+                    <a class="nav-link" id="warranty-tab" href="#warranty"
+                        data-toggle="tab" data-target="#warranty" type="button" role="tab" aria-controls="warranty" aria-selected="false">
+                        {{ translate('Warranty') }}
+                    </a>
+                </li>
+
                 <!-- Frequently Bought Product -->
                 <li class="nav-item">
                     <a class="nav-link" id="frequenty-bought-product-tab" href="#frequenty-bought-product"
@@ -168,19 +176,6 @@
                                             </div>
                                         </div>
                                         @endif
-
-                                        @if (addon_is_activated('refund_request'))
-                                        <!-- refund_request -->
-                                        <div class="form-group row mt-4 mb-4">
-                                            <label class="col-xxl-3 col-from-label fs-13">{{translate('Refundable')}}</label>
-                                            <div class="col-xxl-9">
-                                                <label class="aiz-switch aiz-switch-success mb-0">
-                                                    <input type="checkbox" name="refundable" @if ($product->refundable == 1) checked @endif value="1">
-                                                    <span></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        @endif
                                     </div>
 
                                     <!-- Product Category -->
@@ -223,6 +218,50 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Refund -->
+                            @if (addon_is_activated('refund_request'))
+                                <h5 class="mb-3 mt-5 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Refund')}}</h5>
+                                <div class="w-100">
+                                    <!-- Refundable -->
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-from-label">{{translate('Refundable')}}?</label>
+                                        <div class="col-md-9">
+                                            <label class="aiz-switch aiz-switch-success mb-0">
+                                                <input type="checkbox" name="refundable" @if ($product->refundable == 1) checked @endif value="1" onchange="isRefundable()">
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="w-100 refund-block @if($product->refundable != 1) d-none @endif">
+        
+                                        <div class="form-group row">
+                                            <div class="col-md-12">
+                                                <label class="form-check-label fw-bold" for="flexCheckChecked">
+                                                    <b>{{translate('Note (Add from preset)')}} </b>
+                                                </label>
+                                            </div>
+                                        </div>
+        
+                                        <input type="hidden" name="refund_note_id" id="refund_note_id" value="{{ $product->refund_note_id }}">
+                                        <div id="refund_note">
+                                            @if($product->refundNote != null)
+                                                <div class="border border-gray my-2 p-2">
+                                                    {{ $product->refundNote->getTranslation('description') ?? '' }}
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-block border border-dashed hov-bg-soft-secondary mt-2 fs-14 rounded-0 d-flex align-items-center justify-content-center"
+                                            onclick="noteModal('refund')">
+                                            <i class="las la-plus"></i>
+                                            <span class="ml-2">{{ translate('Select Refund Note') }}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
 
                             <!-- Status -->
                             <h5 class="mb-3 mt-5 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Status')}}</h5>
@@ -762,6 +801,59 @@
                         </div>
                     </div>
 
+                    <!-- Warranty -->
+                    <div class="tab-pane fade" id="warranty" role="tabpanel" aria-labelledby="warranty-tab">
+                        <div class="bg-white p-3 p-sm-2rem">
+                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Warranty')}}</h5>
+                            <div class="form-group row">
+                                <label class="col-md-2 col-from-label">{{translate('Warranty')}}</label>
+                                <div class="col-md-10">
+                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                        <input type="checkbox" name="has_warranty" onchange="warrantySelection()" @if($product->has_warranty == 1) checked @endif> 
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="w-100 warranty_selection_div @if($product->has_warranty != 1) d-none @endif" >
+                                <div class="form-group row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-10">
+                                        <select class="form-control aiz-selectpicker" 
+                                            name="warranty_id" 
+                                            id="warranty_id" 
+                                            data-selected="{{ $product->warranty_id }}" 
+                                            data-live-search="true"
+                                            @if($product->has_warranty == 1) required @endif
+                                        >
+                                            <option value="">{{ translate('Select Warranty') }}</option>
+                                            @foreach (\App\Models\Warranty::all() as $warranty)
+                                                <option value="{{ $warranty->id }}" @selected(old('warranty_id') == $warranty->id)>{{ $warranty->getTranslation('text') }}</option>
+                                            @endforeach
+                                        </select>
+
+                                        <input type="hidden" name="warranty_note_id" id="warranty_note_id">
+                                        
+                                        <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Warranty Note')}}</h5>
+                                        <div id="warranty_note">
+                                            @if($product->warrantyNote != null)
+                                                <div class="border border-gray my-2 p-2">
+                                                    {{ $product->warrantyNote->getTranslation('description') ?? '' }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <button
+                                            type="button"
+                                            class="btn btn-block border border-dashed hov-bg-soft-secondary mt-2 fs-14 rounded-0 d-flex align-items-center justify-content-center"
+                                            onclick="noteModal('warranty')">
+                                            <i class="las la-plus"></i>
+                                            <span class="ml-2">{{ translate('Select Warranty Note') }}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Frequently Bought Product -->
                     <div class="tab-pane fade" id="frequenty-bought-product" role="tabpanel" aria-labelledby="frequenty-bought-product-tab">
                         <div class="bg-white p-3 p-sm-2rem">
@@ -901,6 +993,10 @@
 @section('modal')
 	<!-- Frequently Bought Product Select Modal -->
     @include('modals.product_select_modal')
+
+    {{-- Note Modal --}}
+    @include('modals.note_modal')
+
 @endsection
 
 @section('script')
@@ -1108,6 +1204,43 @@
             $('#selected-fq-bought-products').html(data);
             AIZ.plugins.sectionFooTable('#selected-fq-bought-products');
         });
+    }
+
+    // Warranty
+    function warrantySelection(){
+        if($('input[name="has_warranty"]').is(':checked')) {
+            $('.warranty_selection_div').removeClass('d-none');
+            $('#warranty_id').attr('required', true);
+        }
+        else {
+            $('.warranty_selection_div').addClass('d-none');
+            $('#warranty_id').removeAttr('required');
+        }
+    }
+
+    // Refundable
+    function isRefundable(){
+        if($('input[name="refundable"]').is(':checked')) {
+            $('.refund-block').removeClass('d-none');
+        }
+        else {
+            $('.refund-block').addClass('d-none');
+        }
+    }
+    
+    function noteModal(noteType){
+        $.post('{{ route('get_notes') }}',{_token:'{{ @csrf_token() }}', note_type: noteType}, function(data){
+            $('#note_modal #note_modal_content').html(data);
+            $('#note_modal').modal('show', {backdrop: 'static'});
+        });
+    }
+
+    function addNote(noteId, noteType){
+        var noteDescription = $('#note_description_'+ noteId).val();
+        $('#'+noteType+'_note_id').val(noteId);
+        $('#'+noteType+'_note').html(noteDescription);
+        $('#'+noteType+'_note').addClass('border border-gray my-2 p-2');
+        $('#note_modal').modal('hide');
     }
 
 </script>

@@ -151,13 +151,12 @@
                                     @if (addon_is_activated('refund_request'))
                                         @php
                                             $no_of_max_day = get_setting('refund_request_time');
-                                            $last_refund_date = $orderDetail->created_at->addDays($no_of_max_day);
+                                            $last_refund_date = Carbon\Carbon::parse($order->delivered_date)->addDays($no_of_max_day);
                                             $today_date = Carbon\Carbon::now();
                                         @endphp
                                         <td>
-                                            @if ($orderDetail->product != null && $orderDetail->product->refundable != 0 && $orderDetail->refund_request == null && $today_date <= $last_refund_date && $orderDetail->payment_status == 'paid' && $orderDetail->delivery_status == 'delivered')
-                                                <a href="{{ route('refund_request_send_page', $orderDetail->id) }}"
-                                                    class="btn btn-primary btn-sm rounded-0">{{ translate('Send') }}</a>
+                                            @if ($orderDetail->product != null && $orderDetail->product->refundable != 0 && $orderDetail->refund_request == null && $today_date <= $last_refund_date && $order->payment_status == 'paid' && $order->delivery_status == 'delivered')
+                                                <a href="{{ route('refund_request_send_page', $orderDetail->id) }}" class="btn btn-primary btn-sm rounded-0">{{ translate('Send') }}</a>
                                             @elseif ($orderDetail->refund_request != null && $orderDetail->refund_request->refund_status == 0)
                                                 <b class="text-info">{{ translate('Pending') }}</b>
                                             @elseif ($orderDetail->refund_request != null && $orderDetail->refund_request->refund_status == 2)

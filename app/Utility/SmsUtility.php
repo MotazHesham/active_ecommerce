@@ -40,6 +40,16 @@ class SmsUtility
         (new SendSmsService())->sendSMS($user->phone, env('APP_NAME'), $sms_body, $template_id);
     }
 
+    public static function loginWithOtp($user)
+    {
+        $sms_template   = SmsTemplate::where('identifier', 'login_with_otp')->first();
+        $sms_body       = $sms_template->sms_body;
+        $sms_body       = str_replace('[[code]]', $user->otp_code, $sms_body);
+        $template_id    = $sms_template->template_id;
+        
+        (new SendSmsService())->sendSMS($user->phone, env('APP_NAME'), $sms_body, $template_id);
+    }
+
     public static function order_placement($phone = '', $order = '')
     {
         $sms_template   = SmsTemplate::where('identifier', 'order_placement')->first();

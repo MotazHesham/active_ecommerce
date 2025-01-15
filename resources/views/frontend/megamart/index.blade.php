@@ -144,9 +144,11 @@
                     <div class="row no-gutters align-items-center border" style="background: {{ $flash_deal_bg }};">
                         <!-- Flash Deals Baner -->
                         <div class="col-xxl-2 col-md-3 col-sm-4 col-5 h-150px h-md-200px h-lg-240px">
-                            <div class="h-100 w-100 w-xl-auto"
-                                style="background-image: url('{{ uploaded_asset($flash_deal->banner) }}'); background-size: cover; background-position: center center;">
-                            </div>
+                            <a href="{{ route('flash-deal-details', $flash_deal->slug) }}">
+                                <div class="h-100 w-100 w-xl-auto"
+                                    style="background-image: url('{{ uploaded_asset($flash_deal->banner) }}'); background-size: cover; background-position: center center;">
+                                </div>
+                            </a>
                         </div>
 
                         <div class="col-xxl-10 col-md-9 col-sm-8 col-7">
@@ -455,7 +457,7 @@
                                     @foreach ($brands as $brand)
                                         <div class="carousel-box position-relative text-center hov-scale-img has-transition hov-shadow-out z-1">
                                             <a href="{{ route('products.brand', $brand->slug) }}" class="d-block p-sm-2">
-                                                <img src="{{ isset($brand->brandLogo->file_name) ? my_asset($brand->brandLogo->file_name) : static_asset('assets/img/placeholder.jpg') }}"
+                                                <img src="{{ $brand->logo != null ? uploaded_asset($brand->logo) : static_asset('assets/img/placeholder.jpg') }}"
                                                     class="lazyload h-100px h-md-110px mx-auto has-transition p-2 p-sm-4"
                                                     alt="{{ $brand->getTranslation('name') }}"
                                                     onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">

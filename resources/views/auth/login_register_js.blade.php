@@ -105,13 +105,32 @@
                 $('input[name=phone]').val(null);
                 isPhoneShown = false;
                 $(el).html('*{{ translate('Use Phone Number Instead') }}');
+
+                $('.toggle-login-with-otp').addClass('d-none');
+
             } else {
                 $('.phone-form-group').removeClass('d-none');
                 $('.email-form-group').addClass('d-none');
                 $('input[name=email]').val(null);
                 isPhoneShown = true;
                 $(el).html('<i>*{{ translate('Use Email Instead') }}</i>');
+
+                $('.toggle-login-with-otp').removeClass('d-none');
             }
+            
+            $('.submit-button').html('{{ translate('Login') }}');
+            $('.password-login-block').removeClass('d-none');
+            
+            var url = '{{ route('login') }}';
+            $('.loginForm').attr('action', url);
+        }
+
+        function toggleLoginPassOTP() {
+            $('.password-login-block').addClass('d-none');
+            $('.submit-button').html('{{ translate('Login With OTP') }}');
+
+            var url = '{{ route('send-otp') }}';
+            $('.loginForm').attr('action', url);
         }
     </script> 
 @endif

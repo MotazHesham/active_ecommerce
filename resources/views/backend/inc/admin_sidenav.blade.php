@@ -78,7 +78,7 @@
                 @endif
 
                 <!-- Product -->
-                @canany(['add_new_product', 'show_all_products','show_in_house_products','show_seller_products','show_digital_products','product_bulk_import','product_bulk_export','view_product_categories', 'view_all_brands', 'brand_bulk_upload','view_product_attributes','view_colors','view_product_reviews'])
+                @canany(['add_new_product', 'show_all_products','show_in_house_products','show_seller_products','show_digital_products','product_bulk_import','product_bulk_export','view_product_categories', 'view_all_brands', 'brand_bulk_upload','view_product_attributes','view_colors','view_product_warranties','view_product_reviews'])
                     <li class="aiz-side-nav-item">
                         <a href="#" class="aiz-side-nav-link">
                             <div class="aiz-side-nav-icon">
@@ -236,10 +236,58 @@
                                     </ul>
                                 </li>
                             @endcan
+                            @can('view_product_warranties')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('warranties.index')}}" class="aiz-side-nav-link {{ areActiveRoutes(['warranties.edit'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Warranty')}}</span>
+                                    </a>
+                                </li>
+                            @endcan
+                            
                             @can('view_product_reviews')
                                 <li class="aiz-side-nav-item">
                                     <a href="{{route('reviews.index')}}" class="aiz-side-nav-link {{ areActiveRoutes(['detail-reviews', 'custom-review.edit']) }}">
                                         <span class="aiz-side-nav-text">{{translate('Product Reviews')}}</span>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcanany
+
+                <!-- Note  -->
+                @canany(['view_notes', 'add_note'])
+                    <li class="aiz-side-nav-item">
+                        <a href="#" class="aiz-side-nav-link">
+                            <div class="aiz-side-nav-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16.001" viewBox="0 0 16 16.001">
+                                    <path id="Union_64" data-name="Union 64" d="M.333,16A.315.315,0,0,1,0,15.668V.335A.315.315,0,0,1,.333,0h9.31a.285.285,0,0,1,.123.014A.318.318,0,0,1,9.9.1l2.667,2.667.009.01a.293.293,0,0,1,.079.132.274.274,0,0,1,.012.112V5.835l1.267-1.267a.322.322,0,0,1,.466,0l1.5,1.5a.322.322,0,0,1,0,.466L12.667,9.768v5.9a.315.315,0,0,1-.333.333Zm.334-.666H12v-4.9L9.133,13.3a.3.3,0,0,1-.233.1H8.882L6.4,14.468a.2.2,0,0,1-.133.033.332.332,0,0,1-.3-.466l.589-1.368H2.667a.333.333,0,0,1,0-.667H6.843l.258-.6a.321.321,0,0,1,.176-.177L8.5,10H2.667a.333.333,0,0,1,0-.667h6.5L12,6.5V3.335H9.667A.315.315,0,0,1,9.333,3V.668H.667Zm6.233-1.8,1.4-.6-.8-.8-.1.239a.323.323,0,0,1-.074.172Zm2-.967,6.3-6.3-.283-.283-6.3,6.3ZM7.867,11.534l.284.284,6.3-6.3-.283-.283L12.624,6.777a.291.291,0,0,1-.115.115L9.558,9.844a.291.291,0,0,1-.115.115ZM10,2.668h1.533L10.767,1.9,10,1.135ZM2.667,7.335a.333.333,0,0,1,0-.667H10a.333.333,0,1,1,0,.667Zm0-2.668a.333.333,0,1,1,0-.666H10a.333.333,0,1,1,0,.666Z" fill="#575b6a"/>
+                                </svg>
+                            </div>
+                            <span class="aiz-side-nav-text">{{translate('Notes')}}</span>
+                            @if (env("DEMO_MODE") == "On")
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="14.001" viewBox="0 0 16 14.001"
+                                class="mx-2">
+                                <path id="Union_49" data-name="Union 49"
+                                    d="M-19322,3342.5v-5a2.007,2.007,0,0,0-2-2v1.5a3,3,0,0,1-3,3h-4v-10h4a3,3,0,0,1,3,3v1.5a3,3,0,0,1,3,3v5a.506.506,0,0,1-.5.5A.5.5,0,0,1-19322,3342.5Zm-11-2V3339h-3a1,1,0,0,1-1-1,1,1,0,0,1,1-1h3v-7.5a.5.5,0,0,1,.5-.5.5.5,0,0,1,.5.5v11a.5.5,0,0,1-.5.5A.506.506,0,0,1-19333,3340.5Zm-3-7.5a1,1,0,0,1-1-1,1,1,0,0,1,1-1h3v2Z"
+                                    transform="translate(19337 -3329)" fill="#f51350" />
+                            </svg>
+                            @endif
+                            <span class="aiz-side-nav-arrow"></span>
+                        </a>
+                        <!--Submenu-->
+                        <ul class="aiz-side-nav-list level-2">
+                            @can('add_note')
+                                <li class="aiz-side-nav-item">
+                                    <a class="aiz-side-nav-link" href="{{route('note.create')}}">
+                                        <span class="aiz-side-nav-text">{{translate('Add New Note')}}</span>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('view_notes')
+                                <li class="aiz-side-nav-item">
+                                    <a class="aiz-side-nav-link" href="{{route('note.index')}}">
+                                        <span class="aiz-side-nav-text">{{translate('Note List')}}</span>
                                     </a>
                                 </li>
                             @endcan
@@ -510,7 +558,7 @@
                             <ul class="aiz-side-nav-list level-2">
                                 @can('view_refund_requests')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('refund_requests_all')}}" class="aiz-side-nav-link {{ areActiveRoutes(['refund_requests_all', 'reason_show'])}}">
+                                        <a href="{{route('refund_requests_all')}}" class="aiz-side-nav-link {{ areActiveRoutes(['refund_requests_all', 'admin.reason_show'])}}">
                                             <span class="aiz-side-nav-text">{{translate('Refund Requests')}}</span>
                                         </a>
                                     </li>
@@ -1258,6 +1306,11 @@
                             </a>
                             <ul class="aiz-side-nav-list level-2">
                                 @can('otp_configurations')
+                                    <li class="aiz-side-nav-item">
+                                        <a href="{{ route('otp.login_configuration') }}" class="aiz-side-nav-link">
+                                            <span class="aiz-side-nav-text">{{translate('OTP Login Configuration')}}</span>
+                                        </a>
+                                    </li>
                                     <li class="aiz-side-nav-item">
                                         <a href="{{ route('otp.configconfiguration') }}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('OTP Configurations')}}</span>

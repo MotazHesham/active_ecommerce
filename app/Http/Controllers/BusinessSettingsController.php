@@ -533,7 +533,7 @@ class BusinessSettingsController extends Controller
             flash(translate('Demo data import will not work in demo site'))->error();
             return back();
         }
-        $url = 'https://activeitzone.com/ecommerce-demo-data-import/import';
+        $url = 'https://demo.activeitzone.com/envato/ecommerce-demo-data-import/import';
         $header = array(
             'Content-Type:application/json'
         );

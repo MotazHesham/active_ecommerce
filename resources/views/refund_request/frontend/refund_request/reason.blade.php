@@ -23,6 +23,21 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     {{ $refund->reason }}
+
+                                    @if($refund->images != null)
+                                        <div class="spotlight-group d-flex flex-wrap mt-3">
+                                            @foreach (explode(',', $refund->images) as $photo)
+                                            <a href="{{ uploaded_asset($photo) }}" 
+                                                class="mr-2 mr-md-3 mb-2 mb-md-3 border overflow-hidden has-transition hov-scale-img hov-border-primary"
+                                                target="_blank">
+                                                <img class="img-fit h-60px lazyload has-transition"
+                                                        src="{{ static_asset('assets/img/placeholder.jpg') }}"
+                                                        data-src="{{ uploaded_asset($photo) }}"
+                                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                            </a>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>

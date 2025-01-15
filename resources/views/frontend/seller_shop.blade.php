@@ -52,12 +52,14 @@
     @endphp
 
     @if (!isset($type) || $type == 'top-selling' || $type == 'cupons')
-        @if ($shop->top_banner)
+        @if ($shop->top_banner_image)
             <!-- Top Banner -->
             <section class="h-160px h-md-200px h-lg-300px h-xl-100 w-100">
-                <img class="d-block lazyload h-100 img-fit"
-                    src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
-                    data-src="{{ uploaded_asset($shop->top_banner) }}" alt="{{ env('APP_NAME') }} offer">
+                <a href="{{ $shop->top_banner_link }}">
+                    <img class="d-block lazyload h-100 img-fit"
+                        src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
+                        data-src="{{ uploaded_asset($shop->top_banner_image) }}" alt="{{ env('APP_NAME') }} offer">
+                </a>
             </section>
         @endif
     @endif
@@ -195,11 +197,12 @@
     </section>
 
     @if (!isset($type))
+
+        <!-- Featured Products -->
         @php
             $feature_products = $shop->user->products->where('published', 1)->where('approved', 1)->where('seller_featured', 1);
         @endphp
         @if (count($feature_products) > 0)
-            <!-- Featured Products -->
             <section class="mt-3 mb-3" id="section_featured">
                 <div class="container">
                 <!-- Top Section -->
@@ -229,19 +232,29 @@
         @endif
 
         <!-- Banner Slider -->
-        <section class="mt-3 mb-3">
-            <div class="container">
-                <div class="aiz-carousel mobile-img-auto-height" data-arrows="true" data-dots="false" data-autoplay="true">
-                    @if ($shop->sliders != null)
-                        @foreach (explode(',',$shop->sliders) as $key => $slide)
+        @if ($shop->slider_images != null)
+            <section class="mt-3 mb-3">
+                <div class="container">
+                    <div class="aiz-carousel mobile-img-auto-height" data-arrows="true" data-dots="false" data-autoplay="true">
+                        @php
+                            $shop_slider_images = get_slider_images(json_decode($shop->slider_images, true));
+                            $shop_slider_links = json_decode($shop->slider_links, true);
+                        @endphp
+                        @foreach ($shop_slider_images as $key => $slider)
                             <div class="carousel-box w-100 h-140px h-md-300px h-xl-450px">
-                                <img class="d-block lazyload h-100 img-fit" src="{{ static_asset('assets/img/placeholder-rect.jpg') }}" data-src="{{ uploaded_asset($slide) }}" alt="{{ $key }} offer">
+                                <a href="{{ isset($shop_slider_links[$key]) ? $shop_slider_links[$key] : '' }}">
+                                    <img class="d-block lazyload h-100 img-fit" 
+                                        src="{{ $slider ? my_asset($slider->file_name) : static_asset('assets/img/placeholder.jpg') }}"
+                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';"
+                                        alt="{{ $key }} offer">
+                                </a>
                             </div>
                         @endforeach
-                    @endif
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        @endif
+
 
         <!-- Coupons -->
         @php
@@ -274,30 +287,44 @@
                 </div>
             </section>
         @endif
-
-        @if ($shop->banner_full_width_1)
-            <!-- Banner full width 1 -->
-            @foreach (explode(',',$shop->banner_full_width_1) as $key => $banner)
+        
+        <!-- Banner full width 1 -->
+        @if ($shop->banner_full_width_1_images)
+            @php
+                $shop_banner_full_width_1_images = get_slider_images(json_decode($shop->banner_full_width_1_images, true));
+                $shop_banner_full_width_1_links = json_decode($shop->banner_full_width_1_links, true);
+            @endphp
+            @foreach ($shop_banner_full_width_1_images as $key => $banner)
                 <section class="container mb-3 mt-3">
                     <div class="w-100">
-                        <img class="d-block lazyload h-100 img-fit"
-                            src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
-                            data-src="{{ uploaded_asset($banner) }}" alt="{{ env('APP_NAME') }} offer">
+                        <a href="{{ isset($shop_banner_full_width_1_links[$key]) ? $shop_banner_full_width_1_links[$key] : '' }}">
+                            <img class="d-block lazyload h-100 img-fit"
+                                src="{{ $banner ? my_asset($banner->file_name) : static_asset('assets/img/placeholder.jpg') }}"
+                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';"
+                                alt="{{ env('APP_NAME') }} banner">
+                        </a>
                     </div>
                 </section>
             @endforeach
         @endif
-
-        @if($shop->banners_half_width)
-            <!-- Banner half width -->
+        
+        <!-- Banner half width -->
+        @if($shop->banners_half_width_images)
+            @php
+                $shop_banners_half_width_images = get_slider_images(json_decode($shop->banners_half_width_images, true));
+                $shop_banners_half_width_links = json_decode($shop->banners_half_width_links, true);
+            @endphp
             <section class="container  mb-3 mt-3">
                 <div class="row gutters-16">
-                    @foreach (explode(',',$shop->banners_half_width) as $key => $banner)
+                    @foreach ($shop_banners_half_width_images as $key => $banner)
                     <div class="col-md-6 mb-3 mb-md-0">
                         <div class="w-100">
-                            <img class="d-block lazyload h-100 img-fit"
-                                src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
-                                data-src="{{ uploaded_asset($banner) }}" alt="{{ env('APP_NAME') }} offer">
+                            <a href="{{ isset($shop_banners_half_width_links[$key]) ? $shop_banners_half_width_links[$key] : '' }}">
+                                <img class="d-block lazyload h-100 img-fit"
+                                    src="{{ $banner ? my_asset($banner->file_name) : static_asset('assets/img/placeholder.jpg') }}"
+                                    onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';"
+                                    alt="{{ env('APP_NAME') }} banner">
+                            </a>
                         </div>
                     </div>
                     @endforeach
@@ -356,13 +383,20 @@
                     </div>
                 </div>
 
-                @if ($shop->banner_full_width_2)
-                    <!-- Banner full width 2 -->
-                    @foreach (explode(',',$shop->banner_full_width_2) as $key => $banner)
+                <!-- Banner full width 2 -->
+                @if ($shop->banner_full_width_2_images)
+                    @php
+                        $shop_banner_full_width_2_images = get_slider_images(json_decode($shop->banner_full_width_2_images, true));
+                        $shop_banner_full_width_2_links = json_decode($shop->banner_full_width_2_links, true);
+                    @endphp
+                    @foreach ($shop_banner_full_width_2_images as $key => $banner)
                         <div class="mt-3 mb-3 w-100">
-                            <img class="d-block lazyload h-100 img-fit"
-                                src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
-                                data-src="{{ uploaded_asset($banner) }}" alt="{{ env('APP_NAME') }} offer">
+                            <a href="{{ isset($shop_banner_full_width_2_links[$key]) ? $shop_banner_full_width_2_links[$key] : '' }}">
+                                <img class="d-block lazyload h-100 img-fit"
+                                    src="{{ $banner ? my_asset($banner->file_name) : static_asset('assets/img/placeholder.jpg') }}"
+                                    onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';"
+                                    alt="{{ env('APP_NAME') }} banner">
+                            </a>
                         </div>
                     @endforeach
                 @endif

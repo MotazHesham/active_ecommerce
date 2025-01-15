@@ -23,6 +23,10 @@ class OTPController extends Controller
         return view('backend.otp_systems.configurations.index', compact('otp_configurations'));
     }
 
+    public function loginConfigure(){
+        return view('backend.otp_systems.configurations.login_configuration');
+    }
+
     /**
      * Update the specified resource in storage.
      *

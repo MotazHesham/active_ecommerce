@@ -146,4 +146,75 @@ class OTPVerificationController extends Controller
             SmsUtility::account_opening($user, $password);
         }
     }
+
+    public function sendOtp(Request $request){
+        $phone = '+'.$request->country_code.$request->phone;
+        return $this->handleOtpSending($phone);
+    }
+
+    public function resendOtp($phone){
+        return $this->handleOtpSending($phone);
+    }
+
+    public function handleOtpSending($phone){
+        $user = User::where('phone', $phone)->first();
+        if ($user != null) {
+            
+            if($user->otp_code != null && $user->otp_sent_time != null){
+                $resendWaitTime = 180;
+                $elapsedTime = strtotime(date("Y-m-d H:i:s")) -  strtotime($user->otp_sent_time);
+                $resendOtpTimeLeft = max($resendWaitTime - $elapsedTime, 0);
+                if($resendOtpTimeLeft > 0){
+                    flash(translate('Please wait').' '.($resendOtpTimeLeft-1).' '.('seconds before trying again.'))->error();
+                    return back();
+                }
+            }
+
+            $user->otp_code = rand(100000,999999);
+            $user->otp_sent_time = date("Y-m-d H:i:s");
+            $user->save();
+            SmsUtility::loginWithOtp($user);
+            return redirect()->route('otp-verification-page', ['user_id' => encrypt($user->id)]);
+        }
+        else {
+            flash(translate('No account exists with this phone number'))->error();
+            return back();
+        }
+    }
+    public function otpVerificationPage(Request $request){
+        $user = User::where('id', decrypt($request->user_id))->first();
+        $phone = $user->phone;
+
+        $resendWaitTime = 180;
+        $elapsedTime = strtotime(date("Y-m-d H:i:s")) -  strtotime($user->otp_sent_time);
+        $resendOtpTimeLeft = max($resendWaitTime - $elapsedTime, 0);
+
+        return view('otp_systems.frontend.auth.'.get_setting('authentication_layout_select').'.otp_verification', compact('phone', 'resendOtpTimeLeft'));
+    }
+    
+    public function validateOtpCode(Request $request){
+        $user = User::wherePhone($request->phone)->whereOtpCode($request->otp_code)->first();
+        if($user != null){
+
+            $otpValidityDuration  = 300;
+            $elapsedTime = strtotime(date("Y-m-d H:i:s")) -  strtotime($user->otp_sent_time);
+            $otpValidityPeriodLeft = max($otpValidityDuration - $elapsedTime, 0);
+            if($otpValidityPeriodLeft < 1){
+                flash(translate('Your OTP code has expired. Please request a new one.'))->error();
+                return back();
+            }
+
+            $user->otp_code = null; 
+            $user->otp_sent_time = null;
+            
+            $user->save();
+            auth()->login($user, true);
+            flash("Logged in successfully")->success();
+            return redirect()->route('home');
+        }
+        else{
+            flash("OTP do not matched")->error();
+            return back();
+        }
+    }
 }

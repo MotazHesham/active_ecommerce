@@ -29,15 +29,14 @@
             @foreach ($categories as $key => $category)
                 <div class="mb-4 bg-white rounded-0 border">
                     <!-- Category Name -->
-                    <div class="text-dark p-4 d-flex align-items-center">
+                    <a href="{{ route('products.category', $category->slug) }}" class="text-dark p-4 d-flex align-items-center">
                         <div class="size-60px overflow-hidden p-1 border mr-3">
                             <img src="{{ uploaded_asset($category->banner) }}" alt="" class="img-fit h-100">
                         </div>
-                        <a href="{{ route('products.category', $category->slug) }}"
-                            class="text-reset fs-16 fs-md-20 fw-700 hov-text-primary">
+                        <div class="text-reset fs-16 fs-md-20 fw-700 hov-text-primary">
                             {{ $category->getTranslation('name') }}
-                        </a>
-                    </div>
+                        </div>
+                    </a>
                     <div class="px-4 py-2">
                         <div class="row row-cols-xl-5 row-cols-md-3 row-cols-sm-2 row-cols-1 gutters-16">
                             @foreach ($category->childrenCategories as $key => $child_category)

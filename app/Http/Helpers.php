@@ -1923,7 +1923,6 @@ if (!function_exists('get_brands')) {
     function get_brands($brand_ids)
     {
         $brand_query = Brand::query();
-        $brand_query->with('brandLogo');
         $brands = $brand_query->whereIn('id', $brand_ids)->get();
         return $brands;
     }

@@ -25,11 +25,19 @@ Route::controller(OTPVerificationController::class)->group(function () {
     //Forgot password phone
     Route::get('/password/phone/reset', 'show_reset_password_form')->name('password.phone.form');
     Route::post('/password/reset/submit', 'reset_password_with_code')->name('password.update.phone');
+
+    // Send OTP
+    Route::post('/send-otp', 'sendOtp')->name('send-otp');
+    Route::get('/otp-verification', 'otpVerificationPage')->name('otp-verification-page');
+    Route::get('/resend-otp/{phone}', 'resendOtp')->name('resend-otp');
+    Route::post('/validate-otp-code', 'validateOtpCode')->name('validate-otp-code');
+    
 });
 
 //Admin
 Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function(){
     Route::controller(OTPController::class)->group(function () {
+        Route::get('/otp-login-configuration', 'loginConfigure')->name('otp.login_configuration');
         Route::get('/otp-configuration', 'configure_index')->name('otp.configconfiguration');
         Route::post('/otp-configuration/update/activation', 'updateActivationSettings')->name('otp_configurations.update.activation');
         Route::post('/otp-credentials-update', 'update_credentials')->name('update_credentials');
@@ -40,5 +48,5 @@ Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function()
         Route::post('/sms-send', 'send')->name('sms.send');
     });
 
-     Route::resource('sms-templates', SmsTemplateController::class);
+    Route::resource('sms-templates', SmsTemplateController::class);
 });

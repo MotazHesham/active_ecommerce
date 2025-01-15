@@ -36,38 +36,43 @@ class ShopController extends Controller
             $shop->logo             = $request->logo;
         }
 
-        if ($request->has('delivery_pickup_longitude') && $request->has('delivery_pickup_latitude')) {
-
+        if ($request->has('delivery_pickup_longitude') && $request->has('delivery_pickup_latitude'))
+        {
             $shop->delivery_pickup_longitude    = $request->delivery_pickup_longitude;
             $shop->delivery_pickup_latitude     = $request->delivery_pickup_latitude;
-        } elseif (
-            $request->has('facebook') ||
-            $request->has('google') ||
-            $request->has('twitter') ||
-            $request->has('youtube') ||
-            $request->has('instagram')
-        ) {
+        } 
+        elseif ($request->has('facebook') || $request->has('google') || $request->has('twitter') ||$request->has('youtube') || $request->has('instagram'))
+        {
             $shop->facebook = $request->facebook;
             $shop->instagram = $request->instagram;
             $shop->google = $request->google;
             $shop->twitter = $request->twitter;
             $shop->youtube = $request->youtube;
-        } elseif (
-            $request->has('top_banner') ||
-            $request->has('sliders') ||
-            $request->has('banner_full_width_1') ||
-            $request->has('banners_half_width') ||
-            $request->has('banner_full_width_2')
-        ) {
-            $shop->top_banner = $request->top_banner;
-            $shop->sliders = $request->sliders;
-            $shop->banner_full_width_1 = $request->banner_full_width_1;
-            $shop->banners_half_width = $request->banners_half_width;
-            $shop->banner_full_width_2 = $request->banner_full_width_2;
         }
 
         if ($shop->save()) {
             flash(translate('Your Shop has been updated successfully!'))->success();
+            return back();
+        }
+
+        flash(translate('Sorry! Something went wrong.'))->error();
+        return back();
+    }
+
+    public function bannerUpdate(Request $request){
+        $shop = Shop::find($request->shop_id);
+        $shop->top_banner_image     = $request->top_banner_image;
+        $shop->top_banner_link      = $request->top_banner_link;
+        $shop->slider_images        = $request->slider_images;
+        $shop->slider_links         = $request->slider_links;
+        $shop->banner_full_width_1_images   = $request->banner_full_width_1_images;
+        $shop->banner_full_width_1_links    = $request->banner_full_width_1_links;
+        $shop->banners_half_width_images    = $request->banners_half_width_images;
+        $shop->banners_half_width_links     = $request->banners_half_width_links;
+        $shop->banner_full_width_2_images   = $request->banner_full_width_2_images;
+        $shop->banner_full_width_2_links    = $request->banner_full_width_2_links;
+        if ($shop->save()) {
+            flash(translate('Your Shop banners has been updated successfully!'))->success();
             return back();
         }
 

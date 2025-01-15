@@ -233,6 +233,40 @@
 
     <!-- Size chart show Modal -->
     @include('modals.size_chart_show_modal')
+
+    <!-- Product Warranty Modal -->
+    <div class="modal fade" id="warranty-note-modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title h6">{{ translate('Warranty Note') }}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                </div>
+                <div class="modal-body c-scrollbar-light">
+                    @if($detailedProduct->warranty_note_id != null)
+                        <p>{{ $detailedProduct->warrantyNote->getTranslation('description') }}</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Refund Modal -->
+    <div class="modal fade" id="refund-note-modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title h6">{{ translate('Refund Note') }}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                </div>
+                <div class="modal-body c-scrollbar-light">
+                    @if($detailedProduct->refund_note_id != null)
+                        <p>{{ $detailedProduct->refundNote->getTranslation('description') }}</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')

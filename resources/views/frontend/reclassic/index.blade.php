@@ -239,9 +239,11 @@
                     <div class="row gutters-16 align-items-center">
                         <!-- Flash Deals Baner -->
                         <div class="col-auto">
-                            <div class=" size-180px size-md-200px size-lg-280px rounded-2 overflow-hidden"
-                                style="background-image: url('{{ uploaded_asset($flash_deal->banner) }}'); background-size: cover; background-position: center center;">
-                            </div>
+                            <a href="{{ route('flash-deal-details', $flash_deal->slug) }}">
+                                <div class=" size-180px size-md-200px size-lg-280px rounded-2 overflow-hidden"
+                                    style="background-image: url('{{ uploaded_asset($flash_deal->banner) }}'); background-size: cover; background-position: center center;">
+                                </div>
+                            </a>
                         </div>
 
                         <div class="col">
@@ -683,7 +685,7 @@
                                 <a href="{{ route('products.brand', $brand->slug) }}" class="d-block has-transition hov-shadow-out z-1 hov-scale-img rounded-2 overflow-hidden">
                                     <span class="d-flex flex-column flex-sm-row align-items-center">
                                         <span class="d-flex align-items-center bg-white size-80px p-2 rounded-2 overflow-hidden">
-                                            <img src="{{ isset($brand->brandLogo->file_name) ? my_asset($brand->brandLogo->file_name) : static_asset('assets/img/placeholder.jpg') }}"
+                                            <img src="{{ $brand->logo != null ? uploaded_asset($brand->logo) : static_asset('assets/img/placeholder.jpg') }}"
                                             class="lazyload w-100 has-transition"
                                             alt="{{ $brand->getTranslation('name') }}"
                                             onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">

@@ -28,7 +28,7 @@
                             <!-- Login form -->
                             <div class="pt-3 pt-lg-4">
                                 <div class="">
-                                    <form class="form-default" role="form" action="{{ route('login') }}" method="POST">
+                                    <form class="form-default loginForm" role="form" action="{{ route('login') }}" method="POST">
                                         @csrf
                                         
                                         <!-- Email or Phone -->
@@ -65,33 +65,38 @@
                                             </div>
                                         @endif
                                             
-                                        <!-- password -->
-                                        <div class="form-group">
-                                            <label for="password" class="fs-12 fw-700 text-soft-dark">{{  translate('Password') }}</label>
-                                            <div class="position-relative">
-                                                <input type="password" class="form-control rounded-0 {{ $errors->has('password') ? ' is-invalid' : '' }}" placeholder="{{ translate('Password')}}" name="password" id="password">
-                                                <i class="password-toggle las la-2x la-eye"></i>
+                                        <div class="password-login-block">
+                                            <!-- password -->
+                                            <div class="form-group">
+                                                <label for="password" class="fs-12 fw-700 text-soft-dark">{{  translate('Password') }}</label>
+                                                <div class="position-relative">
+                                                    <input type="password" class="form-control rounded-0 {{ $errors->has('password') ? ' is-invalid' : '' }}" placeholder="{{ translate('Password')}}" name="password" id="password">
+                                                    <i class="password-toggle las la-2x la-eye"></i>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div class="row mb-2">
-                                            <!-- Remember Me -->
-                                            <div class="col-6">
-                                                <label class="aiz-checkbox">
-                                                    <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
-                                                    <span class="has-transition fs-12 fw-400 text-gray-dark hov-text-primary">{{  translate('Remember Me') }}</span>
-                                                    <span class="aiz-square-check"></span>
-                                                </label>
-                                            </div>
-                                            <!-- Forgot password -->
-                                            <div class="col-6 text-right">
-                                                <a href="{{ route('password.request') }}" class="text-reset fs-12 fw-400 text-gray-dark hov-text-primary"><u>{{ translate('Forgot password?')}}</u></a>
+                                            <div class="row mb-2">
+                                                <!-- Remember Me -->
+                                                <div class="col-5">
+                                                    <label class="aiz-checkbox">
+                                                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                                                        <span class="has-transition fs-12 fw-400 text-gray-dark hov-text-primary">{{  translate('Remember Me') }}</span>
+                                                        <span class="aiz-square-check"></span>
+                                                    </label>
+                                                </div>
+                                                <!-- Forgot password -->
+                                                <div class="col-7 text-right">
+                                                    @if(get_setting('login_with_otp'))
+                                                        <a href="javascript:void(0);" class="text-reset fs-12 fw-400 text-gray-dark hov-text-primary toggle-login-with-otp" onclick="toggleLoginPassOTP(this)">{{ translate('Login With OTP') }} / </a>
+                                                    @endif
+                                                    <a href="{{ route('password.request') }}" class="text-reset fs-12 fw-400 text-gray-dark hov-text-primary"><u>{{ translate('Forgot password?')}}</u></a>
+                                                </div>
                                             </div>
                                         </div>
 
                                         <!-- Submit Button -->
                                         <div class="mb-4 mt-4">
-                                            <button type="submit" class="btn btn-primary btn-block fw-700 fs-14 rounded-0">{{  translate('Login') }}</button>
+                                            <button type="submit" class="btn btn-primary btn-block fw-700 fs-14 rounded-0 submit-button">{{  translate('Login') }}</button>
                                         </div>
                                     </form>
 

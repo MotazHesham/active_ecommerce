@@ -29,22 +29,22 @@ class CategoryController extends Controller
 
     public function featured()
     {
-        // return Cache::remember('app.featured_categories', 86400, function () {
+        return Cache::remember('app.featured_categories', 86400, function () {
             return new CategoryCollection(Category::where('featured', 1)->get());
-        // });
+        });
     }
 
     public function home()
     {
-        // return Cache::remember('app.home_categories', 86400, function () {
+        return Cache::remember('app.home_categories', 86400, function () {
             return new CategoryCollection(Category::whereIn('id', json_decode(get_setting('home_categories')))->get());
-        // });
+        });
     }
 
     public function top()
     {
-        // return Cache::remember('app.top_categories', 86400, function () {
+        return Cache::remember('app.top_categories', 86400, function () {
             return new CategoryCollection(Category::whereIn('id', json_decode(get_setting('home_categories')))->limit(20)->get());
-        // });
+        });
     }
 }

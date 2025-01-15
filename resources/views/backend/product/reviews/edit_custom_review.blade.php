@@ -48,23 +48,23 @@
                         <label class="">{{ translate('Rating')}} <span class="text-danger">*</span></label>
                         <div class="rating rating-input">
                             <label>
-                                <input type="radio" name="rating" value="1" required>
+                                <input type="radio" name="rating" value="1" @if($review->rating == 1) checked @endif required>
                                 <i class="las la-star @if($review->rating >= 1) active @endif"></i>
                             </label>
                             <label>
-                                <input type="radio" name="rating" value="2">
+                                <input type="radio" name="rating" value="2" @if($review->rating == 2) checked @endif>
                                 <i class="las la-star @if($review->rating >= 2) active @endif"></i>
                             </label>
                             <label>
-                                <input type="radio" name="rating" value="3">
+                                <input type="radio" name="rating" value="3" @if($review->rating == 3) checked @endif>
                                 <i class="las la-star @if($review->rating >= 3) active @endif"></i>
                             </label>
                             <label>
-                                <input type="radio" name="rating" value="4">
+                                <input type="radio" name="rating" value="4" @if($review->rating == 4) checked @endif>
                                 <i class="las la-star @if($review->rating >= 4) active @endif"></i>
                             </label>
                             <label>
-                                <input type="radio" name="rating" value="5">
+                                <input type="radio" name="rating" value="5" @if($review->rating == 5) checked @endif>
                                 <i class="las la-star @if($review->rating >= 5) active @endif"></i>
                             </label>
                         </div>

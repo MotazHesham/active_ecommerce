@@ -18,7 +18,7 @@
 				<div class="col-md-4">
 					<form class="" id="sort_brands" action="" method="GET">
 						<div class="input-group input-group-sm">
-					  		<input type="text" class="form-control" id="search" name="search"@isset($sort_search) value="{{ $sort_search }}" @endisset placeholder="{{ translate('Type name & Enter') }}">
+					  		<input type="text" class="form-control" id="search" name="search" @isset($sort_search) value="{{ $sort_search }}" @endisset placeholder="{{ translate('Type name & Enter') }}">
 						</div>
 					</form>
 				</div>

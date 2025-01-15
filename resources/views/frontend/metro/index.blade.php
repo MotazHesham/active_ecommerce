@@ -92,15 +92,17 @@
                 <div class="row no-gutters align-items-center" style="background: {{ $flash_deal_bg }};">
                     <!-- Flash Deals Baner & Countdown -->
                     <div class="col-xxl-4 col-lg-5 col-6 h-200px h-md-400px h-lg-475px">
-                        <div class="h-100 w-100 w-xl-auto"
-                            style="background-image: url('{{ uploaded_asset($flash_deal->banner) }}'); background-size: cover; background-position: center center;">
-                            <div class="py-5 px-md-3 px-xl-5 d-none d-md-block">
-                                <div class="bg-white">
-                                    <div class="aiz-count-down-circle"
-                                        end-date="{{ date('Y/m/d H:i:s', $flash_deal->end_date) }}"></div>
+                        <a href="{{ route('flash-deal-details', $flash_deal->slug) }}">
+                            <div class="h-100 w-100 w-xl-auto"
+                                style="background-image: url('{{ uploaded_asset($flash_deal->banner) }}'); background-size: cover; background-position: center center;">
+                                <div class="py-5 px-md-3 px-xl-5 d-none d-md-block">
+                                    <div class="bg-white">
+                                        <div class="aiz-count-down-circle"
+                                            end-date="{{ date('Y/m/d H:i:s', $flash_deal->end_date) }}"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
 
                     <div class="col-xxl-8 col-lg-7 col-6">
@@ -646,7 +648,7 @@
                             <div
                                 class="col text-center border-right border-bottom hov-scale-img has-transition hov-shadow-out z-1">
                                 <a href="{{ route('products.brand', $brand->slug) }}" class="d-block p-sm-3">
-                                    <img src="{{ isset($brand->brandLogo->file_name) ? my_asset($brand->brandLogo->file_name) : static_asset('assets/img/placeholder.jpg') }}"
+                                    <img src="{{ $brand->logo != null ? uploaded_asset($brand->logo)  : static_asset('assets/img/placeholder.jpg') }}"
                                         class="lazyload h-100 h-md-100px mx-auto has-transition p-2 p-sm-4 mw-100"
                                         alt="{{ $brand->getTranslation('name') }}"
                                         onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">

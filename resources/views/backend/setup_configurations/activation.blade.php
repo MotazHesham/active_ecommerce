@@ -272,25 +272,20 @@
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="mb-0 h6 text-center">{{ translate('Guest Checkout Activation') }}</h3>
+                    <h3 class="mb-0 h6 text-center">{{ translate('Newsletter Activation') }}</h3>
                 </div>
                 <div class="card-body text-center">
                     <label class="aiz-switch aiz-switch-success mb-0">
-                        <input type="checkbox" onchange="updateSettings(this, 'guest_checkout_activation')"
-                            <?php if (get_setting('guest_checkout_activation') == 1) {
+                        <input type="checkbox" onchange="updateSettings(this, 'newsletter_activation')"
+                            <?php if (get_setting('newsletter_activation') == 1) {
                                 echo 'checked';
                             } ?>>
                         <span class="slider round"></span>
                     </label>
-                    <div class="alert"
-                        style="color: #004085;background-color: #cce5ff;border-color: #b8daff;margin-bottom:0;margin-top:10px;">
-                        {{ translate('You need to configure SMTP correctly to enable this feature.') }}
-                        <a href="{{ route('smtp_settings.index') }}">{{ translate('Configure Now') }}</a>
-                    </div>
                 </div>
             </div>
         </div>
-
+        
         @if (addon_is_activated('wholesale'))
             <div class="col-lg-4">
                 <div class="card">
@@ -309,6 +304,7 @@
                 </div>
             </div>
         @endif
+
         @if (addon_is_activated('auction'))
             <div class="col-lg-4">
                 <div class="card">
@@ -327,6 +323,28 @@
                 </div>
             </div>
         @endif
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0 h6 text-center">{{ translate('Guest Checkout Activation') }}</h3>
+                </div>
+                <div class="card-body text-center">
+                    <label class="aiz-switch aiz-switch-success mb-0">
+                        <input type="checkbox" onchange="updateSettings(this, 'guest_checkout_activation')"
+                            <?php if (get_setting('guest_checkout_activation') == 1) {
+                                echo 'checked';
+                            } ?>>
+                        <span class="slider round"></span>
+                    </label>
+                    <div class="alert"
+                        style="color: #004085;background-color: #cce5ff;border-color: #b8daff;margin-bottom:0;margin-top:10px;">
+                        {{ translate('You need to configure SMTP correctly to enable this feature.') }}
+                        <a href="{{ route('smtp_settings.index') }}">{{ translate('Configure Now') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <h4 class="text-center text-muted mt-4">{{ translate('Social Media Login') }}</h4>

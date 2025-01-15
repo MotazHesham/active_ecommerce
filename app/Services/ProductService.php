@@ -133,6 +133,8 @@ class ProductService
         }
         unset($collection['button']); 
 
+        $collection['has_warranty'] = isset($collection['has_warranty']) ? 1 : 0;
+
         $data = $collection->merge(compact(
             'user_id',
             'approved',
@@ -278,6 +280,8 @@ class ProductService
             $attributes = json_encode(array());
         }
 
+        $collection['has_warranty'] = isset($collection['has_warranty']) ? 1 : 0;
+        
         unset($collection['button']);
         
         $data = $collection->merge(compact(
