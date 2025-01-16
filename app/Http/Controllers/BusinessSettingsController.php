@@ -528,37 +528,6 @@ class BusinessSettingsController extends Controller
     }
 
     public function import_data(Request $request)
-    {
-        if (env("DEMO_MODE") == "On"){
-            flash(translate('Demo data import will not work in demo site'))->error();
-            return back();
-        }
-        $url = 'https://demo.activeitzone.com/envato/ecommerce-demo-data-import/import';
-        $header = array(
-            'Content-Type:application/json'
-        );
-        $data['main_url'] = $request->main_url;
-        $data['domain'] = $request->domain;
-        $data['purchase_key'] = $request->purchase_key;
-        $data['layout'] = $request->layout;
-        $request_data_json = json_encode($data);
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $request_data_json);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-        $raw_file_data = curl_exec($ch);
-
-        if(json_decode($raw_file_data, true)['status']) {
-            flash(translate('Demo data uploaded successfully'))->success();
-        } else {
-            flash(translate(json_decode($raw_file_data, true)['message']))->error();
-        }
-
-        return back();
+    { 
     }
 }

