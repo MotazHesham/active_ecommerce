@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
 use App;
+use App\Traits\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends Model
 {
-    use PreventDemoModeChanges;
+    use PreventDemoModeChanges,Auditable, SoftDeletes;
 
     protected $with = ['category_translations'];
 
