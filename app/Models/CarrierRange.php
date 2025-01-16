@@ -8,7 +8,7 @@ use App\Traits\PreventDemoModeChanges;
 
 class CarrierRange extends Model
 {
-    use HasFactory, PreventDemoModeChanges;
+    use HasFactory, PreventDemoModeChanges, Auditable;
 
     public function carrier()
     {

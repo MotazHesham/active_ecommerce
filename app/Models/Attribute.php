@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
 use App;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Attribute extends Model
 {
-  use PreventDemoModeChanges;
+  use PreventDemoModeChanges,SoftDeletes;
 
     protected $with = ['attribute_translations'];
 

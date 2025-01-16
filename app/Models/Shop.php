@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Shop extends Model
 {
-  use PreventDemoModeChanges;
+  use PreventDemoModeChanges,SoftDeletes;
 
 
   protected $with = ['user'];

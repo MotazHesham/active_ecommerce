@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
 
 class ProductStock extends Model
 {
-    use PreventDemoModeChanges;
+    use PreventDemoModeChanges,Auditable;
 
     protected $fillable = ['product_id', 'variant', 'sku', 'price', 'qty', 'image'];
     //

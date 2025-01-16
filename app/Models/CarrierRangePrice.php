@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
 
 class CarrierRangePrice extends Model
 {
-    use HasFactory, PreventDemoModeChanges;
+    use HasFactory, PreventDemoModeChanges, Auditable;
 
     public function carrier()
     {

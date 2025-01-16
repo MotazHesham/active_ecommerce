@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
 
 class Address extends Model
 {
-    use PreventDemoModeChanges;
+    use PreventDemoModeChanges,Auditable;
 
     protected $fillable = ['set_default'];
 

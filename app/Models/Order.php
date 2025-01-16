@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    use PreventDemoModeChanges;
+    use PreventDemoModeChanges,Auditable, SoftDeletes;
     public function orderDetails()
     {
         return $this->hasMany(OrderDetail::class);

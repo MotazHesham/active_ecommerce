@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App;
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use PreventDemoModeChanges;
+    use PreventDemoModeChanges,Auditable, SoftDeletes;
     
     protected $guarded = ['choice_attributes'];
 

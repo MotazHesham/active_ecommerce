@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Carrier extends Model
 {
-    use HasFactory, PreventDemoModeChanges;
+    use HasFactory, PreventDemoModeChanges, Auditable, SoftDeletes;
 
 
     public function carrier_ranges(){
